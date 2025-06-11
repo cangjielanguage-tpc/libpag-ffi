@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "libpag",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}
