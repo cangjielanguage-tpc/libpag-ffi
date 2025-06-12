@@ -1,0 +1,11 @@
+[
+    {
+        "Name": "libpag-cj",
+        "License": "Apache License Version 2.0",
+        "License File": " LICENSE ",
+        "Version Number": "v4.4.31",
+        "Owner": "Tencent"
+        "Upstream URL": "https://github.com/Tencent/libpag",
+        "Description": "libpag is a real-time rendering library for PAG (Portable Animated Graphics) files."
+    }
+]
