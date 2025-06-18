@@ -450,18 +450,18 @@ public open class PAGLayer {
         }
     }
 
-    public func equals(obj: PAGLayer): Bool {
+    protected func equals(obj: PAGLayer): Bool {
         if (refEq(this, obj)) {
             return true
         }
         return nativeEquals(obj)
     }
 
-    public func hashCode(): Int64 {
+    protected func hashCode(): Int64 {
         return 31 * 17 + (ptr ^ (ptr >> 32))
     }
 
-    public func isNullptr(): Bool {
+    protected func isNullptr(): Bool {
         unsafe {
             return cj_PAGLayer_isNullptr(ptr)
         }
