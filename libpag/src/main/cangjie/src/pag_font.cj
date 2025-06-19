@@ -42,7 +42,7 @@ public class PAGFont {
 
     private static var hasInit: Bool = false;
 
-    public static func initFontFallback() {
+    protected static func initFontFallback() {
         if (hasInit) {
             return
         }
@@ -150,7 +150,7 @@ public class PAGFont {
         }
     }
 
-    public static func setFallbackFontPaths(fontNameList: Array<String>, ttcIndices: Array<Int32>): Unit {
+    protected static func setFallbackFontPaths(fontNameList: Array<String>, ttcIndices: Array<Int32>): Unit {
         unsafe {
             let lenfn: Int64 = fontNameList.size
             let arrCString: Array<CString>

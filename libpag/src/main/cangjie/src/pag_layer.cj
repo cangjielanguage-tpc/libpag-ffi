@@ -450,7 +450,7 @@ public open class PAGLayer {
         }
     }
 
-    protected func equals(obj: PAGLayer): Bool {
+    public func equals(obj: PAGLayer): Bool {
         if (refEq(this, obj)) {
             return true
         }
@@ -461,7 +461,7 @@ public open class PAGLayer {
         return 31 * 17 + (ptr ^ (ptr >> 32))
     }
 
-    protected func isNullptr(): Bool {
+    public func isNullptr(): Bool {
         unsafe {
             return cj_PAGLayer_isNullptr(ptr)
         }
