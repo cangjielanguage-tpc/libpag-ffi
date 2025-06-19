@@ -170,23 +170,4 @@ public class PAGImage {
             return
         }
     }
-
-    // TODO:有问题，未实现
-    //    /**
-    //     * Creates a PAGImage object from pixelMap, return null if the pixelMap is empty or it's not valid.
-    //     */
-    //    public static func FromPixelMap(pixelMap:PixelMap): Option<PAGImage> {
-    //        unsafe {
-    //            // 仓颉的PixelMap怎么转成C结构体CJPixelMap
-    //            var data: CJPixelMap = CJPixelMap(
-    ////size: Int64, buf: CPointer<UInt8>, alphaType: UInt8, editable: Bool, pixelFormat: UInt8, height: Int32, width: Int32
-    //
-    //                )
-    //            let instanceId = cj_PAGImage_FromPixelMap(ptrCJPAGImage,data)
-    //            if (instanceId == 0) {
-    //                return Option<PAGImage>.None;
-    //            }
-    //            return PAGImage(instanceId)
-    //        }
-    //    }
 }
