@@ -586,6 +586,10 @@ public class PAGViewController <: XComponentController {
      * Sets the maximum frame rate for rendering.
      */
     public func setMaxFrameRate(value: Float32): Unit {
+        if (value <= 0.0) {
+            Hilog.error(0, 'PAGViewController', "setMaxFrameRate value range needs to be greater than 0.0");
+            return
+        }
         unsafe {
             return cj_PAGViewController_setMaxFrameRate(jView, value)
         }
@@ -605,6 +609,10 @@ public class PAGViewController <: XComponentController {
      * changes when this method is called.
      */
     public func setScaleMode(value: Int32): Unit {
+        if (value != 0 && value != 1 && value != 2 && value != 3) {
+            Hilog.error(0, 'PAGViewController', "setScaleMode invalid setting");
+            return
+        }
         unsafe {
             return cj_PAGViewController_setScaleMode(jView, value)
         }
@@ -630,6 +638,10 @@ public class PAGViewController <: XComponentController {
      * will be set to PAGScaleMode::None when this method is called.
      */
     public func setMatrix(values: Array<Float32>): Unit {
+        if (values.size == 0) {
+            Hilog.error(0, 'PAGViewController', "setMatrix invalid setting");
+            return
+        }
         unsafe {
             var data: VArray<Float32, $9> = VArray<Float32, $9>({i => 0.0})
             for (i in 0..values.size) {
@@ -756,10 +768,10 @@ public class PAGViewController <: XComponentController {
      * Returns a rectangle in pixels that defines the displaying area of the specified layer, which
      * is in the coordinate of the PAGView.
      */
-    public func getBounds(layer: Option<PAGLayer>): Array<Float32> {
+    public func getBounds(layer: PAGLayer): Array<Float32> {
         unsafe {
             var values = VArray<Float32, $4>({i => 0.0})
-            cj_PAGViewController_getBounds(jView, layer.getOrThrow().getptr(), inout values)
+            cj_PAGViewController_getBounds(jView, layer.getptr(), inout values)
             var data: Array<Float32> = Array<Float32>(4, repeat: 0.0)
             for (i in 0..data.size) {
                 data[i] = values[i]

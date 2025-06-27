@@ -223,6 +223,10 @@ public class PAGPlayer {
      * Set the maximum frame rate for rendering.
      */
     public func setMaxFrameRate(value: Float32): Unit {
+        if (value <= 0.0) {
+            Hilog.error(0, 'PAGPlayer', "setMaxFrameRate value range needs to be greater than 0.0");
+            return
+        }
         unsafe {
             cj_PAGPlayer_setMaxFrameRate(ptrCJPAGPlayer, value)
         }
@@ -242,6 +246,10 @@ public class PAGPlayer {
      * changes when this method is called.
      */
     public func setScaleMode(value: Int32): Unit {
+        if (value != 0 && value != 1 && value != 2 && value != 3) {
+            Hilog.error(0, 'PAGPlayer', "setScaleMode invalid setting");
+            return
+        }
         unsafe {
             cj_PAGPlayer_setScaleMode(ptrCJPAGPlayer, value)
         }
@@ -267,6 +275,10 @@ public class PAGPlayer {
      * PAGScaleMode::None when this method is called.
      */
     public func setMatrix(values: Array<Float32>): Unit {
+        if (values.size == 0) {
+            Hilog.error(0, 'PAGPlayer', "setMatrix invalid setting");
+            return
+        }
         unsafe {
             var data: VArray<Float32, $9> = VArray<Float32, $9>({i => 0.0})
             for (i in 0..values.size) {
@@ -341,10 +353,10 @@ public class PAGPlayer {
      * Returns a rectangle in pixels that defines the displaying area of the specified layer, which
      * is in the coordinate of the PAGSurface.
      */
-    public func getBounds(layer: Option<PAGLayer>): Array<Float32> {
+    public func getBounds(layer: PAGLayer): Array<Float32> {
         unsafe {
             var values = VArray<Float32, $4>({i => 0.0})
-            cj_PAGPlayer_getBounds(ptrCJPAGPlayer, layer.getOrThrow().getptr(), inout values)
+            cj_PAGPlayer_getBounds(ptrCJPAGPlayer, layer.getptr(), inout values)
             var data: Array<Float32> = Array<Float32>(4, repeat: 0.0)
             for (i in 0..data.size) {
                 data[i] = values[i]

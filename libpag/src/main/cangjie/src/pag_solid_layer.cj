@@ -14,7 +14,7 @@ foreign {
 }
 
 public class PAGSolidLayer <: PAGLayer {
-    public PAGSolidLayer(nativeContext: Int64) {
+    PAGSolidLayer(nativeContext: Int64) {
         super(nativeContext)
     }
 

@@ -98,7 +98,7 @@ public class PAGComposition <: PAGLayer {
      * 
      * @param layer - 要被识别的层实例
      *
-     * @return Int64 - 返回要被识别的子层的索引位置
+     * @return Int64 - 返回要被识别的子层的索引位置。当layer不存在时，返回-1。
      */
     public func getLayerIndex(layer: PAGLayer): Int64
 
@@ -796,17 +796,8 @@ public class PAGImageViewController <: XComponentController {
      * @param composition - 要设置的 PAGComposition，可能为 null
      * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
      */
-    public func setComposition(composition: Option<PAGComposition>, maxFrameRate!: Float640.0): Unit
+    public func setComposition(composition: Option<PAGComposition>, maxFrameRate!: Float64 = 30.0): Unit
 
-    /*
-     * 设置一个新的 PAGComposition 到 PAGImageView，并将最大帧率设置为 30 fps。注意：如果
-	 * 该组合已添加到另一个 PAGImageView，它将从之前的 PAGImageView 中移除
-     * 
-     * @param composition - PAGComposition 对象的 native 层地址
-     * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
-     */
-    public func setComposition(composition: Int64, maxFrameRate!: Float640.0): Unit
-    
     /*
      * 获取通过 setPath() 方法设置的 pag 文件的路径字符串
      * 
@@ -821,7 +812,7 @@ public class PAGImageViewController <: XComponentController {
      * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
      * @return Bool - 返回加载是否成功，true 表示成功，false 表示失败
      */
-    public func setPath(path: String, maxFrameRate!: Float640.0): Bool
+    public func setPath(path: String, maxFrameRate!: Float64 = 30.0): Bool
     
     /*
      * 获取当前的缩放模式
@@ -984,7 +975,6 @@ public class PAGImageViewController <: XComponentController {
  * 表示一个 4x4 的矩阵对象，用于图形计算、变换等操作
  */
 public class Matrix4 {
-
     /*
      * 存储矩阵的16个元素，按列主序（column-major order）排列
      */
@@ -1006,13 +996,6 @@ public class Matrix4 {
     private var ptr: Int64
 
     /**
-     * 使用底层 C 接口返回的指针初始化 Matrix4 对象
-     *
-     * @param ptr - 来自 C 库的底层对象指针
-     */
-    public init(ptr: Int64)
-
-    /**
      * 默认构造函数，初始化为单位矩阵
      */
     public init()
@@ -1031,14 +1014,6 @@ PAG 的渲染图层，PAG 是一个树状结构，PAGLayer 相当于树状结构
 
 ```cangjie
 public class PAGLayer {
-
-    /*
-     * 根据对象指针句柄，创建 PAGLayer 实例。
-     * 
-     * @param ptr - C代码返回的对象指针
-     */
-    public init(ptr: Int64)
-
     /*
      * 获取绑定的原生对象指针
      * 
@@ -1313,7 +1288,7 @@ public class PAGPlayer {
 	 * @param layer - 需要获取显示区域的图层
 	 * @return Array<Float32> - 返回一个以像素为单位的矩形
      */
-    public func getBounds(layer: Option<PAGLayer>): Array<Float32>
+    public func getBounds(layer: PAGLayer): Array<Float32>
 
     /*
      * 获取PAGPlayer渲染为内容的当前PAGComposition。
@@ -1402,7 +1377,7 @@ public class PAGPlayer {
     public func setCacheEnabled(value: Bool): Unit
 
 	/*
-     * 设置cacheScale属性的值。
+     * 设置cacheScale属性的值。设置范围从 0.0 到 1.0。小于 1.0 的缩放因子可能会导致输出图像模糊，但可以减少图形内存的使用，从而提高性能。默认值为 1.0。
 	 * 
 	 * @param value - 缩放因子值
      */
@@ -1518,13 +1493,6 @@ PAGShapeLayer 为图形图层，用于处理矢量图形和形状动画。
 
 ```cangjie
 public class PAGShapeLayer <: PAGLayer {
-
-    /*
-     * 根据对象指针句柄，创建 PAGShapeLayer 实例。
-     * 
-     * @param ptr - C代码返回的对象指针
-     */
-    public PAGShapeLayer(nativeContext: Int64)
 }
     
 ```
@@ -1534,13 +1502,6 @@ PAGSolidLayer 为实色图层，支持修改实色图层的颜色。
 
 ```cangjie
 public class PAGSolidLayer <: PAGLayer {
-
-    /*
-     * 根据对象指针句柄，创建 PAGSolidLayer 实例。
-     * 
-     * @param ptr - C代码返回的对象指针
-     */
-    public PAGSolidLayer(nativeContext: Int64)
 
     /*
      * 设置图层的纯色颜色值。
@@ -1762,14 +1723,6 @@ public enum PAGTextJustification {
 
 ```cangjie
 public class PAGTextLayer <: PAGLayer {
-
-    /*
-     * 根据对象指针句柄，创建 PAGTextLayer 实例。
-     * 
-     * @param nativeLayer - C代码返回的对象指针
-     */
-    public PAGTextLayer(nativeLayer: Int64)
-
     /*
      * 获取文字图层的填充颜色。
      *
@@ -2083,7 +2036,7 @@ public class PAGViewController <: XComponentController {
     public func cacheScale(): Float32
 
 	/*
-     * 设置cacheScale属性的值。
+     * 设置cacheScale属性的值。设置范围从 0.0 到 1.0。小于 1.0 的缩放因子可能会导致输出图像模糊，但可以减少图形内存的使用，从而提高性能。默认值为 1.0。
 	 * 
 	 * @param value - 缩放因子值
      */
@@ -2197,7 +2150,7 @@ public class PAGViewController <: XComponentController {
 	 * @param layer - 需要获取显示区域的图层
 	 * @return Array<Float32> - 返回一个以像素为单位的矩形
      */
-    public func getBounds(layer: Option<PAGLayer>): Array<Float32>
+    public func getBounds(layer: PAGLayer): Array<Float32>
 	
 	/*
      * 添加一个监听器到监听器集合中，这些监听器会在动画的生命周期内接收到事件，例如开始、重复和结束事件。

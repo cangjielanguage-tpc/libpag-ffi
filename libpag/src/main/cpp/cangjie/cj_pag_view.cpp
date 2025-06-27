@@ -133,12 +133,12 @@ double cj_PAGViewController_getProgress(const int64_t jView) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getProgress", "view is null");
         return 0.0;
     }
-    auto player = view->getPlayer();
-    if (!player) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getProgress", "player is null");
+    auto animator = view->getAnimator();
+    if (!animator) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getProgress", "animator is null");
         return 0.0;
     }
-    return player->getProgress();
+    return animator->progress();
 }
 
 void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition) {

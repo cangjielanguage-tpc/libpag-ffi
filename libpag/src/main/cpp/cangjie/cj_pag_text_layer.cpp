@@ -13,6 +13,10 @@ static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
     }
     CJPAGLayerHandle *instance;
     instance = (CJPAGLayerHandle *)ptr;
+    if (!instance) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "getPAGTextLayer", "instance is null");
+        return nullptr;
+    }
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     if (layer == nullptr) {
         return nullptr;
