@@ -29,6 +29,8 @@ foreign {
     func cj_PAGTextLayer_setText(ptr: Int64, t: CString): Unit
 
     func cj_PAGTextLayer_reset(ptr: Int64): Unit
+
+    func cj_PAGTextLayer_release(ptrCJPAGPlayer: Int64): Unit
 }
 
 public class PAGTextLayer <: PAGLayer {
@@ -159,6 +161,19 @@ public class PAGTextLayer <: PAGLayer {
     public func reset(): Unit {
         unsafe {
             cj_PAGTextLayer_reset(ptr)
+        }
+    }
+
+    /*
+     * Free up resources used by the PAGTextLayer instance immediately instead of relying on the garbage collector to do this for you at some point in the future.
+     */
+    public func release(): Unit {
+        if (isRelease) {
+            return
+        }
+        unsafe {
+            cj_PAGTextLayer_release(ptr)
+            isRelease = true
         }
     }
 }

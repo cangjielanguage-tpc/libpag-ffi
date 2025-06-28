@@ -157,58 +157,18 @@ ColorType ToTGFXColorType(int ohPixelFormat) {
     return ColorType::Unknown;
 }
 
-//TODO:FromPixelMap有问题
-// int64_t cj_PAGImage_FromPixelMap(const int64_t ptr, CJPixelMap pixelMap) {
-//     auto rowSize=0;
-//    auto imageInfo = tgfx::ImageInfo::Make(static_cast<int>(pixelMap.width), static_cast<int>(pixelMap.height),
-//                                    ToTGFXColorType(pixelMap.pixelFormat),
-//                                    pixelMap.alphaType, rowSize);
+int64_t cj_PAGImage_FromPixelMap(CJPixelMap pixelMap) {
+    std::shared_ptr<PAGImage> image = PAGImage::FromPixels(pixelMap.buf, pixelMap.width, pixelMap.height,
+                                              pixelMap.size, ColorType::BGRA_8888,
+                                              AlphaType::Unknown);
 
-//  bool alphaOnly =
-//      imageInfo.colorType() == ColorType::ALPHA_8 || imageInfo.colorType() == ColorType::Gray_8;
-//
-//  Bitmap bitmap = {};
-//  if (!bitmap.allocPixels(imageInfo.width(), imageInfo.height(), alphaOnly)) {
-//    LOGE("OHOSBitmap::CopyBitmap() Bitmap Failed to allocPixels");
-//    return {};
-//  }
-//  void* pixel;
-//  errorCode = OH_PixelMap_AccessPixels(pixelmap, &pixel);
-//  if (errorCode != IMAGE_RESULT_SUCCESS) {
-//    LOGE("OHOSBitmap::CopyBitmap() OH_PixelMap_AccessPixels failed");
-//    return {};
-//  }
-//  bitmap.writePixels(imageInfo, pixel);
-//  OH_PixelMap_UnAccessPixels(pixelmap);
-//  return bitmap;
-//
-//    
-//  auto bitmap = tgfx::OHOSPixelMap::CopyBitmap(env, args[0]);
-//  auto image = tgfx::Image::MakeFrom(bitmap);
-//  if (image == nullptr) {
-//    return nullptr;
-//  }
-//  auto pagImage = pag::StillImage::MakeFrom(std::move(image));
-//  return JPAGImage::ToJs(env, pagImage);
+    CJPAGImage *handler = new CJPAGImage(image);
+    if (handler == NULL) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGImage]", "[FromPixelMap]-new CJPAGImage error.");
+        return -1;
+    }
+    return (int64_t)handler;
+}
 
-
-//    OH_LOG_Print(LOG_APP, LOG_DEBUG, LOG_DOMAIN, "cj_PAGImage_FromPath", "path:%{public}s", path);
-//    // 检查字符串指针是否为 NULL 或者字符串是否为空
-//    if (path == nullptr || path[0] == '\0') {
-//        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImage_FromPath", "Path is null or the string is empty.");
-//        return 0;
-//    }
-//    std::shared_ptr<PAGImage> surface = PAGImage::FromPath(path);
-//    if (!surface) {
-//        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImage_FromPath", "surface is null");
-//        return 0;
-//    }
-//    CJPAGImage *handler = new CJPAGImage(surface);
-//    if (handler == NULL) {
-//        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImage_FromPath", "Pointer is null.");
-//        return 0;
-//    }
-//    return (int64_t)handler;
-//}
 }
 } // namespace pag

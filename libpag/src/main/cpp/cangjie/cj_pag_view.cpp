@@ -644,7 +644,6 @@ void cj_PAGViewController_onAnimatorProgress(const int64_t jView, CJPAGView::pro
     view->playingProgressCallback = callback;
 }
 
-// TODO:有问题，未实现
 CJPixelMap cj_PAGViewController_makeSnapshot(const int64_t jView) {
     CJPAGView *view = (CJPAGView *)jView;
     auto player = view->getPlayer();

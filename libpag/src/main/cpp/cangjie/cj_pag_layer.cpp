@@ -393,6 +393,7 @@ void cj_PAGLayer_nativeRelease(const int64_t ptr) {
     }
     CJPAGLayerHandle *instance;
     instance = (CJPAGLayerHandle *)ptr;
+    instance->reset();
     delete instance;
 }
 

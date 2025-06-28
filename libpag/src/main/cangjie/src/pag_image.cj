@@ -26,7 +26,7 @@ foreign {
 
     func cj_PAGImage_release(ptrCJPAGImage: Int64): Unit
 
-    //func cj_PAGImage_FromPixelMap(ptrCJPAGImage: Int64,pixelMap:CJPixelMap): Int64
+    func cj_PAGImage_FromPixelMap(pixelMap: CJPixelMap): Int64
 }
 
 public class PAGImage {
@@ -74,6 +74,38 @@ public class PAGImage {
                 return Option<PAGImage>.None;
             }
             return PAGImage(instanceId)
+        }
+    }
+
+    /**
+     * Creates a PAGImage object from pixelMap, return None if the pixelMap is empty or it's not valid.
+     * @param pixelMap - Image pixel class, used for reading or writing image data and obtaining image information.
+     * @returns Option<PAGImage> - Successful creation returns PAGImage, failed creation returns None.
+     */
+    public static func fromPixelMap(pixelMap: PixelMap): Option<PAGImage> {
+        unsafe {
+            try {
+                let nums: Int64 = Int64(pixelMap.getPixelBytesNumber())
+                let dst: Array<UInt8> = Array<UInt8>(nums, item: 0)
+                pixelMap.readPixelsToBuffer(dst)
+                let imageInfo: ImageInfo = pixelMap.getImageInfo()
+
+                let pixelFormat: UInt8 = getPAGColorTypeFromPixelMapFormat(PixelMapFormat.BGRA_8888)
+
+                let handle = acquireArrayRawData(dst)
+                let alphaType: UInt8 = 0 // AlphaType.UNKNOWN
+                let cjpp: CJPixelMap = CJPixelMap(nums, handle.pointer, alphaType, pixelMap.isEditable, pixelFormat, imageInfo.size.height, imageInfo.size.width)
+
+                let nativeImage = cj_PAGImage_FromPixelMap(cjpp)
+                if (nativeImage <= 0) {
+                    return Option<PAGImage>.None
+                } else {
+                    return PAGImage(nativeImage)
+                }
+            } catch (e: BusinessException) {
+                Hilog.error(0, "PAGImage", "FromPixelMap failed, error code: ${e.code}, message: ${e.message}.")
+                return Option<PAGImage>.None
+            }
         }
     }
 
