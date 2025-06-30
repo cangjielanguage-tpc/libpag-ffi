@@ -23,6 +23,18 @@ static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
     return nullptr;
 }
 
+void cj_PAGTextLayer_release(const int64_t ptr)
+{
+    if (ptr == 0) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGTextLayer_release", "ptr is null.");
+        return;
+    }
+    CJPAGLayerHandle *player = (CJPAGLayerHandle *)ptr;
+    player->reset();
+    delete player;
+    return;
+}
+
 long long cj_PAGTextLayer_make(const int64_t duration, char *text, float fontSize, char *fontFamily, char *fontStyle) {
     std::string textStr = text;
     std::string ff = fontFamily;

@@ -40,6 +40,6 @@ void cj_PAGImage_setMatrix(const int64_t ptr, float values[9]);
 int32_t cj_PAGImage_scaleMode(const int64_t ptr);
 void cj_PAGImage_setScaleMode(const int64_t ptr, int32_t mode);
 void cj_PAGImage_release(const int64_t ptr);
-// int64_t cj_PAGImage_FromPixelMap(const int64_t ptr, CJPixelMap pixelMap);
+int64_t cj_PAGImage_FromPixelMap(CJPixelMap pixelMap);
 }
 }

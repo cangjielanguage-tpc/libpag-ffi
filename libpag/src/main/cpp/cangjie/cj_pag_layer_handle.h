@@ -92,5 +92,6 @@ void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color);
 char *cj_PAGTextLayer_text(const int64_t ptr);
 void cj_PAGTextLayer_setText(const int64_t ptr, char *t);
 void cj_PAGTextLayer_reset(const int64_t ptr);
+void cj_PAGTextLayer_release(const int64_t ptr);
 }
 #endif // LIBPAG_CJ_CJ_PAG_LAYER_HANDLE_H

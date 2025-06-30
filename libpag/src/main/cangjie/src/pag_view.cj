@@ -811,11 +811,15 @@ public class PAGViewController <: XComponentController {
     public func releaseAll(): Unit {
         unsafe {
             cj_PAGViewController_release(jView)
-            let p = LibC.mallocCString(id)
-            cj_PAGViewController_destroyJPAGView(p)
-            LibC.free(p)
+            if (id != "") {
+                let p = LibC.mallocCString(id)
+                cj_PAGViewController_destroyJPAGView(p)
+                LibC.free(p)
+                id = ""
+            }
             if (let Some(value) <- this.composition) {
                 value.nativeRelease()
+                this.composition = None
             }
         }
     }

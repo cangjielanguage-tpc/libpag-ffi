@@ -86,6 +86,8 @@ public open class PAGLayer {
     // Binding with C code, the object pointer returned by C code.
     let ptr: Int64
 
+    var isRelease: Bool = false
+
     init(ptr: Int64) {
         this.ptr = ptr
     }
