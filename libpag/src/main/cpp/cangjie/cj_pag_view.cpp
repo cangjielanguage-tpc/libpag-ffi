@@ -8,30 +8,35 @@ namespace pag {
 static std::unordered_map<std::string, std::shared_ptr<CJPAGView>> ViewMap = {};
 
 void CJPAGView::onAnimationStart(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
         playingStateCallback(0, g_jView);
     }
 }
 
 void CJPAGView::onAnimationCancel(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
         playingStateCallback(1, g_jView);
     }
 }
 
 void CJPAGView::onAnimationEnd(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
         playingStateCallback(2, g_jView);
     }
 }
 
 void CJPAGView::onAnimationRepeat(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
         playingStateCallback(3, g_jView);
     }
 }
 
 void CJPAGView::onAnimationUpdate(PAGAnimator *animator) {
+    std::lock_guard lock_guard(locker);
     if (playingProgressCallback) {
         playingProgressCallback(g_jView);
     }
