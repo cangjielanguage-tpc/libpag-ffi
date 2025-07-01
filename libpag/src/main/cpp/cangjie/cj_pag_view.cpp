@@ -141,8 +141,8 @@ double cj_PAGViewController_getProgress(const int64_t jView) {
     return animator->progress();
 }
 
-void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition) {
-    if (jView == 0 || ptrComposition == 0) {
+void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition, bool isNull) {
+    if (jView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setComposition", "Pointer is null");
         return;
     }
@@ -156,14 +156,16 @@ void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrC
                      "player or animator is null");
         return;
     }
+    if (isNull) {
+        player->setComposition(nullptr);
+        animator->setDuration(0);
+        return;
+    }
     if (layer && layer->layerType() == LayerType::PreCompose) {
         auto composition = std::static_pointer_cast<PAGComposition>(layer);
         player->setComposition(composition);
         animator->setProgress(player->getProgress());
         animator->setDuration(layer->duration());
-    } else {
-        player->setComposition(nullptr);
-        animator->setDuration(0);
     }
 }
 

@@ -86,7 +86,7 @@ public class PAGImage {
         unsafe {
             try {
                 let nums: Int64 = Int64(pixelMap.getPixelBytesNumber())
-                let dst: Array<UInt8> = Array<UInt8>(nums, item: 0)
+                let dst: Array<UInt8> = Array<UInt8>(nums, repeat: 0)
                 pixelMap.readPixelsToBuffer(dst)
                 let imageInfo: ImageInfo = pixelMap.getImageInfo()
 
