@@ -127,7 +127,7 @@ public class PAGImageViewController <: XComponentController {
      * composition is already added to another PAGImageView, it will be removed from the previous
      * PAGImageView.
      */
-    public func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
+    func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
         this.filePath = ""
         unsafe {
             cj_PAGImageViewController_setComposition(cjImageView, composition, maxFrameRate)
@@ -187,28 +187,32 @@ public class PAGImageViewController <: XComponentController {
     }
      */
 
-  /**
-   * Returns the current scale mode.
-   */
+    /**
+     * Returns the current scale mode.
+     */
     public func scaleMode(): Int32 {
         unsafe {
             return cj_PAGImageViewController_scaleMode(cjImageView)
         }
     }
 
-  /**
-   * Specifies the rule of how to scale the pag content to fit the PAGImageView's size. The
-   * current matrix of the PAGImageView changes when this method is called.
-   */
+    /**
+     * Specifies the rule of how to scale the pag content to fit the PAGImageView's size. The
+     * current matrix of the PAGImageView changes when this method is called.
+     */
     public func setScaleMode(scaleMode: Int32): Unit {
+        if (scaleMode != 0 && scaleMode != 1 && scaleMode != 2 && scaleMode != 3) {
+            Hilog.error(0, 'PAGImageViewController', "setScaleMode invalid setting");
+            return
+        }
         unsafe {
             cj_PAGImageViewController_setScaleMode(cjImageView, scaleMode)
         }
     }
 
-  /**
-   * Returns a copy of the current matrix.
-   */
+    /**
+     * Returns a copy of the current matrix.
+     */
     public func matrix(): Matrix4 {
         unsafe {
             let res: CJFloat32Array = cj_PAGImageViewController_matrix(cjImageView)
@@ -240,10 +244,10 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-  /**
-   * Sets the transformation which will be applied to the composition. The scaleMode property
-   * will be set to PAGScaleMode::None when this method is called.
-   */
+    /**
+     * Sets the transformation which will be applied to the composition. The scaleMode property
+     * will be set to PAGScaleMode::None when this method is called.
+     */
     public func setMatrix(matrix: Matrix4): Unit {
         unsafe {
             let buf: Array<Float32> = PAGUtils.ToNativeMatrix(matrix)
@@ -254,6 +258,10 @@ public class PAGImageViewController <: XComponentController {
     }
 
     public func setMatrix(buf: Array<Float32>): Unit {
+        if (buf.size == 0) {
+            Hilog.error(0, 'PAGImageViewController', "setMatrix invalid setting");
+            return
+        }
         unsafe {
             let handle = acquireArrayRawData(buf)
             cj_PAGImageViewController_setMatrix(cjImageView, handle.pointer)
@@ -261,68 +269,68 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-  /**
-   * This value defines the scale factor for the size of the cached image frames, which ranges
-   * from 0.0 to 1.0. A scale factor less than 1.0 may result in blurred output, but it can reduce
-   * graphics memory usage, increasing the rendering performance. The default value is 1.0.
-   */
+    /**
+     * This value defines the scale factor for the size of the cached image frames, which ranges
+     * from 0.0 to 1.0. A scale factor less than 1.0 may result in blurred output, but it can reduce
+     * graphics memory usage, increasing the rendering performance. The default value is 1.0.
+     */
     public func renderScale(): Float64 {
         unsafe {
             return cj_PAGImageViewController_renderScale(cjImageView)
         }
     }
 
-  /**
-   * Sets the value of the renderScale property.
-   */
+    /**
+     * Sets the value of the renderScale property.
+     */
     public func setRenderScale(renderScale: Float64): Unit {
         unsafe {
             cj_PAGImageViewController_setRenderScale(cjImageView, renderScale)
         }
     }
 
-  /**
-   * If set to true, the PAGImageView loads all image frames into the memory, which will
-   * significantly increase the rendering performance but may cost lots of additional memory. Set
-   * it to true if you prefer rendering speed over memory usage. If set to false, the PAGImageView
-   * loads only one image frame at a time into the memory. The default value is false.
-   */
+    /**
+     * If set to true, the PAGImageView loads all image frames into the memory, which will
+     * significantly increase the rendering performance but may cost lots of additional memory. Set
+     * it to true if you prefer rendering speed over memory usage. If set to false, the PAGImageView
+     * loads only one image frame at a time into the memory. The default value is false.
+     */
     public func cacheAllFramesInMemory(): Bool {
         unsafe {
             return cj_PAGImageViewController_cacheAllFramesInMemory(cjImageView)
         }
     }
 
-  /**
-   * Sets the value of the cacheAllFramesInMemory property.
-   */
+    /**
+     * Sets the value of the cacheAllFramesInMemory property.
+     */
     public func setCacheAllFramesInMemory(enable: Bool): Unit {
         unsafe {
             cj_PAGImageViewController_setCacheAllFramesInMemory(cjImageView, enable)
         }
     }
 
-  /**
-   * Returns the current frame index the PAGImageView is rendering.
-   */
+    /**
+     * Returns the current frame index the PAGImageView is rendering.
+     */
     public func currentFrame(): Float64 {
         unsafe {
             return cj_PAGImageViewController_currentFrame(cjImageView)
         }
     }
 
-  /**
-   * Sets the frame index for the PAGImageView to render.
-   */
+    /**
+     * Sets the frame index for the PAGImageView to render.
+     */
     public func setCurrentFrame(currentFrame: Float64): Unit {
         unsafe {
             cj_PAGImageViewController_setCurrentFrame(cjImageView, currentFrame)
         }
     }
 
-  /**
-   * Returns a PixelMap capturing the contents of the current PAGImageView.
-   */
+    /**
+     * Returns a PixelMap capturing the contents of the current PAGImageView.
+     */
     public func currentImage(): Option<PixelMap> {
         unsafe {
             let res: CJPixelMap = cj_PAGImageViewController_currentImage(cjImageView)
@@ -334,7 +342,7 @@ public class PAGImageViewController <: XComponentController {
 
             //InitializationOptions
             var alphaType: AlphaType = getAlphaType(res.alphaType) //!: AlphaType = AlphaType.UNKNOWN,
-            var editable: Bool = res.editable                      //= false,
+            var editable: Bool = res.editable //= false,
             var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat) //!: PixelMapFormat = PixelMapFormat.UNKNOWN,
 
             var height: Int32 = res.height
@@ -358,68 +366,68 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-  /**
-   * Starts to play the animation from the current position. Calling the play() method when the
-   * animation is already playing has no effect. The play() method does not alter the animation's
-   * current position. However, if the animation previously reached its end, it will restart from
-   * the beginning.
-   */
+    /**
+     * Starts to play the animation from the current position. Calling the play() method when the
+     * animation is already playing has no effect. The play() method does not alter the animation's
+     * current position. However, if the animation previously reached its end, it will restart from
+     * the beginning.
+     */
     public func play(): Unit {
         unsafe {
             cj_PAGImageViewController_play(cjImageView)
         }
     }
 
-  /**
-   * Indicates whether the animation is playing.
-   */
+    /**
+     * Indicates whether the animation is playing.
+     */
     public func isPlaying(): Bool {
         unsafe {
             return cj_PAGImageViewController_isPlaying(cjImageView)
         }
     }
 
-  /**
-   * Cancels the animation at the current position. Calling the play() method can resume the
-   * animation from the last paused position.
-   */
+    /**
+     * Cancels the animation at the current position. Calling the play() method can resume the
+     * animation from the last paused position.
+     */
     public func pause(): Unit {
         unsafe {
             cj_PAGImageViewController_pause(cjImageView)
         }
     }
 
-  /**
-   * The total number of times the animation is set to play. The default is 1, which means the
-   * animation will play only once. If the repeat count is set to 0 or a negative value, the
-   * animation will play infinity times.
-   */
+    /**
+     * The total number of times the animation is set to play. The default is 1, which means the
+     * animation will play only once. If the repeat count is set to 0 or a negative value, the
+     * animation will play infinity times.
+     */
     public func repeatCount(): Int64 {
         unsafe {
             return cj_PAGImageViewController_repeatCount(cjImageView)
         }
     }
 
-  /**
-   * Set the number of times the animation to play.
-   */
+    /**
+     * Set the number of times the animation to play.
+     */
     public func setRepeatCount(repeatCount: Int64): Unit {
         unsafe {
             cj_PAGImageViewController_setRepeatCount(cjImageView, repeatCount)
         }
     }
 
-  /**
-   * Adds a listener to the set of listeners that are sent events through the life of an
-   * animation, such as start, repeat, and end.
-   */
+    /**
+     * Adds a listener to the set of listeners that are sent events through the life of an
+     * animation, such as start, repeat, and end.
+     */
     public func addListener(listener: PAGImageViewListener): Unit {
         this.listeners.add(listener)
     }
 
-  /**
-   * Removes a listener from the set listening to this animation.
-   */
+    /**
+     * Removes a listener from the set listening to this animation.
+     */
     public func removeListener(listener: PAGImageViewListener): Unit {
         for (i in 0..this.listeners.size) {
             if (refEq(this.listeners[i], listener)) {
@@ -428,12 +436,12 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-  /**
-   * Renders the current image frame immediately. Note that all the changes previously made to the
-   * PAGImageView will only take effect after this method is called. If the play() method is
-   * already called, there is no need to call it manually since it will be automatically called
-   * every frame. Returns true if the content has changed.
-   */
+    /**
+     * Renders the current image frame immediately. Note that all the changes previously made to the
+     * PAGImageView will only take effect after this method is called. If the play() method is
+     * already called, there is no need to call it manually since it will be automatically called
+     * every frame. Returns true if the content has changed.
+     */
     public func flush(): Bool {
         unsafe {
             return cj_PAGImageViewController_flush(cjImageView)

@@ -70,6 +70,51 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 
 10. 使用 DevEco Studio 构建工程项目, 生成 hap 包即可
 
+#### 使用说明
+
+1. 通过 module 引入
+    1. 克隆下载项目
+    2. 将 libpag 模块拷贝到应用项目下
+    3. 修改自身应用 entry 下的 oh-package.json5 文件，在 dependencies 字段添加 'libpag': "file:../libpag"
+      ```json
+      {
+        "name": "entry",
+        "version": "1.0.0",
+        "description": "Please describe the basic information.",
+        "main": "",
+        "author": "",
+        "license": "",
+        "dependencies": {
+          'libpag': "file:../libpag"
+        }
+      }
+      ```
+    4. 修改自身应用 entry 下的 cjpm.toml 文件，在 [dependencies] 字段下添加   [dependencies.libpag4cj]
+    path = "${libpag}"
+      ```toml
+      [dependencies]
+        [dependencies.libpag4cj]
+          path = "${libpag}"
+      ```
+    5. 在项目中使用 import libpag4cj.* 引用 libpag 项目
+      ```cangjie
+      import libpag4cj.*
+      ```
+2. 把 libpag4cj 作为三方库依赖引入
+    1. 克隆下载项目
+	2. 用DevEco Studio打开工程，选中libpag目录，点击顶部菜单栏“Build”-“Make Module ‘libpag’”构建
+    3. 构建成功后，在libpag的build目录中找到libpag.har，将libpag.har拷贝到需要引入的工程中。例如，在需要引入的工程entry目录下新建一个third-party目录，将libpag.har拷贝进去
+	4. 打开 entry/oh-package.json5 在 “dependencies” 字段下添加'libpag':   "file:../entry/third-party/libpag.har"
+      ```json
+      "dependencies": {
+        'libpag': "file:../entry/third-party/libpag.har"
+      }
+      ```
+    5. 在项目中使用 libpag
+      ```cangjie
+      import libpag4cj.*
+      ```
+
 ### 功能示例
 
 #### PAGView
@@ -95,7 +140,7 @@ class EntryView {
         var path = '/data/storage/el1/bundle/entry/resources/resfile/resfile_test.pag'
         // 设置要播放的pag文件路径。目前resfile目录下的pag文件只能通过绝对路径设置'/data/storage/el1/bundle/entry/resources/resfile/'+pag文件名
         this.controller.setPath(path)
-        // 设置动画播放次数。-1表示循环播放
+        // 设置动画播放次数。小于等于0表示循环播放
         this.controller.setRepeatCount(-1)
         Timer.once(50 * Duration.millisecond) {
             =>

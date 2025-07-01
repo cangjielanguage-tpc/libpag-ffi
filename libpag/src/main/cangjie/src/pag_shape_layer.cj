@@ -12,7 +12,7 @@ foreign {
 }
 
 public class PAGShapeLayer <: PAGLayer {
-    public PAGShapeLayer(nativeContext: Int64) {
+    PAGShapeLayer(nativeContext: Int64) {
         super(nativeContext)
     }
 

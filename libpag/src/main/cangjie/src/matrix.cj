@@ -13,7 +13,7 @@ public class Matrix4 {
     // Binding with C code, the object pointer returned by C code.
     private var ptr: Int64 = 0
 
-    public init(ptr: Int64) {
+    init(ptr: Int64) {
         this.ptr = ptr
     }
 

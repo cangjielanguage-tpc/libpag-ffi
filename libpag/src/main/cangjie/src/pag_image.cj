@@ -159,6 +159,10 @@ public class PAGImage {
      * Specifies the rule of how to scale the image content to fit the original image size.
      */
     public func setScaleMode(mode: Int32): Unit {
+        if (mode != 0 && mode != 1 && mode != 2 && mode != 3) {
+            Hilog.error(0, 'PAGImage', "setScaleMode invalid setting");
+            return
+        }
         unsafe {
             return cj_PAGImage_setScaleMode(ptrCJPAGImage, mode)
         }
@@ -183,6 +187,10 @@ public class PAGImage {
      * Set the transformation which will be applied to the image content.
      */
     public func setMatrix(values: Array<Float32>): Unit {
+        if (values.size == 0) {
+            Hilog.error(0, 'PAGImage', "setMatrix invalid setting");
+            return
+        }
         unsafe {
             var data: VArray<Float32, $9> = VArray<Float32, $9>({i => 0.0})
             for (i in 0..values.size) {

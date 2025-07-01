@@ -28,5 +28,6 @@ public class TraceImage {
         let imageInfo: ImageInfo = pixelMap.getImageInfo()
         let w: Int32 = imageInfo.size.width
         let h: Int32 = imageInfo.size.height
+        Hilog.info(0, "TraceImage", "tag:${tag} width = ${w}, height = ${h}")
     }
 }
