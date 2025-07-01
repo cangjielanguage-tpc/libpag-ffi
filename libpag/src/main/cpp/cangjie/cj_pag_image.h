@@ -7,6 +7,7 @@
 #include <pag/pag.h>
 #include <hilog/log.h>
 #include <multimedia/image_framework/image/pixelmap_native.h>
+#include "cj_type.h"
 
 namespace pag {
 class CJPAGImage {

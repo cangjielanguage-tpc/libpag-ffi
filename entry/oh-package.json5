@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    'libpag': "file:../libpag"
+    '@cangjie-tpc/libpag': "file:../libpag"
   }
 }
 

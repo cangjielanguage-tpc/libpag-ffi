@@ -140,7 +140,7 @@ foreign {
 
     func cj_PAGViewController_destroyJPAGView(jView: CString): Unit
 
-    func cj_PAGViewController_setComposition(jView: Int64, ptrComposition: Int64): Unit
+    func cj_PAGViewController_setComposition(jView: Int64, ptrComposition: Int64, isNull: Bool): Unit
 
     func cj_PAGViewController_play(jView: Int64): Unit
 
@@ -300,11 +300,21 @@ public class PAGViewController <: XComponentController {
      */
     public func setComposition(composition: Option<PAGComposition>) {
         this.filePath = ''
-        this.composition = composition
-        unsafe {
-            if (let Some(v) <- composition) {
-                let native: Int64 = v.getNativeComposition()
-                cj_PAGViewController_setComposition(jView, native)
+        if (this.composition.isNone() && composition.isNone()) {
+            return
+        } else {
+            var native: Int64 = 0
+            unsafe {
+                if (let Some(v) <- composition) {
+                    this.composition = composition
+                    native = v.getNativeComposition()
+                    cj_PAGViewController_setComposition(jView, native, false)
+                    return
+                }
+                if (let Some(v) <- this.composition) {
+                    native = v.getNativeComposition()
+                    cj_PAGViewController_setComposition(jView, native, true)
+                }
             }
         }
     }
@@ -336,7 +346,7 @@ public class PAGViewController <: XComponentController {
                 }
                 this.composition = v
                 let native: Int64 = v.getNativeComposition()
-                cj_PAGViewController_setComposition(jView, native)
+                cj_PAGViewController_setComposition(jView, native, false)
                 return true
             }
             this.composition = None
@@ -768,7 +778,7 @@ public class PAGViewController <: XComponentController {
      * Returns a rectangle in pixels that defines the displaying area of the specified layer, which
      * is in the coordinate of the PAGView.
      */
-    public func getBounds(layer: PAGLayer): Array<Float32> {
+    public func getBounds(layer: PAGLayer): Rect {
         unsafe {
             var values = VArray<Float32, $4>({i => 0.0})
             cj_PAGViewController_getBounds(jView, layer.getptr(), inout values)
@@ -776,7 +786,7 @@ public class PAGViewController <: XComponentController {
             for (i in 0..data.size) {
                 data[i] = values[i]
             }
-            return data
+            return PAGUtils.ToTsRect(data)
         }
     }
 

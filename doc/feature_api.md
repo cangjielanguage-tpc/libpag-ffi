@@ -4,8 +4,561 @@
 
 libpag是基于仓颉语言适配的动画渲染库。
 
+### 1. 提供PAGView动画播放组件
 
-### 1. PAG
+#### 1.1 PAGView
+通用动画渲染组件，支持实时 PAG 动画播放及交互效果。
+
+```cangjie
+public class PAGView {
+    /**
+    * 初始化PAGView组件
+    *
+    * @param controller - PAGViewController控制器
+    */
+    PAGView(controller: PAGViewController)
+}
+```
+
+#### 1.2 PAGViewController
+PAGView控制器。
+
+```cangjie
+public class PAGViewController <: XComponentController {
+    /*
+     * 设置新的PAGComposition。当多个PAGView共用一个PAGComposition，仅在最后一个PAGView中展示PAGComposition
+     *
+     * @param composition - PAGComposition对象，表示要渲染的动画内容
+     * @return Unit - Unit
+     */
+    public func setComposition(composition: Option<PAGComposition>)
+	
+	/*
+     * 返回当前PAGComposition
+     * 
+     * @return Option<PAGComposition> -  返回PAGComposition对象
+     */
+    public func getComposition():Option<PAGComposition>
+
+	/*
+     * 获取pag文件的路径字符串。
+     * 
+     * @return String - 返回设置的pag文件的路径字符串
+     */
+    public func getPath():String
+	
+	/*
+     * 设置pag文件路径。如果文件不存在或数据不是pag文件则返回false。
+     * 
+	 * @param path - PAG文件的沙箱路径.目前只支持/data/storage/el1/bundle/entry/resources/resfile下的沙箱路径。
+     * @return Bool - 返回设置结果。true是设置成功
+     */
+    public func setPath(path: String): Bool
+	
+	/*
+     * 异步设置pag文件路径，该路径可以是网络路径或本地路径。
+     * 
+	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
+	 * @param callback - 自定义回调函数
+     */
+    public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit): Unit
+
+	/*
+     * 播放动画
+     */
+    public func play(): Unit
+
+	/*
+     * 暂停播放
+	 * 
+     * @return Unit - Unit
+     */
+    public func pause(): Unit
+
+	/*
+     * 判断动画是否播放
+	 * 
+     * @return Bool - true代表正在播放，否则相反
+     */
+    public func isPlaying(): Bool
+	
+	/*
+     * 判断是否同步播放
+	 * 
+     * @return Bool - 如果PAGView正在同步播放，则返回true。默认值为false。
+     */
+    public func isSync(): Bool
+
+	/*
+     * 设置是否同步播放
+	 * 
+	 * @param isSync - true是同步
+     */
+    public func setSync(isSync: Bool): Unit
+	
+	/*
+     * 设置动画播放的次数。
+	 * 
+	 * @param repeatCount - 动画播放次数。小于或等于0：动画将无限循环播放。
+     */
+    public func setRepeatCount(repeatCount: Int32): Unit
+	
+	/*
+     * 播放动画的总次数
+	 * 
+	 * @return Int32 - 播放动画的总次数
+     */
+    public func repeatCount(): Int32
+	
+	/*
+     * 获取videoEnabled的属性值
+	 * 
+	 * @return Bool - 当前videoEnabled的属性值
+     */
+    public func videoEnabled(): Bool
+	
+	/*
+     * 设置videoEnabled属性的值。控制是否启用播放 PAG 文件中嵌入的视频内容。
+	 * 
+	 * @param enable - 是否支持视频渲染
+     */
+    public func setVideoEnabled(enable: Bool): Unit
+	
+	/*
+     * 获取 cacheEnabled 属性值。
+	 * @return Bool - 返回当前cacheEnabled属性值
+     */
+    public func cacheEnabled(): Bool
+	
+	/*
+     * 设置cacheEnabled属性的值。如果该值为 true，通过缓存技术来提升复杂动画的渲染效率
+	 * 
+	 * @param enable - 设置是否启用PAG 渲染器的位图缓存功能
+     */
+    public func setCacheEnabled(enable: Bool): Unit
+	
+	/*
+     * 获取是否启用了磁盘缓存功能。
+	 * 
+	 * @return Bool - 返回是否启用缓存功能
+     */
+    public func useDiskCache(): Bool
+
+	/*
+     * 设置useDiskCache属性的值。如果设置为 true，渲染数据被缓存到磁盘文件中
+	 * 
+	 * @param value - 是否启用缓存功能
+     */
+    public func setUseDiskCache(value: Bool): Unit
+
+	/*
+     * 获取cacheScale属性值
+	 * 
+	 * @return Float32 - 缩放因子值
+     */
+    public func cacheScale(): Float32
+
+	/*
+     * 设置cacheScale属性的值。设置范围从 0.0 到 1.0。小于 1.0 的缩放因子可能会导致输出图像模糊，但可以减少图形内存的使用，从而提高性能。默认值为 1.0。
+	 * 
+	 * @param value - 缩放因子值
+     */
+    public func setCacheScale(value: Float32): Unit
+	
+	/*
+     * 获取动画渲染的最大帧率。
+	 * 
+	 * @return Float32 - 最大帧率
+     */
+    public func maxFrameRate(): Float32
+	
+	/*
+     * 设置渲染的最大帧率。如果设置的值低于 PAGFile 实际帧率，则会丢帧以提升性能；否则该设置不产生影响。默认值为 60。
+	 * 
+	 * @param value - 最大帧率值
+     */
+    public func setMaxFrameRate(value: Float32): Unit
+	
+	/*
+     * 获取当前缩放模式。
+	 * 
+	 * @return Int32 - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
+     */
+    public func scaleMode(): Int32
+
+	/*
+     * 指定如何缩放页面内容以适应曲面大小的规则。矩阵调用此方法时会发生变化。
+	 * 
+	 * @param value - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
+     */
+    public func setScaleMode(value: Int32): Unit
+	
+	/*
+     * 获取当前动画变换矩阵
+	 * 
+	 * @return Array<Float32> - 当前变换矩阵
+     */
+    public func matrix(): Array<Float32>
+	
+	/*
+     * 设置将应用于合成的变换。调用此方法时，scaleMode属性将设置为None。
+	 * 
+	 * @param value - 要设置的变换矩阵
+     */
+    public func setMatrix(values: Array<Float32>): Unit
+	
+	/*
+     * 当前加载动画的总时长（以微秒为单位）
+	 *
+	 * @return Int64 - 返回当前加载动画的总时长
+     */
+    public func duration(): Int64
+	
+	/*
+     * 获取当前播放位置的进度，该值在0.0到1.0之间。
+	 * 
+	 * @return Float64 - 当前播放位置的进度值
+     */
+    public func getProgress(): Float64
+	
+	/*
+     * 设置播放位置的进度，有效值为0.0到1.0。
+	 * 
+	 * @param value - 要设置的播放进度
+     */
+    public func setProgress(value: Float64): Unit
+
+	/*
+     * 获取当前帧。
+	 * 
+	 * @return Int32 - 当前帧
+     */
+    public func currentFrame(): Int32
+	
+	/*
+     * 调用此方法可立即渲染当前位置。请注意，之前对 PAGView 所做的所有更改仅在此方法被
+	 * 调用后才会生效。如果已经调用了 play() 方法，则无需手动调用此方法，因为它会在每一
+	 * 帧自动被调用。如果内容发生了变化，则返回 true。
+	 * 
+	 * @return Bool - 内容是否发生变化
+     */
+    public func flush(): Bool
+	
+	/*
+     * 获取位于指定点下方的图层数组。该点以像素为单位。
+	 * 
+	 * @param x - 指定点的水平方向上的坐标
+	 * @param y - 指定点的垂直方向上的坐标
+	 * @return Array<PAGLayer> - 返回位于指定点下方的图层数组
+     */
+    public func getLayersUnderPoint(x: Float32, y: Float32): Array<PAGLayer>
+	
+	/*
+     * 立即释放pag视图创建的缓存。可以调用以减轻内存压力。
+	 * 
+     */
+    public func freeCache(): Unit
+	
+	/*
+     *获取当前帧的图像快照。如果PAGView尚未显示，则返回null。
+	 * 
+	 * @return Option<PixelMap> - PAGView当前帧的图像快照PixelMap
+     */
+    public func makeSnapshot(): Option<PixelMap>
+	
+	/*
+     * 获取一个以像素为单位的矩形，该矩形定义了指定层的显示区域位于PAGView的坐标系中。
+	 *
+	 * @param layer - 需要获取显示区域的图层
+	 * @return Rect - 原始区域矩形
+     */
+    public func getBounds(layer: PAGLayer): Rect
+
+	/*
+     * 添加一个监听器到监听器集合中，这些监听器会在动画的生命周期内接收到事件，例如开始、重复和结束事件。
+	 *
+	 * @param listener - 要添加的动画监听器对象
+	 *
+     */
+    public func addListener(listener: PAGViewListener)
+	
+	/*
+     * 从集合中删除收听此动画的收听者。
+	 *
+	 * @param listener - 要删除的动画监听器对象
+	 *
+     */
+    public func removeListener(listener: PAGViewListener)
+	
+	/*
+     * 立即释放 PAGViewController 实例所使用的资源
+	 *
+     */
+    public func releaseAll(): Unit
+
+	/*
+     * 获取当前 PAGView 实例的唯一标识符
+     *
+	 * @return String - 返回当前 PAGView 对象对应的唯一字符串ID
+     */
+    public func uniqueID(): String
+
+	/*
+     * 手动触发动画的帧更新
+	 *
+     */
+    public func update(): Unit
+}
+
+```
+
+### 2. 提供PAGImageView动画播放组件
+
+#### 2.1 PAGImageView
+PAGImageView 主要应用于 UI 列表以及页面中含有多个 pag 文件同时渲染的场景。
+
+```cangjie
+public class PAGImageView {
+    /**
+    * 初始化PAGImageView组件
+    *
+    * @param controller - PAGImageViewController控制器
+    */
+    PAGImageView(controller: PAGImageViewController)
+}
+```
+
+#### 2.2 PAGImageViewController
+PAGImageView控制器。
+
+```cangjie
+public class PAGImageViewController <: XComponentController {
+
+    /*
+     * 获取 PAGImageView 中的当前 PAGComposition。
+     * 
+     * @return Option<PAGComposition> - 返回 PAGImageView 中的当前 PAGComposition，可能为 null
+     */
+    public func getComposition(): Option<PAGComposition>
+    
+    /*
+     * 设置PAGComposition，并将最大帧率设置为 30 fps。如果该PAGComposition已添加到另一个 PAGImageView，
+	 * 它将从之前的 PAGImageView 中移除
+	 * 
+     * @param composition - 要设置的 PAGComposition
+     * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
+     */
+    public func setComposition(composition: Option<PAGComposition>, maxFrameRate!: Float64 = 30.0): Unit
+
+    /*
+     * 获取pag文件的路径字符串
+     * 
+     * @return String - 返回 pag 文件的路径字符串
+     */
+    public func getPath(): String
+    
+    /*
+     * 设置pag文件路径。
+     * 
+     * @param path - 要加载的 pag 文件的路径。目前只支持/data/storage/el1/bundle/entry/resources/resfile下的沙箱路径。
+     * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
+     * @return Bool - 返回加载是否成功，true 表示成功，false 表示失败
+     */
+    public func setPath(path: String, maxFrameRate!: Float64 = 30.0): Bool
+    
+    /*
+     * 获取当前的缩放模式
+     * 
+     * @return Int32 - 返回当前的缩放模式
+     */
+    public func scaleMode(): Int32
+
+    /*
+     * 设置缩放模式
+     * 
+     * @param scaleMode - 缩放模式（0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪））
+     */
+    public func setScaleMode(scaleMode: Int32): Unit
+
+    /*
+     * 获取当前动画变换矩阵
+     * 
+     * @return Matrix4 - 返回当前矩阵的一个副本
+     */
+    public func matrix(): Matrix4
+
+    /*
+     * 设置将应用于合成的变换。调用此方法时，scaleMode属性将设置为None。
+     * 
+     * @param matrix - 要设置的变换矩阵
+     */
+    public func setMatrix(matrix: Matrix4): Unit
+
+    /*
+     * 渲染时对图像的缩放比例。范围从 0.0 到 1.0。小于 1.0 的缩放因子可能导致输出
+     * 模糊，但可以减少图形内存使用，提高渲染性能。默认值为 1.0
+     * 
+     * @return Float64 - 返回当前的缩放比例
+     */
+    public func renderScale(): Float64
+    
+    /*
+     * 设置图像的缩放比例
+     * 
+     * @param renderScale - 要设置的缩放比例
+     */
+    public func setRenderScale(renderScale: Float64): Unit
+    
+    /*
+	 * 获取 cacheAllFramesInMemory 属性的值。
+     * 如果设置为 true，PAGImageView 将所有图像帧加载到内存中，这将显著提高渲染性能，但可能会
+     * 消耗大量额外内存。如果优先考虑渲染速度而不是内存使用，请将其设置为 true。如果设置为
+     * false，PAGImageView 一次只将一个图像帧加载到内存中。默认值为 false
+     * 
+     * @return Bool - 返回是否缓存所有帧到内存中的状态
+     */
+    public func cacheAllFramesInMemory(): Bool
+    
+    /*
+     * 设置 cacheAllFramesInMemory 属性的值
+     * 
+     * @param enable - 要设置的缓存状态
+     */
+    public func setCacheAllFramesInMemory(enable: Bool): Unit
+    
+    /*
+     * 获取 PAGImageView 正在渲染的当前帧数
+     * 
+     * @return Float64 - 返回当前帧数
+     */
+    public func currentFrame(): Float64
+    
+    /*
+     * 设置 PAGImageView 到指定帧
+     * 
+     * @param currentFrame - 指定帧
+     */
+    public func setCurrentFrame(currentFrame: Float64): Unit
+    
+    /*
+     * 获取当前 PAGImageView 位图的快照信息
+     *
+     * @return Option<PixelMap> - 返回当前 PAGImageView 内容的 PixelMap
+     */
+    public func currentImage(): Option<PixelMap>
+    
+    /*
+     * 播放动画
+     */
+    public func play(): Unit
+    
+    /*
+     * 判断动画是否播放
+     * 
+     * @return Bool - true代表正在播放，否则相反
+     */
+    public func isPlaying(): Bool
+    
+    /*
+     * 暂停播放
+     * 
+     */
+    public func pause(): Unit
+    
+    /*
+     * 播放动画的总次数
+     * 
+     * @return Int64 - 播放动画的总次数
+     */
+    public func repeatCount(): Int64
+
+    /*
+     * 设置动画播放的次数
+     * 
+     * @param repeatCount - 动画播放次数。小于或等于0：动画将无限循环播放。
+     */
+    public func setRepeatCount(repeatCount: Int64): Unit
+    
+    /*
+     * 添加一个监听器到动画生命周期事件监听器集合中，例如开始、重复和结束事件
+     * 
+     * @param listener - 要添加的 PAGImageViewListener 监听器
+     */
+    public func addListener(listener: PAGImageViewListener): Unit
+    
+    /*
+     * 从动画监听器集合中移除一个监听器
+     * 
+     * @param listener - 要移除的 PAGImageViewListener 监听器
+     */
+    public func removeListener(listener: PAGImageViewListener): Unit
+    
+    /*
+     * 立即渲染当前图像帧。注意，之前对 PAGImageView 的所有更改将在此方法调用后生效。如果 play() 方法已经被调用，则无需手动调用此方法，因为它将在每一帧自动调用。如果内容已更改，则返回 true
+     * 
+     * @return Bool - 内容是否发生变化
+     */
+    public func flush(): Bool
+
+	/*
+     * 异步设置pag文件路径，该路径可以是网络路径或本地路径。
+     * 
+	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
+	 * @param callback - 自定义回调函数
+	 * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
+     */
+    public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit, maxFrameRate!: Float64 = 30.0): Unit
+
+}
+```
+
+#### 2.3 Matrix4类
+
+```cangjie
+/**
+ * 表示一个 4x4 的矩阵对象，用于图形计算、变换等操作
+ */
+public class Matrix4 {
+    /*
+     * 存储矩阵的16个元素，按列主序（column-major order）排列
+     */
+    public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
+
+    /*
+     * 矩阵是否为单位矩阵的标记（内部使用）
+     */
+    var _identity: Bool = true
+
+    /*
+     * 是否已计算单位矩阵状态的标记（内部使用）
+     */
+    var _identityCalculated: Bool = false
+
+    /*
+     * 与底层 C 语言库绑定的指针，表示对应的底层对象（仅内部使用）
+     */
+    private var ptr: Int64
+
+    /**
+     * 默认构造函数，初始化为单位矩阵
+     */
+    public init()
+
+    /**
+     * 使用指定矩阵数据构造 Matrix4 对象
+     *
+     * @param props - 包含16个 Float32 元素的数组，按列主序排列
+     */
+    public init(props: Array<Float32>)
+}
+```
+
+### 3.其他接口
+
+#### 介绍
+这些接口主要用于配合 PAGView 与 PAGImageView 的功能实现，根据具体使用场景可按需调用。
+
+##### 3.1 PAG
 PAG 类用于获取 PAG SDK 的版本信息。
 
 ```cangjie
@@ -19,7 +572,7 @@ public class PAG {
 }
 ```
 
-### 2. PAGComposition
+##### 3.2 PAGComposition
 PAGComponsition 是渲染树中的容器，继承于 PAGLayer，可以包含多个 PAGLayer，支持用户自己创建，支持增加、删除、更换渲染顺序，支持通过图层名称获取该名称对应的图层。
 
 ```cangjie
@@ -205,7 +758,7 @@ public class PAGComposition <: PAGLayer {
 
 ```
 
-### 3. PAGDecoder
+##### 3.3 PAGDecoder
 PAGDecoder 提供了一个实用程序，可以直接从 PAG 组件读取图像帧，并将图像帧作为序列文件缓存在磁盘上，这可能会大大加快读取过程，具体取决于 PAG 文件的复杂性。您可以使用 PAGDiskCache 的 SetMaxDiskSize() 方法来管理磁盘使用的缓存限制。
 
 ```cangjie
@@ -312,7 +865,7 @@ public class PAGDecoder {
 }
 ```
 
-### 4. PAGDiskCache
+##### 3.4 PAGDiskCache
 PAGDiskCache 用于读取、设置磁盘缓存大小，以及清除磁盘缓存内容。
 
 ```cangjie
@@ -343,7 +896,7 @@ public class PAGDiskCache {
 }
 ```
 
-### 5. PAGFile
+##### 3.5 PAGFile
 PAG 动画文件加载器，解析并准备动画资源以供渲染。
 
 ```cangjie
@@ -514,7 +1067,7 @@ public class PAGFile <: PAGComposition {
 
 ```
 
-### 6. PAGFont
+##### 3.6 PAGFont
 PAGFont 用于管理字体资源的类。
 
 ```cangjie
@@ -629,7 +1182,7 @@ public class PAGFont {
 }
 ```
 
-### 7. PAGImage
+##### 3.7 PAGImage
 PAG 动画中的图像工具类，支持纹理操作与图像处理。
 
 ```cangjie
@@ -707,11 +1260,18 @@ public class PAGImage {
      */
     public func width(): Int64
 
+    /**
+     * 通过 PixelMap 创建一个 PAGImage 对象。如果传入的 PixelMap 为空或无效，则返回 None。
+     *
+     * @param pixelMap - 像素图类，用于读取或写入图像数据，并获取图像信息。
+     * @returns Option<PAGImage> - 创建成功返回 PAGImage，失败则返回 None。
+     */
+    public static func fromPixelMap(pixelMap: PixelMap): Option<PAGImage>
 }
 
 ```
 
-### 8. PAGImageLayer
+##### 3.8 PAGImageLayer
 PAGImageView 为图片图层，支持通过 replaceImage 的方法替换默认占位图，同时支持通过 imageBytes 获取默认占位图的数据。
 
 ```cangjie
@@ -759,257 +1319,7 @@ public class PAGImageLayer <: PAGLayer {
 }
 ```
 
-
-### 9. 提供PAGImageView动画播放组件
-
-#### 9.1 PAGImageView
-PAGImageView 主要应用于 UI 列表以及页面中含有多个 pag 文件同时渲染的场景。
-
-```cangjie
-public class PAGImageView {
-    /**
-    * 初始化PAGImageView组件
-    *
-    * @param controller - PAGImageViewController控制器
-    */
-    PAGImageView(controller: controller)
-}
-```
-
-#### 9.2 PAGImageViewController
-PAGImageView控制器。
-
-```cangjie
-public class PAGImageViewController <: XComponentController {
-
-    /*
-     * 获取 PAGImageView 中的当前 PAGComposition。如果内部组合是从 pag 文件路径加载的，则返回 null
-     * 
-     * @return Option<PAGComposition> - 返回 PAGImageView 中的当前 PAGComposition，可能为 null
-     */
-    public func getComposition(): Option<PAGComposition>
-    
-    /*
-     * 设置一个新的 PAGComposition 到 PAGImageView，并将最大帧率设置为 30 fps。注意：
-	 * 如果该组合已添加到另一个 PAGImageView，它将从之前的 PAGImageView 中移除
-     * 
-     * @param composition - 要设置的 PAGComposition，可能为 null
-     * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
-     */
-    public func setComposition(composition: Option<PAGComposition>, maxFrameRate!: Float64 = 30.0): Unit
-
-    /*
-     * 获取通过 setPath() 方法设置的 pag 文件的路径字符串
-     * 
-     * @return String - 返回 pag 文件的路径字符串
-     */
-    public func getPath(): String
-    
-    /*
-     * 从本地路径加载 pag 文件，如果文件不存在或数据不是 pag 文件，则返回 false
-     * 
-     * @param path - 要加载的 pag 文件的路径
-     * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
-     * @return Bool - 返回加载是否成功，true 表示成功，false 表示失败
-     */
-    public func setPath(path: String, maxFrameRate!: Float64 = 30.0): Bool
-    
-    /*
-     * 获取当前的缩放模式
-     * 
-     * @return Int32 - 返回当前的缩放模式。缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
-     */
-    public func scaleMode(): Int32
-
-    /*
-     * 指定如何缩放 pag 内容以适应 PAGImageView 的大小的规则。调用此方法时，PAGImageView
-	 * 的当前矩阵会发生变化
-     * 
-     * @param scaleMode - 指定缩放模式的整数值。缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
-     */
-    public func setScaleMode(scaleMode: Int32): Unit
-
-    /*
-     * 获取当前矩阵的一个副本
-     * 
-     * @return Matrix4 - 返回当前矩阵的一个副本
-     */
-    public func matrix(): Matrix4
-
-    /*
-     * 设置将应用于组合的变换。调用此方法时，scaleMode 属性将被设置为 PAGScaleMode::None
-     * 
-     * @param matrix - 要设置的变换矩阵
-     * @return Unit - 无返回值
-     */
-    public func setMatrix(matrix: Matrix4): Unit
-
-    /*
-     * 获取当前的缩放因子属性值。该值定义了缓存图像帧大小的缩放因子，范围从 0.0 到 1.0。小于 1.0 的缩放因子可能导致输出
-     * 模糊，但可以减少图形内存使用，提高渲染性能。默认值为 1.0
-     * 
-     * @return Float64 - 返回当前的缩放因子
-     */
-    public func renderScale(): Float64
-    
-    /*
-     * 设置 renderScale 属性的值
-     * 
-     * @param renderScale - 要设置的缩放因子
-     * @return Unit - 无返回值
-     */
-    public func setRenderScale(renderScale: Float64): Unit
-    
-    /*
-	 * 获取 cacheAllFramesInMemory 属性的值。
-     * 如果设置为 true，PAGImageView 将所有图像帧加载到内存中，这将显著提高渲染性能，但可能会
-     * 消耗大量额外内存。如果优先考虑渲染速度而不是内存使用，请将其设置为 true。如果设置为
-     * false，PAGImageView 一次只将一个图像帧加载到内存中。默认值为 false
-     * 
-     * @return Bool - 返回是否缓存所有帧到内存中的状态
-     */
-    public func cacheAllFramesInMemory(): Bool
-    
-    /*
-     * 设置 cacheAllFramesInMemory 属性的值
-     * 
-     * @param enable - 要设置的缓存状态
-     */
-    public func setCacheAllFramesInMemory(enable: Bool): Unit
-    
-    /*
-     * 获取 PAGImageView 正在渲染的当前帧索引
-     * 
-     * @return Float64 - 返回当前帧索引
-     */
-    public func currentFrame(): Float64
-    
-    /*
-     * 设置 PAGImageView 要渲染的帧索引
-     * 
-     * @param currentFrame - 要设置的帧索引
-     */
-    public func setCurrentFrame(currentFrame: Float64): Unit
-    
-    /*
-     * 获取捕获当前 PAGImageView 内容的 PixelMap
-     * 
-     * @return Option<PixelMap> - 返回当前 PAGImageView 内容的 PixelMap，可能为 null
-     */
-    public func currentImage(): Option<PixelMap>
-    
-    /*
-     * 从当前位置开始播放动画。如果动画已经在播放，调用 play() 方法没有效果。play() 方法不
-     * 会改变动画的当前位置。但是，如果动画之前到达了结尾，它将从头开始重新播放
-     *
-     */
-    public func play(): Unit
-    
-    /*
-     * 指示动画是否正在播放
-     * 
-     * @return Bool - 返回动画是否正在播放的状态
-     */
-    public func isPlaying(): Bool
-    
-    /*
-     * 在当前位置暂停动画。调用 play() 方法可以从上次暂停的位置恢复动画
-     * 
-     */
-    public func pause(): Unit
-    
-    /*
-     * 动画要播放的总次数。默认值为 1，表示动画只会播放一次。如果重复次数设置为 0 或负值，
-     * 动画将无限次播放
-     * 
-     * @return Int64 - 返回动画的重复次数
-     */
-    public func repeatCount(): Int64
-
-    /*
-     * 设置动画播放的次数
-     * 
-     * @param repeatCount - 要设置的动画重复次数
-     */
-    public func setRepeatCount(repeatCount: Int64): Unit
-    
-    /*
-     * 添加一个监听器到动画生命周期事件监听器集合中，例如开始、重复和结束事件
-     * 
-     * @param listener - 要添加的 PAGImageViewListener 监听器
-     */
-    public func addListener(listener: PAGImageViewListener): Unit
-    
-    /*
-     * 从动画监听器集合中移除一个监听器
-     * 
-     * @param listener - 要移除的 PAGImageViewListener 监听器
-     */
-    public func removeListener(listener: PAGImageViewListener): Unit
-    
-    /*
-     * 立即渲染当前图像帧。注意，之前对 PAGImageView 的所有更改将在此方法调用后生效。如果 play() 方法已经被调用，则无需手动调用此方法，因为它将在每一帧自动调用。如果内容已更改，则返回 true
-     * 
-     * @return Bool - 返回内容是否已更改
-     */
-    public func flush(): Bool
-
-	/*
-     * 从特定路径异步加载pag文件，该路径可以是网络路径或本地路径。
-     * 
-	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
-	 * @param callback - 回调函数，接收一个 Option 类型的 PAGFile 对象。
-	 * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
-     * @return Unit - Unit
-     */
-    public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit, maxFrameRate!: Float64 = 30.0): Unit
-
-}
-
-```
-
-#### 9.3 Matrix4类
-
-```cangjie
-/**
- * 表示一个 4x4 的矩阵对象，用于图形计算、变换等操作
- */
-public class Matrix4 {
-    /*
-     * 存储矩阵的16个元素，按列主序（column-major order）排列
-     */
-    public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
-
-    /*
-     * 矩阵是否为单位矩阵的标记（内部使用）
-     */
-    var _identity: Bool = true
-
-    /*
-     * 是否已计算单位矩阵状态的标记（内部使用）
-     */
-    var _identityCalculated: Bool = false
-
-    /*
-     * 与底层 C 语言库绑定的指针，表示对应的底层对象（仅内部使用）
-     */
-    private var ptr: Int64
-
-    /**
-     * 默认构造函数，初始化为单位矩阵
-     */
-    public init()
-
-    /**
-     * 使用指定矩阵数据构造 Matrix4 对象
-     *
-     * @param props - 包含16个 Float32 元素的数组，按列主序排列
-     */
-    public init(props: Array<Float32>)
-}
-```
-
-### 10. PAGLayer
+##### 3.9 PAGLayer
 PAG 的渲染图层，PAG 是一个树状结构，PAGLayer 相当于树状结构中的叶子节点。
 
 ```cangjie
@@ -1221,7 +1531,7 @@ public class PAGLayer {
 
 ```
 
-### 11. PAGMarker
+##### 3.10 PAGMarker
 Marker 存储评论和其他元数据，并在构图或图层中标记重要时间。
 
 ```cangjie
@@ -1238,7 +1548,7 @@ public class PAGMarker {
 }
 ```
 
-### 12. PAGPlayer
+##### 3.11 PAGPlayer
 PAG 动画核心播放控制器，管理时间轴、事件及渲染流程。
 
 ```cangjie
@@ -1460,7 +1770,7 @@ public class PAGPlayer {
 
 ```
 
-### 13. PAGScaleMode
+##### 3.12 PAGScaleMode
 定义 PAGPlayer 的 setScaleMode 方法中使用的值。
 
 ```cangjie
@@ -1488,7 +1798,7 @@ public class PAGScaleMode {
 }
 ```
 
-### 14. PAGShapeLayer
+##### 3.13 PAGShapeLayer
 PAGShapeLayer 为图形图层，用于处理矢量图形和形状动画。
 
 ```cangjie
@@ -1497,7 +1807,7 @@ public class PAGShapeLayer <: PAGLayer {
     
 ```
 
-### 15. PAGSolidLayer
+##### 3.14 PAGSolidLayer
 PAGSolidLayer 为实色图层，支持修改实色图层的颜色。
 
 ```cangjie
@@ -1520,7 +1830,7 @@ public class PAGSolidLayer <: PAGLayer {
 }
 ```
 
-### 16. PAGSurface
+##### 3.15 PAGSurface
 PAGSurface 提供多格式单帧渲染数据接口。
 
 ```cangjie
@@ -1596,7 +1906,7 @@ public class PAGSurface {
 }
 ```
 
-### 17. PAGText
+##### 3.16 PAGText
 PAGSurface 提供多格式单帧渲染数据接口。
 
 ```cangjie
@@ -1704,7 +2014,7 @@ public class PAGText <: ToString {
 }
 ```
 
-### 18. PAGTextJustification
+##### 3.17 PAGTextJustification
 
 ```cangjie
 public enum PAGTextJustification {
@@ -1718,7 +2028,7 @@ public enum PAGTextJustification {
 }
 ```
 
-### 19. PAGTextLayer
+##### 3.18 PAGTextLayer
 为文本图层，支持用户修改默认的文本信息、文本颜色、更换字体、字体大小等。
 
 ```cangjie
@@ -1801,7 +2111,7 @@ public class PAGTextLayer <: PAGLayer {
 }
 ```
 
-### 20. PAGTimeStretchMode
+##### 3.19 PAGTimeStretchMode
 定义 PAGFile 的 setTimeStretchMode 方法中使用的值。
 
 ```cangjie
@@ -1829,7 +2139,7 @@ public class PAGTimeStretchMode {
 }
 ```
 
-### 21. PAGVideoRange
+##### 3.20 PAGVideoRange
 表示从 PAGImageLayer 内容开始的时间范围。
 
 ```cangjie
@@ -1867,331 +2177,7 @@ public class PAGVideoRange {
 }
 ```
 
-
-### 22. 提供PAGView动画播放组件
-
-#### 22.1 PAGView
-通用动画渲染组件，支持实时 PAG 动画播放及交互效果。
-
-```cangjie
-public class PAGView {
-    /**
-    * 初始化PAGView组件
-    *
-    * @param controller - PAGViewController控制器
-    */
-    PAGView(controller: controller)
-}
-```
-
-#### 22.2 PAGViewController
-PAGView控制器。
-
-```cangjie
-public class PAGViewController <: XComponentController {
-    /*
-     * 为PAGView设置新的PAGComposition以呈现为内容。请注意，如果组成是已添加到另一个PAGView，
-	 * 它将从之前的PAGView中删除。
-     * 
-     * @param composition - PAGComposition对象，表示要渲染的动画内容
-     * @return Unit - Unit
-     */
-    public func setComposition(composition: Option<PAGComposition>)
-	
-	/*
-     * 返回当前PAGComposition，以便PAGView作为内容呈现。
-     * 
-     * @return Option<PAGComposition> -  返回一个Option类型的PAGComposition对象
-     */
-    public func getComposition():Option<PAGComposition>
-
-	/*
-     * setPath（）设置的pag文件的路径字符串。
-     * 
-     * @return String - 返回设置的pag文件的路径字符串
-     */
-    public func getPath():String
-	
-	/*
-     * 从本地路径加载pag文件，如果文件不存在或数据不是pag文件则返回false。
-     * 
-	 * @param path - PAG文件的沙箱路径.目前只支持/data/storage/el1/bundle/entry/resources/resfile下的沙箱路径。
-     * @return Bool - 返回是否成功加载
-     */
-    public func setPath(path: String): Bool
-	
-	/*
-     * 从特定路径异步加载pag文件，该路径可以是网络路径或本地路径。
-     * 
-	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
-	 * @param callback - 回调函数，接收一个 Option 类型的 PAGFile 对象。
-     * @return Unit - Unit
-     */
-    public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit): Unit
-
-	/*
-     * 从当前位置开始播放动画。如果动画已经在播放中，调用此方法不会产生任何效果。
-     * play() 方法不会改变动画的当前位置。但是，如果动画之前已经播放到结尾，则会从头开始重新播放。
-     * 
-     * @return Unit - Unit
-     */
-    public func play(): Unit
-
-	/*
-     * 取消当前动画的播放，停留在当前位置。调用 play() 方法可以从上次暂停的位置继续播放动画。
-	 * 
-     * @return Unit - Unit
-     */
-    public func pause(): Unit
-
-	/*
-     * 指示动画是否正在播放。
-	 * 
-     * @return Bool - 返回是否正在播放
-     */
-    public func isPlaying(): Bool
-	
-	/*
-     * 如果PAGView正在主线程中播放，则返回true。默认值为false。
-	 * 
-     * @return Bool - 返回是否正在主线程中播放
-     */
-    public func isSync(): Bool
-
-	/*
-     * 设置PAGView的同步标志。
-	 * 
-	 * @param isSync - 是否同步
-     * @return Unit - Unit
-     */
-    public func setSync(isSync: Bool): Unit
-	
-	/*
-     * 设置动画播放的次数。
-	 * 
-	 * @param repeatCount - 动画播放次数。小于或等于0：动画将无限循环播放。
-     * @return Unit - Unit
-     */
-    public func setRepeatCount(repeatCount: Int32): Unit
-	
-	/*
-     * 播放动画的总次数
-	 * 
-	 * @return Int32 - 播放动画的总次数
-     */
-    public func repeatCount(): Int32
-	
-	/*
-     * 获取videoEnabled的属性值
-	 * 
-	 * @return Bool - 是否跳过视频合成的渲染。false表示跳过视频合成的渲染
-     */
-    public func videoEnabled(): Bool
-	
-	/*
-     * 设置videoEnabled属性的值。如果设置为false，PAGView将跳过视频合成的渲染。
-	 * 
-	 * @param enable - 是否支持视频渲染
-	 * @return Unit - Unit
-     */
-    public func setVideoEnabled(enable: Bool): Unit
-	
-	/*
-     * 获取 cacheEnabled 属性值。如果该值为 true，PAG 渲染器会为每一层的静态内容缓存一个内部的位图表示，以提升包含复
-	 * 杂矢量内容的图层的渲染性能。此功能可显著提高渲染效率，但也会增加图形内存的使用。默认值为 true。
-	 * 
-	 * @return Bool - 返回是否启用了 PAG 渲染器的位图缓存功能
-     */
-    public func cacheEnabled(): Bool
-	
-	/*
-     * 设置cacheEnabled属性的值。
-	 * 
-	 * @param enable - 设置是否启用PAG 渲染器的位图缓存功能
-	 * @return Unit - Unit
-     */
-    public func setCacheEnabled(enable: Bool): Unit
-	
-	/*
-     * 获取是否启用了磁盘缓存功能。
-	 * 
-	 * @return Bool - 返回是否启用缓存功能
-     */
-    public func useDiskCache(): Bool
-
-	/*
-     * 设置useDiskCache属性的值。如果设置为 true，PAG 会将相关的渲染数据缓存到磁盘文件中，例如视频合成的解码图像帧。
-     * 这有助于减少内存使用并提高渲染性能。
-	 * 
-	 * @param value - 是否启用缓存功能
-     */
-    public func setUseDiskCache(value: Bool): Unit
-
-	/*
-     * 此值定义了内部图形缓存的缩放因子，范围从 0.0 到 1.0。小于 1.0 的缩放因子可能会导致输
-	 * 出图像模糊，但可以减少图形内存的使用，从而提高性能。默认值为 1.0。
-	 * 
-	 * @return Float32 - 缩放因子值
-     */
-    public func cacheScale(): Float32
-
-	/*
-     * 设置cacheScale属性的值。设置范围从 0.0 到 1.0。小于 1.0 的缩放因子可能会导致输出图像模糊，但可以减少图形内存的使用，从而提高性能。默认值为 1.0。
-	 * 
-	 * @param value - 缩放因子值
-     */
-    public func setCacheScale(value: Float32): Unit
-	
-	/*
-     * 渲染的最大帧速率。如果设置为小于实际帧速率的值，则PAGFile，它可以降低帧数，但可以
-	 * 提高性能。否则，它没有任何效果。默认值为60。
-	 * 
-	 * @return Float32 - 最大帧速率
-     */
-    public func maxFrameRate(): Float32
-	
-	/*
-     * 设置渲染的最大帧速率。
-	 * 
-	 * @param value - 最大帧速率值
-     */
-    public func setMaxFrameRate(value: Float32): Unit
-	
-	/*
-     * 获取当前缩放模式。
-	 * 
-	 * @return Int32 - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
-     */
-    public func scaleMode(): Int32
-
-	/*
-     * 指定如何缩放页面内容以适应曲面大小的规则。矩阵调用此方法时会发生变化。
-	 * 
-	 * @param value - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
-     */
-    public func setScaleMode(value: Int32): Unit
-	
-	/*
-     * 获取当前矩阵的副本。
-	 * 
-	 * @return Array<Float32> - 当前矩阵的副本
-     */
-    public func matrix(): Array<Float32>
-	
-	/*
-     * 设置将应用于合成的变换。scaleMode属性调用此方法时，将设置为PAGScaleMode:：None。
-	 * 
-	 * @param value - 要设置的变换矩阵
-     */
-    public func setMatrix(values: Array<Float32>): Unit
-	
-	/*
-     * 获取当前合成的持续时间（以微秒为单位）
-	 * 
-	 * @return Int64 - 返回当前合成的持续时间
-     */
-    public func duration(): Int64
-	
-	/*
-     * 获取当前播放位置的进度，该值在0.0到1.0之间。
-	 * 
-	 * @return Float64 - 当前播放位置的进度值
-     */
-    public func getProgress(): Float64
-	
-	/*
-     * 设置播放位置的进度，有效值为0.0到1.0。
-	 * 
-	 * @param value - 要设置的播放进度
-     */
-    public func setProgress(value: Float64): Unit
-
-	/*
-     * 获取当前帧。
-	 * 
-	 * @return Int32 - 当前帧
-     */
-    public func currentFrame(): Int32
-	
-	/*
-     * 调用此方法可立即渲染当前位置。请注意，之前对 PAGView 所做的所有更改仅在此方法被
-	 * 调用后才会生效。如果已经调用了 play() 方法，则无需手动调用此方法，因为它会在每一
-	 * 帧自动被调用。如果内容发生了变化，则返回 true。
-	 * 
-	 * @return Bool - 内容是否发生变化
-     */
-    public func flush(): Bool
-	
-	/*
-     * 获取位于指定点下方的图层数组。该点以像素为单位。
-	 * 
-	 * @param x - 指定点的水平方向上的坐标
-	 * @param y - 指定点的垂直方向上的坐标
-	 * @return Array<PAGLayer> - 返回位于指定点下方的图层数组
-     */
-    public func getLayersUnderPoint(x: Float32, y: Float32): Array<PAGLayer>
-	
-	/*
-     * 立即释放pag视图创建的缓存。可以调用以减轻内存压力。
-	 * 
-     */
-    public func freeCache(): Unit
-	
-	/*
-     * 获取一个捕获PAGView内容的位图。后续渲染PAGView将不会被捕获。如果PAGView尚未显示，则返回null。
-	 * 
-	 * @return Option<PixelMap> - 返回一个捕获PAGView内容的位图
-     */
-    public func makeSnapshot(): Option<PixelMap>
-	
-	/*
-     * 获取一个以像素为单位的矩形，该矩形定义了指定层的显示区域位于PAGView的坐标系中。
-	 *
-	 * @param layer - 需要获取显示区域的图层
-	 * @return Array<Float32> - 返回一个以像素为单位的矩形
-     */
-    public func getBounds(layer: PAGLayer): Array<Float32>
-	
-	/*
-     * 添加一个监听器到监听器集合中，这些监听器会在动画的生命周期内接收到事件，例如开始、重复和结束事件。
-	 *
-	 * @param listener - 要添加的动画监听器对象
-	 *
-     */
-    public func addListener(listener: PAGViewListener)
-	
-	/*
-     * 从集合中删除收听此动画的收听者。
-	 *
-	 * @param listener - 要删除的动画监听器对象
-	 *
-     */
-    public func removeListener(listener: PAGViewListener)
-	
-	/*
-     * 立即释放 PAGViewController 实例所使用的资源，而不是依赖垃圾收集器在未来某个时刻为你完成这项工作。
-	 *
-     */
-    public func releaseAll(): Unit
-
-	/*
-     * 获取当前 PAGView 实例的唯一标识符
-     *
-	 * @return String - 返回当前 PAGView 对象对应的唯一字符串ID
-     */
-    public func uniqueID(): String
-
-	/*
-     * 手动触发动画的帧更新
-	 *
-     */
-    public func update(): Unit
-}
-
-```
-
-
-### 23. TraceImage
+##### 3.21 TraceImage
 记录图像信息。
 
 ```cangjie
@@ -2209,7 +2195,7 @@ public class TraceImage {
 }
 ```
 
-### 24. VideoDecoder
+##### 3.22 VideoDecoder
 
 ```cangjie
 public abstract class VideoDecoder {
