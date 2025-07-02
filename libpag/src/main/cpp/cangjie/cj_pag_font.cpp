@@ -95,8 +95,7 @@ char* cj_PAGFont_getFontStyle(const int64_t ptr)
     }
     PAGFont font = instance->get();
     const std::string fontStyle = font.fontStyle;
-    char *cstr = new char[fontStyle.size() + 1]; 
-    std::strcpy(cstr, fontStyle.c_str());     
+    char *cstr = cj_string_To_UTF8((char *)fontStyle.c_str(),"ISO-8859-1");
     return cstr;
 }
 }

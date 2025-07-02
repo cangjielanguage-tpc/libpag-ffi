@@ -7,6 +7,7 @@
 
 #include <pag/pag.h>
 #include <hilog/log.h>
+#include "cj_string_util.h"
 
 extern "C" {// cangjie [PAGFont] ffi
 long long cj_PAGFont_registerFont(char* fileName, const int32_t ttcIndex, char* fontFamily, char* fontStyle);
