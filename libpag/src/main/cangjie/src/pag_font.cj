@@ -70,6 +70,12 @@ public class PAGFont {
         this.ptr = ptr
     }
 
+    private init(fontFamily: String, fontStyle: String) {
+        this.fontFamily = fontFamily
+        this.fontStyle = fontStyle
+        this.ptr = 0
+    }
+
     public static func registerFontFromPath(fontPath: String, ttcIndex!: Int32 = 0, fontFamily!: String = "",
         fontStyle!: String = ""): PAGFont {
         return registerFont(fontPath, ttcIndex, fontFamily, fontStyle)
@@ -115,8 +121,14 @@ public class PAGFont {
         fontFamily: String, fontStyle: String): PAGFont {
         let stageContext = getStageContext(context.getOrThrow())
         let resMgr = ResourceManager.getResourceManager(stageContext)
-        var buf: Array<Byte> = resMgr.getRawFileContent(fileName)
-        return registerFontBytes(buf, Int32(buf.size), ttcIndex, fontFamily, fontStyle)
+        try {
+            var buf: Array<Byte> = resMgr.getRawFileContent(fileName)
+            return registerFontBytes(buf, Int32(buf.size), ttcIndex, fontFamily, fontStyle)
+        } catch (e: BusinessException) {
+            Hilog.error(0, "PAGFont",
+                "registerFont getRawFileContent failed, error code: ${e.code}, message: ${e.message}.")
+            return PAGFont("", "")
+        }
     }
 
     private static func registerFontBytes(bytes: Array<Byte>, length: Int32, ttcIndex: Int32): PAGFont {

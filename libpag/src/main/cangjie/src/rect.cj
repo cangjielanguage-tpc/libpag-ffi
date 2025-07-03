@@ -22,7 +22,7 @@ public class Rect <: ToString {
     /**
      * Create a SourceRect instance.
      */
-    public init(){}
+    public init() {}
 
     /**
      * Create a SourceRect instance based on parameters.

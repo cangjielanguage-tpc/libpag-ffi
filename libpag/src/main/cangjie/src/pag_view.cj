@@ -184,9 +184,9 @@ foreign {
 
     func cj_PAGViewController_setScaleMode(jView: Int64, value: Int32): Unit
 
-    func cj_PAGViewController_matrix(ptrCJPAGPlayer: Int64, values: VArray<Float32, $9>): Unit
+    func cj_PAGViewController_matrix(jView: Int64, values: VArray<Float32, $9>): Unit
 
-    func cj_PAGViewController_setMatrix(ptrCJPAGPlayer: Int64, values: VArray<Float32, $9>): Unit
+    func cj_PAGViewController_setMatrix(jView: Int64, values: VArray<Float32, $9>): Unit
 
     func cj_PAGViewController_duration(jView: Int64): Int64
 
@@ -315,6 +315,7 @@ public class PAGViewController <: XComponentController {
                     native = v.getNativeComposition()
                     cj_PAGViewController_setComposition(jView, native, true)
                 }
+                this.composition = None
             }
         }
     }
@@ -337,19 +338,13 @@ public class PAGViewController <: XComponentController {
      * Loads a pag file from the local path, returns false if the file does not exist or the data is not a pag file.
      */
     public func setPath(path: String): Bool {
-        this.filePath = path
         let file: Option<PAGFile> = PAGFile.LoadFromPath(path)
-        unsafe {
-            if (let Some(v) <- file) {
-                if (let Some(value) <- this.composition) {
-                    value.nativeRelease()
-                }
-                this.composition = v
-                let native: Int64 = v.getNativeComposition()
-                cj_PAGViewController_setComposition(jView, native, false)
-                return true
-            }
-            this.composition = None
+        if (let Some(v) <- file) {
+            setComposition(v)
+            this.filePath = path
+            return true
+        } else {
+            setComposition(Option<PAGComposition>.None)
             return false
         }
     }
@@ -358,21 +353,14 @@ public class PAGViewController <: XComponentController {
      * Asynchronously load a pag file from the specific path which can be a network path or a local path.
      */
     public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit): Unit {
-        this.filePath = path
         unsafe {
-            PAGFont.initFontFallback()
-            if (filePath == '') {
-                callback(Option<PAGFile>.None)
-            }
-            if (PAGFile.IsNetWorkPath(filePath)) {
-                let cacheData: Array<UInt8> = PAGDiskCache.readFile(filePath)
+            if (PAGFile.IsNetWorkPath(path)) {
+                let cacheData: Array<UInt8> = PAGDiskCache.readFile(path)
                 if (cacheData.size > 0) {
                     let file: Option<PAGFile> = PAGFile.LoadFromBytes(cacheData)
                     if (let Some(v) <- file) {
-                        if (let Some(value) <- this.composition) {
-                            value.nativeRelease()
-                        }
-                        this.composition = v
+                        setComposition(v)
+                        this.filePath = path
                         callback(v)
                     }
                 } else {
@@ -382,11 +370,11 @@ public class PAGViewController <: XComponentController {
                         expectDataType: HttpDataType.ARRAY_BUFFER
                     )
                     httpRequest.request(
-                        filePath,
+                        path,
                         {
                             err, resp =>
                             if (let Some(e) <- err) {
-                                Hilog.error(0, "PAGFile", "LoadFromPathAsync error:${e.message}")
+                                Hilog.error(0, "PAGViewController", "setPathAsync httpRequest error:${e.message}")
                             }
                             if (let Some(r) <- resp) {
                                 if (r.responseCode.getValue() == ResponseCode.OK.getValue()) {
@@ -395,38 +383,33 @@ public class PAGViewController <: XComponentController {
                                         case HttpData.ARRAY_DATA(bytes) =>
                                             let file: Option<PAGFile> = PAGFile.LoadFromBytes(bytes)
                                             if (let Some(v) <- file) {
-                                                if (let Some(value) <- this.composition) {
-                                                    value.nativeRelease()
-                                                }
-                                                this.composition = v
+                                                setComposition(v)
+                                                this.filePath = path
                                                 callback(v)
+                                                httpRequest.destroy()
+                                                return
                                             }
                                         case _ => ()
                                     }
-                                } else {
-                                    callback(Option<PAGFile>.None)
                                 }
-                            } else {
-                                callback(Option<PAGFile>.None)
                             }
+                            setComposition(Option<PAGComposition>.None)
+                            callback(Option<PAGFile>.None)
                             httpRequest.destroy()
                         },
                         options: option
                     )
                 }
             } else {
-                var pagfile = PAGFile.LoadFromPath(filePath)
-                if (pagfile.isNone()) {
-                    callback(Option<PAGFile>.None)
-                } else {
-                    if (let Some(v) <- pagfile) {
-                        if (let Some(value) <- this.composition) {
-                            value.nativeRelease()
-                        }
-                        this.composition = v
-                        callback(v)
-                    }
+                var pagfile = PAGFile.LoadFromPath(path)
+                if (let Some(v) <- pagfile) {
+                    setComposition(v)
+                    this.filePath = path
+                    callback(v)
+                    return
                 }
+                setComposition(Option<PAGComposition>.None)
+                callback(Option<PAGFile>.None)
             }
         }
     }
@@ -754,7 +737,7 @@ public class PAGViewController <: XComponentController {
                 return None
             }
             var alphaType: AlphaType = getAlphaType(res.alphaType)
-            var editable: Bool = res.editable //= false,
+            var editable: Bool = res.editable
             var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
             var height: Int32 = res.height
             var width: Int32 = res.width
@@ -833,21 +816,22 @@ public class PAGViewController <: XComponentController {
     public func releaseAll(): Unit {
         unsafe {
             cj_PAGViewController_release(jView)
+            jView = 0
             if (id != "") {
                 let p = LibC.mallocCString(id)
                 cj_PAGViewController_destroyJPAGView(p)
                 LibC.free(p)
                 id = ""
             }
-            if (let Some(value) <- this.composition) {
-                value.nativeRelease()
-                this.composition = None
-            }
+            setComposition(Option<PAGComposition>.None)
         }
     }
 
     public func uniqueID(): String {
         unsafe {
+            if (jView == 0) {
+                return ""
+            }
             let id: CString = cj_PAGViewController_uniqueID(jView)
             let str = id.toString()
             LibC.free(id)

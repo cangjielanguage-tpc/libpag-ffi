@@ -55,7 +55,7 @@ private:
 
 extern "C" {
 int64_t cj_PAGViewController_createJPAGView();
-void cj_PAGViewController_destroyJPAGView(const char *path);
+void cj_PAGViewController_destroyJPAGView(const char *id);
 void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition, bool isNull);
 void cj_PAGViewController_play(const int64_t jView);
 const char *cj_PAGViewController_uniqueID(const int64_t jView);

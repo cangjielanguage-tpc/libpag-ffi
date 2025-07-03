@@ -4,11 +4,15 @@
 
 package libpag4cj
 
+import std.convert.*
+import std.sync.*
+import ohos.net.http.*
+
 @FastNative
 foreign {
     func cj_PAGImageViewController_createPAGImageView(): Int64
 
-    func cj_PAGImageViewController_setComposition(cjImageView: Int64, native: Int64, maxFrameRate: Float64): Unit
+    func cj_PAGImageViewController_setComposition(cjImageView: Int64, native: Int64, maxFrameRate: Float64, isNull: Bool): Unit
 
     func cj_PAGImageViewController_scaleMode(cjImageView: Int64): Int32
 
@@ -18,17 +22,17 @@ foreign {
 
     func cj_PAGImageViewController_setMatrix(cjImageView: Int64, bytes: CPointer<Float32>): Unit
 
-    func cj_PAGImageViewController_renderScale(cjImageView: Int64): Float64
+    func cj_PAGImageViewController_renderScale(cjImageView: Int64): Float32
 
-    func cj_PAGImageViewController_setRenderScale(cjImageView: Int64, renderScale: Float64): Unit
+    func cj_PAGImageViewController_setRenderScale(cjImageView: Int64, renderScale: Float32): Unit
 
     func cj_PAGImageViewController_cacheAllFramesInMemory(cjImageView: Int64): Bool
 
     func cj_PAGImageViewController_setCacheAllFramesInMemory(cjImageView: Int64, enable: Bool): Unit
 
-    func cj_PAGImageViewController_currentFrame(cjImageView: Int64): Float64
+    func cj_PAGImageViewController_currentFrame(cjImageView: Int64): Int64
 
-    func cj_PAGImageViewController_setCurrentFrame(cjImageView: Int64, currentFrame: Float64): Unit
+    func cj_PAGImageViewController_setCurrentFrame(cjImageView: Int64, currentFrame: Int64): Unit
 
     func cj_PAGImageViewController_currentImage(cjImageView: Int64): CJPixelMap
 
@@ -47,50 +51,160 @@ foreign {
     func cj_PAGImageViewController_uniqueID(cjImageView: Int64): CString
 
     func cj_PAGImageViewController_update(cjImageView: Int64): Unit
+
+    func cj_PAGImageViewController_SetSurfaceId(cjImageView: Int64, surfaceId: Int64): Unit
+
+    func cj_PAGImageViewController_ChangeSurface(cjImageView: Int64): Unit
+
+    func cj_PAGImageViewController_onAnimatorStateChange(cjImageView: Int64, cb: CFunc<(UInt8, Int64) -> Unit>): Unit
+
+    func cj_PAGImageViewController_onAnimatorProgress(cjImageView: Int64, cb: CFunc<(Int64) -> Unit>): Unit
+
+    func cj_PAGImageViewController_release(cjImageView: Int64): Unit
+
+    func cj_PAGImageViewController_destroyJPAGImageView(id: CString): Unit
+
+    func cj_PAGImageViewController_matrixFromArray(cjImageView: Int64, values: VArray<Float32, $9>): Unit
+
+    func cj_PAGImageViewController_setMatrixFromArray(cjImageView: Int64, values: VArray<Float32, $9>): Unit
 }
 
-public abstract class PAGImageViewListener {
+/**
+ * Implementation of the IPAGImageViewListener interface.
+ * This class allows clients to provide custom behavior for animation lifecycle callbacks
+ */
+public class PAGImageViewListener <: IPAGImageViewListener {
+    public var onAnimationStartImpl: (PAGImageViewController) -> Unit
+    public var onAnimationEndImpl: (PAGImageViewController) -> Unit
+    public var onAnimationRepeatImpl: (PAGImageViewController) -> Unit
+    public var onAnimationCancelImpl: (PAGImageViewController) -> Unit
+    public var onAnimationUpdateImpl: (PAGImageViewController) -> Unit
+    public init(
+        onAnimationStart!: (PAGImageViewController) -> Unit,
+        onAnimationEnd!: (PAGImageViewController) -> Unit,
+        onAnimationRepeat!: (PAGImageViewController) -> Unit,
+        onAnimationCancel!: (PAGImageViewController) -> Unit,
+        onAnimationUpdate!: (PAGImageViewController) -> Unit
+    ) {
+        this.onAnimationStartImpl = onAnimationStart
+        this.onAnimationEndImpl = onAnimationEnd
+        this.onAnimationRepeatImpl = onAnimationRepeat
+        this.onAnimationCancelImpl = onAnimationCancel
+        this.onAnimationUpdateImpl = onAnimationUpdate
+    }
+
     /**
-     * Notifies the start of the animation. It can be called from either the UI thread or the
-     * thread that calls the play() method.
+     * Notifies the beginning of the animation. It can be called from either the UI thread or the thread
+     * that calls the play method.
      */
-    public var onAnimationStart: Option<(PAGImageViewController) -> Unit> = None
+    public func onAnimationStart(imageViewController: PAGImageViewController): Unit {
+        this.onAnimationStartImpl(imageViewController)
+    }
 
     /**
      * Notifies the end of the animation. It can only be called from the UI thread.
      */
-    public var onAnimationEnd: Option<(PAGImageViewController) -> Unit> = None
+    public func onAnimationEnd(imageViewController: PAGImageViewController): Unit {
+        this.onAnimationEndImpl(imageViewController)
+    }
 
     /**
      * Notifies the repetition of the animation. It can only be called from the UI thread.
      */
-    public var onAnimationRepeat: Option<(PAGImageViewController) -> Unit> = None
+    public func onAnimationRepeat(imageViewController: PAGImageViewController): Unit {
+        this.onAnimationRepeatImpl(imageViewController)
+    }
 
     /**
-     * Notifies the cancellation of the animation. It can be called from either the UI thread or
-     * the thread that calls the stop() method.
+     * Notifies the cancellation of the animation. It can be called from either the UI thread or the
+     * thread that calls the stop method.
      */
-    public var onAnimationCancel: Option<(PAGImageViewController) -> Unit> = None
+    public func onAnimationCancel(imageViewController: PAGImageViewController): Unit {
+        this.onAnimationCancelImpl(imageViewController)
+    }
 
     /**
      * Notifies another frame of the animation has occurred. It may be called from an arbitrary
      * thread if the animation is running asynchronously.
      */
-    public var onAnimationUpdate: Option<(PAGImageViewController) -> Unit> = None
+    public func onAnimationUpdate(imageViewController: PAGImageViewController): Unit {
+        this.onAnimationUpdateImpl(imageViewController)
+    }
+}
+
+/**
+ * Listener interface for receiving animation lifecycle events from a PAGImageViewController.
+ */
+public interface IPAGImageViewListener {
+    func onAnimationStart(imageViewController: PAGImageViewController): Unit
+
+    func onAnimationEnd(imageViewController: PAGImageViewController): Unit
+
+    func onAnimationRepeat(imageViewController: PAGImageViewController): Unit
+
+    func onAnimationCancel(imageViewController: PAGImageViewController): Unit
+
+    func onAnimationUpdate(imageViewController: PAGImageViewController): Unit
+}
+
+protected var imageViewControllerMap: HashMap<Int64, Option<PAGImageViewController>> = HashMap<Int64, Option<PAGImageViewController>>(
+)
+
+/**
+ * Animation state callback
+ */
+@C
+func onImageViewStateChange(state: UInt8, imageView: Int64): Unit {
+    if (imageViewControllerMap.contains(imageView)) {
+        match (state) {
+            case 0 => imageViewControllerMap[imageView].getOrThrow().onAnimationStart()
+            case 1 => imageViewControllerMap[imageView].getOrThrow().onAnimationCancel()
+            case 2 => imageViewControllerMap[imageView].getOrThrow().onAnimationEnd()
+            case 3 => imageViewControllerMap[imageView].getOrThrow().onAnimationRepeat()
+            case _ => ()
+        }
+    }
+}
+
+/**
+ * Animation update callback
+ */
+@C
+func onImageViewProgressUpdate(imageView: Int64): Unit {
+    if (imageViewControllerMap.contains(imageView)) {
+        imageViewControllerMap[imageView].getOrThrow().onAnimatorProgressUpdate()
+    }
 }
 
 public class PAGImageViewController <: XComponentController {
+    private var mt = Mutex()
     private var composition: Option<PAGComposition> = None
     private var filePath: String = ""
     private var listeners: ArrayList<PAGImageViewListener> = ArrayList<PAGImageViewListener>(4)
     private var view: Option<PAGImageView> = None
     // Binding with C code, the object pointer returned by C code.
     private var cjImageView: Int64 = 0
-
+    private var id: String
     public init() {
-        cjImageView
         unsafe {
             cjImageView = cj_PAGImageViewController_createPAGImageView()
+            cj_PAGImageViewController_onAnimatorStateChange(cjImageView, onImageViewStateChange)
+            cj_PAGImageViewController_onAnimatorProgress(cjImageView, onImageViewProgressUpdate)
+            let uniqueID: CString = cj_PAGImageViewController_uniqueID(cjImageView)
+            id = uniqueID.toString()
+            LibC.free(uniqueID)
+        }
+    }
+
+    protected override func onSurfaceCreated(surfaceId: String) {
+        unsafe {
+            cj_PAGImageViewController_SetSurfaceId(cjImageView, Int64.parse(surfaceId))
+        }
+    }
+
+    protected override func onSurfaceChanged(surfaceId: String, rect: SurfaceRect) {
+        unsafe {
+            cj_PAGImageViewController_ChangeSurface(cjImageView)
         }
     }
 
@@ -112,12 +226,22 @@ public class PAGImageViewController <: XComponentController {
      */
     public func setComposition(composition: Option<PAGComposition>, maxFrameRate!: Float64 = 30.0): Unit {
         this.filePath = ""
-        this.composition = composition
-
-        unsafe {
-            if (let Some(v) <- composition) {
-                let native: Int64 = v.getNativeComposition()
-                cj_PAGImageViewController_setComposition(cjImageView, native, maxFrameRate)
+        if (this.composition.isNone() && composition.isNone()) {
+            return
+        } else {
+            var native: Int64 = 0
+            unsafe {
+                if (let Some(v) <- composition) {
+                    this.composition = composition
+                    native = v.getNativeComposition()
+                    cj_PAGImageViewController_setComposition(cjImageView, native, maxFrameRate, false)
+                    return
+                }
+                if (let Some(v) <- this.composition) {
+                    native = v.getNativeComposition()
+                    cj_PAGImageViewController_setComposition(cjImageView, native, maxFrameRate, true)
+                }
+                this.composition = None
             }
         }
     }
@@ -130,7 +254,7 @@ public class PAGImageViewController <: XComponentController {
     func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
         this.filePath = ""
         unsafe {
-            cj_PAGImageViewController_setComposition(cjImageView, composition, maxFrameRate)
+            cj_PAGImageViewController_setComposition(cjImageView, composition, maxFrameRate, false)
         }
     }
 
@@ -147,45 +271,86 @@ public class PAGImageViewController <: XComponentController {
      * @returns
      */
     public func setPath(path: String, maxFrameRate!: Float64 = 30.0): Bool {
-        this.filePath = path
         let file: Option<PAGFile> = PAGFile.LoadFromPath(path)
-
-        unsafe {
-            if (let Some(v) <- file) {
-                this.composition = v
-                let native: Int64 = v.getNativeComposition()
-                cj_PAGImageViewController_setComposition(cjImageView, native, maxFrameRate)
-                return true
-            }
-            this.composition = None
+        if (let Some(v) <- file) {
+            setComposition(v, maxFrameRate: maxFrameRate)
+            this.filePath = path
+            return true
+        } else {
+            setComposition(Option<PAGComposition>.None)
             return false
         }
     }
 
     /**
-     * 从特定路径异步加载pag文件，该路径可以是网络路径或本地路径。
+     * Asynchronously load a pag file from the specific path which can be a network path or a local path.
      * @param path
      * @returns
      */
-    /*
-    func setPathAsync(path: String, maxFrameRate!: Float64 = 30.0): Future<PAGFile> {
-        this.filePath = path
-
-        let fut: Future<PAGFile> = spawn { =>
-            let futPAGFile: Future<PAGFile> = PAGFile.LoadFromPathAsync(path)
-            let pagFile: PAGFile = futPAGFile.get()
-            this.composition = pagFile
-
-            unsafe {
-                //this.cjImageView.setComposition(pagFile?.getNativeComposition(), maxFrameRate)
-                let native: Int64 = pagFile.getNativeComposition()
-                cj_PAGImageViewController_setComposition(cjImageView, native, maxFrameRate)
+    public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit, maxFrameRate!: Float64 = 30.0): Unit {
+        unsafe {
+            if (PAGFile.IsNetWorkPath(path)) {
+                let cacheData: Array<UInt8> = PAGDiskCache.readFile(path)
+                if (cacheData.size > 0) {
+                    let file: Option<PAGFile> = PAGFile.LoadFromBytes(cacheData)
+                    if (let Some(v) <- file) {
+                        setComposition(v, maxFrameRate: maxFrameRate)
+                        this.filePath = path
+                        callback(v)
+                        return
+                    }
+                    setComposition(Option<PAGComposition>.None)
+                    callback(Option<PAGFile>.None)
+                } else {
+                    let httpRequest = createHttp()
+                    let option = HttpRequestOptions(
+                        method: RequestMethod.GET,
+                        expectDataType: HttpDataType.ARRAY_BUFFER
+                    )
+                    httpRequest.request(
+                        path,
+                        {
+                            err, resp =>
+                            if (let Some(e) <- err) {
+                                Hilog.error(0, "PAGImageViewController", "setPathAsync httpRequest error:${e.message}")
+                            }
+                            if (let Some(r) <- resp) {
+                                if (r.responseCode.getValue() == ResponseCode.OK.getValue()) {
+                                    match (r.result) {
+                                        case HttpData.STRING_DATA(str) => ()
+                                        case HttpData.ARRAY_DATA(bytes) =>
+                                            let file: Option<PAGFile> = PAGFile.LoadFromBytes(bytes)
+                                            if (let Some(v) <- file) {
+                                                setComposition(v, maxFrameRate: maxFrameRate)
+                                                this.filePath = path
+                                                callback(v)
+                                                httpRequest.destroy()
+                                                return
+                                            }
+                                        case _ => ()
+                                    }
+                                }
+                            }
+                            setComposition(Option<PAGComposition>.None)
+                            callback(Option<PAGFile>.None)
+                            httpRequest.destroy()
+                        },
+                        options: option
+                    )
+                }
+            } else {
+                var pagfile = PAGFile.LoadFromPath(path)
+                if (let Some(v) <- pagfile) {
+                    setComposition(v, maxFrameRate: maxFrameRate)
+                    this.filePath = path
+                    callback(v)
+                    return
+                }
+                setComposition(Option<PAGComposition>.None)
+                callback(Option<PAGFile>.None)
             }
-            return pagFile
         }
-        return fut
     }
-     */
 
     /**
      * Returns the current scale mode.
@@ -210,10 +375,7 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-    /**
-     * Returns a copy of the current matrix.
-     */
-    public func matrix(): Matrix4 {
+    private func matrixToMatrix4(): Matrix4 {
         unsafe {
             let res: CJFloat32Array = cj_PAGImageViewController_matrix(cjImageView)
             let size: Int64 = res.size
@@ -229,18 +391,18 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-    public func matrixToArray(): Array<Float32> {
+    /**
+     * Returns a copy of the current matrix.
+     */
+    public func matrix(): Array<Float32> {
         unsafe {
-            let res: CJFloat32Array = cj_PAGImageViewController_matrix(cjImageView)
-            let size: Int64 = res.size
-            let buf: CPointer<Float32> = res.buf
-            let bytes: Array<Float32> = Array<Float32>(size, repeat: 0.0)
-            for (i in 0..size) {
-                bytes[i] = (buf + i).read()
+            var values = VArray<Float32, $9>({i => 0.0})
+            cj_PAGImageViewController_matrixFromArray(cjImageView, inout values)
+            var data: Array<Float32> = Array<Float32>(6, repeat: 0.0)
+            for (i in 0..5) {
+                data[i] = values[i]
             }
-            free_CPointer_Float32(buf)
-
-            return bytes
+            return data
         }
     }
 
@@ -248,7 +410,7 @@ public class PAGImageViewController <: XComponentController {
      * Sets the transformation which will be applied to the composition. The scaleMode property
      * will be set to PAGScaleMode::None when this method is called.
      */
-    public func setMatrix(matrix: Matrix4): Unit {
+    private func setMatrixFormMatrix4(matrix: Matrix4): Unit {
         unsafe {
             let buf: Array<Float32> = PAGUtils.ToNativeMatrix(matrix)
             let handle = acquireArrayRawData(buf)
@@ -257,15 +419,20 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-    public func setMatrix(buf: Array<Float32>): Unit {
-        if (buf.size == 0) {
+    public func setMatrix(values: Array<Float32>): Unit {
+        if (values.size == 0) {
             Hilog.error(0, 'PAGImageViewController', "setMatrix invalid setting");
             return
         }
         unsafe {
-            let handle = acquireArrayRawData(buf)
-            cj_PAGImageViewController_setMatrix(cjImageView, handle.pointer)
-            releaseArrayRawData(handle)
+            var data: VArray<Float32, $9> = VArray<Float32, $9>({i => 0.0})
+            for (i in 0..values.size) {
+                if (i > 5) {
+                    break
+                }
+                data[i] = values[i]
+            }
+            cj_PAGImageViewController_setMatrixFromArray(cjImageView, inout data)
         }
     }
 
@@ -274,7 +441,7 @@ public class PAGImageViewController <: XComponentController {
      * from 0.0 to 1.0. A scale factor less than 1.0 may result in blurred output, but it can reduce
      * graphics memory usage, increasing the rendering performance. The default value is 1.0.
      */
-    public func renderScale(): Float64 {
+    public func renderScale(): Float32 {
         unsafe {
             return cj_PAGImageViewController_renderScale(cjImageView)
         }
@@ -283,7 +450,7 @@ public class PAGImageViewController <: XComponentController {
     /**
      * Sets the value of the renderScale property.
      */
-    public func setRenderScale(renderScale: Float64): Unit {
+    public func setRenderScale(renderScale: Float32): Unit {
         unsafe {
             cj_PAGImageViewController_setRenderScale(cjImageView, renderScale)
         }
@@ -313,7 +480,7 @@ public class PAGImageViewController <: XComponentController {
     /**
      * Returns the current frame index the PAGImageView is rendering.
      */
-    public func currentFrame(): Float64 {
+    public func currentFrame(): Int64 {
         unsafe {
             return cj_PAGImageViewController_currentFrame(cjImageView)
         }
@@ -322,7 +489,7 @@ public class PAGImageViewController <: XComponentController {
     /**
      * Sets the frame index for the PAGImageView to render.
      */
-    public func setCurrentFrame(currentFrame: Float64): Unit {
+    public func setCurrentFrame(currentFrame: Int64): Unit {
         unsafe {
             cj_PAGImageViewController_setCurrentFrame(cjImageView, currentFrame)
         }
@@ -341,19 +508,16 @@ public class PAGImageViewController <: XComponentController {
             }
 
             //InitializationOptions
-            var alphaType: AlphaType = getAlphaType(res.alphaType) //!: AlphaType = AlphaType.UNKNOWN,
-            var editable: Bool = res.editable //= false,
-            var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat) //!: PixelMapFormat = PixelMapFormat.UNKNOWN,
-
+            var alphaType: AlphaType = getAlphaType(res.alphaType)
+            var editable: Bool = res.editable
+            var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
             var height: Int32 = res.height
             var width: Int32 = res.width
-
             let bytes: Array<Byte> = Array<Byte>(size, repeat: 0)
             for (i in 0..size) {
                 bytes[i] = buf.read(i)
             }
             free_CPointer_UInt8(buf)
-
             let opts: InitializationOptions = InitializationOptions(
                 alphaType: alphaType,
                 editable: editable,
@@ -361,7 +525,6 @@ public class PAGImageViewController <: XComponentController {
                 size: Size(height: height, width: width)
             )
             let pixelMap: PixelMap = createPixelMap(bytes, opts)
-
             return pixelMap
         }
     }
@@ -422,17 +585,17 @@ public class PAGImageViewController <: XComponentController {
      * animation, such as start, repeat, and end.
      */
     public func addListener(listener: PAGImageViewListener): Unit {
-        this.listeners.add(listener)
+        synchronized(mt) {
+            listeners.add(listener)
+        }
     }
 
     /**
      * Removes a listener from the set listening to this animation.
      */
     public func removeListener(listener: PAGImageViewListener): Unit {
-        for (i in 0..this.listeners.size) {
-            if (refEq(this.listeners[i], listener)) {
-                this.listeners.remove(at: i)
-            }
+        synchronized(mt) {
+            listeners.removeValue(listener)
         }
     }
 
@@ -450,6 +613,9 @@ public class PAGImageViewController <: XComponentController {
 
     public func uniqueID(): String {
         unsafe {
+            if(cjImageView==0){
+                return ""
+            }
             let retC: CString = cj_PAGImageViewController_uniqueID(cjImageView)
             let ret = retC.toString()
             LibC.free(retC)
@@ -463,60 +629,81 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-    public func constructor(): Unit {
-        //TODO: 需要把函数传入 C++ 中？？？
+    /**
+     * Free up resources used by the PAGImageViewController instance immediately instead of relying on the
+     * garbage collector to do this for you at some point in the future.
+     */
+    public func releaseAll(): Unit {
+        unsafe {
+            cj_PAGImageViewController_release(cjImageView)
+            cjImageView = 0
+            if (id != "") {
+                let p = LibC.mallocCString(id)
+                cj_PAGImageViewController_destroyJPAGImageView(p)
+                LibC.free(p)
+                id = ""
+            }
+            setComposition(Option<PAGComposition>.None)
+        }
     }
-
-    private func onAnimationStart(): Unit {
-        for (listener in this.listeners) {
-            if (let Some(v) <- listener.onAnimationStart) {
-                v(this)
+    protected func onAnimationStart(): Unit {
+        synchronized(mt) {
+            for (listener in this.listeners) {
+                listener.onAnimationStart(this)
             }
         }
     }
 
-    private func onAnimationEnd(): Unit {
-        for (listener in this.listeners) {
-            if (let Some(v) <- listener.onAnimationEnd) {
-                v(this)
+    protected func onAnimationEnd(): Unit {
+        synchronized(mt) {
+            for (listener in this.listeners) {
+                listener.onAnimationEnd(this)
             }
         }
     }
 
-    private func onAnimationCancel(): Unit {
-        for (listener in this.listeners) {
-            if (let Some(v) <- listener.onAnimationCancel) {
-                v(this)
+    protected func onAnimationCancel(): Unit {
+        synchronized(mt) {
+            for (listener in this.listeners) {
+                listener.onAnimationCancel(this)
             }
         }
     }
 
-    private func onAnimationRepeat(): Unit {
-        for (listener in this.listeners) {
-            if (let Some(v) <- listener.onAnimationRepeat) {
-                v(this)
+    protected func onAnimationRepeat(): Unit {
+        synchronized(mt) {
+            for (listener in this.listeners) {
+                listener.onAnimationRepeat(this)
             }
         }
     }
 
-    public func attachToView(view: PAGImageView) {
-        if (let Some(v) <- this.view) {
-            if (!refEq(v, view)) {
-                Hilog.error(0, "PAGImageView", "[attachToView]-controller has attached to view.")
-            }
+    protected func attachToView(cjImageView: Int64) {
+        if (this.cjImageView != 0 && this.cjImageView != cjImageView) {
+            Hilog.error(0, 'PAGImageViewController', "attachToView controller has attached to view");
         }
-        this.view = view
+        this.cjImageView = cjImageView
     }
 
-    public func detachFromView(): Unit {
-        this.view = None
+    protected func detachFromView() {
+        unsafe {
+            let p = LibC.mallocCString(id)
+            cj_PAGViewController_destroyJPAGView(p)
+            LibC.free(p)
+        }
+        this.listeners.clear()
+        this.cjImageView = 0
     }
 
-    private func onAnimatorProgressUpdate(): Unit {
-        for (listener in this.listeners) {
-            if (let Some(v) <- listener.onAnimationUpdate) {
-                v(this)
+    protected func onAnimatorProgressUpdate(): Unit {
+        synchronized(mt) {
+            for (listener in this.listeners) {
+                listener.onAnimationUpdate(this)
             }
         }
+    }
+
+    protected func getImageView(): Int64 {
+        return this.cjImageView
     }
 }

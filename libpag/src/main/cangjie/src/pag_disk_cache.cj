@@ -15,6 +15,8 @@ foreign {
     func cj_PAGDiskCache_readFile(key: CString): CJBytesArray
 
     func cj_PAGDiskCache_writeFile(key: CString, bytes: CPointer<UInt8>, size: Int64): Bool
+
+    func cj_PAGDiskCache_SetCacheDir(path: CString): Unit
 }
 
 /**
@@ -42,6 +44,9 @@ public class PAGDiskCache {
      * disk usage exceeds the limit, and they will be rechecked after they are closed.
      */
     public static func setMaxDiskSize(size: Int64): Unit {
+        if (size < 0) {
+            return
+        }
         unsafe {
             return cj_PAGDiskCache_setMaxDiskSize(size)
         }
@@ -57,7 +62,7 @@ public class PAGDiskCache {
         }
     }
 
-    public static func readFile(key: String): Array<UInt8> {
+    protected static func readFile(key: String): Array<UInt8> {
         unsafe {
             let k = LibC.mallocCString(key)
             let res: CJBytesArray = cj_PAGDiskCache_readFile(k)
@@ -73,7 +78,7 @@ public class PAGDiskCache {
         }
     }
 
-    public static func writeFile(key: String, bytes: Array<Byte>): Bool {
+    protected static func writeFile(key: String, bytes: Array<Byte>): Bool {
         unsafe {
             let str = LibC.mallocCString(key)
             let handle = acquireArrayRawData(bytes)
@@ -84,4 +89,12 @@ public class PAGDiskCache {
         }
     }
 
+    public static func SetCacheDir(path: String): Unit {
+        unsafe {
+            let p = LibC.mallocCString(path)
+            cj_PAGDiskCache_SetCacheDir(p)
+            LibC.free(p)
+            return
+        }
+    }
 }

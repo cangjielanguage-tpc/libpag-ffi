@@ -10,8 +10,7 @@ extern "C" {
 typedef struct {
     long long mStartTime;
     long long mDuration;
-    char* mComment;
+    char *mComment;
 } CJMarker;
-
 }
-#endif //LIBPAG_CJ_CJ_MARKER_H
+#endif // LIBPAG_CJ_CJ_MARKER_H

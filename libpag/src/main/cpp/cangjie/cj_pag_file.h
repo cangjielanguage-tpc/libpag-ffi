@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include "cj_helper.h"
 #include "cj_pag_image.h"
 #include "cj_pag_layer_handle.h"
 #include "pag/file.h"
-#include "cj_helper.h"
 
 namespace pag {
 

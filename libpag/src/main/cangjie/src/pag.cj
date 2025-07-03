@@ -7,9 +7,7 @@ package libpag4cj
 internal import ohos.hilog.*
 
 @FastNative
-foreign {
-	func cj_pag_sdkVersion(): CString
-}
+foreign func cj_pag_sdkVersion(): CString
 
 public class PAG {
     /**
@@ -23,6 +21,4 @@ public class PAG {
             return ret
         }
     }
-
 }
-

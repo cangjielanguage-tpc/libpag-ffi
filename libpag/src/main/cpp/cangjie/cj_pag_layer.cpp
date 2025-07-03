@@ -41,8 +41,7 @@ int8_t cj_PAGLayer_layerType(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[layerType]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
 
     LayerType lt = instance->get()->layerType();
     int64_t types = 0;
@@ -82,8 +81,7 @@ bool cj_PAGLayer_isPAGFile(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[isPAGFile]-the pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     bool flag = instance->get()->isPAGFile();
     return flag;
 }
@@ -93,8 +91,7 @@ char *cj_PAGLayer_layerName(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[layerName]-the pointer of PAGLayer is null.");
         return nullptr;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::string layerName = instance->get()->layerName();
     char *cstr = new char[layerName.size() + 1];
     std::strcpy(cstr, layerName.c_str());
@@ -106,8 +103,7 @@ void cj_PAGLayer_matrix(const int64_t ptr, float buf[]) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[matrix]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
 
     instance->get()->matrix().get9(buf);
 }
@@ -117,8 +113,7 @@ void cj_PAGLayer_setMatrix(const int64_t ptr, float *buf) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[setMatrix]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     auto pagLayer = instance->get();
     if (pagLayer == nullptr) {
         return;
@@ -133,8 +128,7 @@ void cj_PAGLayer_resetMatrix(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[resetMatrix]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
 
     instance->get()->resetMatrix();
 }
@@ -144,8 +138,7 @@ void cj_PAGLayer_getTotalMatrix(const int64_t ptr, float buf[]) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[getTotalMatrix]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->getTotalMatrix().get9(buf);
 }
 
@@ -154,8 +147,7 @@ bool cj_PAGLayer_visible(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[visible]-the pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     bool visible = instance->get()->visible();
     return visible;
 }
@@ -165,8 +157,7 @@ void cj_PAGLayer_setVisible(const int64_t ptr, bool value) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[setVisible]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->setVisible(value);
 }
 
@@ -175,8 +166,7 @@ int cj_PAGLayer_editableIndex(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[editableInde]-the pointer of PAGLayer is null.");
         return -1;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int visible = instance->get()->editableIndex();
     return visible;
 }
@@ -186,8 +176,7 @@ long long cj_PAGLayer_parent(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[parent]-the pointer of PAGLayer is null.");
         return -1;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::shared_ptr<PAGComposition> pagComposition = instance->get()->parent();
     CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(pagComposition);
     return (int64_t)cjlayer;
@@ -198,8 +187,7 @@ MarkersPAGLayer cj_PAGLayer_markers(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[markers]-the pointer of PAGLayer is null.");
         return MarkersPAGLayer{0, nullptr};
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::vector<const Marker *> markers = instance->get()->markers();
     long long size = markers.size();
     CJMarker *arr = CreateMarkers(markers);
@@ -217,8 +205,7 @@ int64_t cj_PAGLayer_localTimeToGlobal(const int64_t ptr, const int64_t localTime
                      "[localTimeToGlobal]-the pointer of PAGLayer is null.");
         return localTime;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int64_t times = instance->get()->localTimeToGlobal(localTime);
     return times;
 }
@@ -229,8 +216,7 @@ int64_t cj_PAGLayer_globalToLocalTime(const int64_t ptr, const int64_t globalTim
                      "[globalToLocalTime]-the pointer of PAGLayer is null.");
         return globalTime;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int64_t times = instance->get()->globalToLocalTime(globalTime);
     return times;
 }
@@ -240,8 +226,7 @@ int64_t cj_PAGLayer_duration(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[duration]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int64_t times = instance->get()->duration();
     return times;
 }
@@ -251,8 +236,7 @@ float cj_PAGLayer_frameRate(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[frameRate]-the pointer of PAGLayer is null.");
         return 60.0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     float frameRate = instance->get()->frameRate();
     return frameRate;
 }
@@ -262,8 +246,7 @@ int64_t cj_PAGLayer_startTime(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[startTime]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int64_t times = instance->get()->startTime();
     return times;
 }
@@ -273,8 +256,7 @@ void cj_PAGLayer_setStartTime(const int64_t ptr, const int64_t time) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[setStartTime]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->setStartTime(time);
 }
 
@@ -283,8 +265,7 @@ int64_t cj_PAGLayer_currentTime(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[currentTime]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     int64_t times = instance->get()->currentTime();
     return times;
 }
@@ -294,8 +275,7 @@ void cj_PAGLayer_setCurrentTime(const int64_t ptr, const int64_t time) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[setCurrentTime]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->setCurrentTime(time);
 }
 
@@ -304,8 +284,7 @@ double cj_PAGLayer_getProgress(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[getProgress]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     double progress = instance->get()->getProgress();
     return progress;
 }
@@ -315,8 +294,7 @@ void cj_PAGLayer_setProgress(const int64_t ptr, const double value) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[setProgress]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->setProgress(value);
 }
 
@@ -326,8 +304,7 @@ int64_t cj_PAGLayer_trackMatteLayer(const int64_t ptr) {
                      "[trackMatteLayer]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::shared_ptr<PAGLayer> layer = instance->get()->trackMatteLayer();
     CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(layer);
     return (int64_t)cjlayer;
@@ -338,8 +315,7 @@ float *cj_PAGLayer_getBounds(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[getBounds]-the pointer of PAGLayer is null.");
         return nullptr;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     Rect rect = instance->get()->getBounds();
     return CreateRect(rect);
 }
@@ -350,8 +326,7 @@ bool cj_PAGLayer_excludedFromTimeline(const int64_t ptr) {
                      "[excludedFromTimeline]-the pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     bool res = instance->get()->excludedFromTimeline();
     return res;
 }
@@ -362,8 +337,7 @@ void cj_PAGLayer_setExcludedFromTimeline(const int64_t ptr, bool value) {
                      "[setExcludedFromTimeline]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->get()->setExcludedFromTimeline(value);
 }
 
@@ -377,11 +351,9 @@ bool cj_PAGLayer_nativeEquals(const int64_t ptr, const int64_t otherptr) {
                      "[nativeEquals]-the pointer or the other pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
-    CJPAGLayerHandle *instanceOther;
-    instanceOther = (CJPAGLayerHandle *)otherptr;
+    CJPAGLayerHandle *instanceOther = (CJPAGLayerHandle *)otherptr;
     std::shared_ptr<pag::PAGLayer> layerOther = instanceOther->get();
     return layer == layerOther;
 }
@@ -391,8 +363,7 @@ void cj_PAGLayer_nativeRelease(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[nativeRelease]-the pointer of PAGLayer is null.");
         return;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     instance->reset();
     delete instance;
 }
@@ -402,8 +373,7 @@ bool cj_PAGLayer_isNullptr(const int64_t ptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[isNullptr]-the pointer of PAGLayer is null.");
         return true;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::shared_ptr<pag::PAGLayer> pagLayer = instance->get();
     return pagLayer == nullptr;
 }

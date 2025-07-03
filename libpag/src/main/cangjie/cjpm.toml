@@ -17,7 +17,7 @@
 [ffi]
   [ffi.c]
     [ffi.c.pag_native]
-      path = "../../../build/default/intermediates/libs/default/${ABI}/"
+      path = "../../../libs/${ABI}/"
 
 [package]
   cjc-version = "0.48.2"

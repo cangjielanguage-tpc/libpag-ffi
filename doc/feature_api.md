@@ -59,7 +59,7 @@ public class PAGViewController <: XComponentController {
      * 异步设置pag文件路径，该路径可以是网络路径或本地路径。
      * 
 	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
-	 * @param callback - 自定义回调函数
+	 * @param callback - 自定义回调函数。这里操作动画仅支持在回调函数中控制动画
      */
     public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit): Unit
 
@@ -203,7 +203,13 @@ public class PAGViewController <: XComponentController {
 	/*
      * 设置将应用于合成的变换。调用此方法时，scaleMode属性将设置为None。
 	 * 
-	 * @param value - 要设置的变换矩阵
+	 * @param value - 要设置的变换矩阵。按以下顺序提供六个Float32值：
+	 *   - values[0]: scaleX - 水平缩放因子，控制X轴方向的缩放。
+     *   - values[1]: skewX - 水平倾斜角度，控制X轴方向的倾斜。
+     *   - values[2]: transX - 水平平移距离，控制X轴方向的平移。
+     *   - values[3]: skewY - 垂直倾斜角度，控制Y轴方向的倾斜。
+     *   - values[4]: scaleY - 垂直缩放因子，控制Y轴方向的缩放。
+     *   - values[5]: transY - 垂直平移距离，控制Y轴方向的平移。
      */
     public func setMatrix(values: Array<Float32>): Unit
 	
@@ -379,20 +385,26 @@ public class PAGImageViewController <: XComponentController {
      * @param scaleMode - 缩放模式（0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪））
      */
     public func setScaleMode(scaleMode: Int32): Unit
-
-    /*
+	
+	/*
      * 获取当前动画变换矩阵
-     * 
-     * @return Matrix4 - 返回当前矩阵的一个副本
+	 * 
+	 * @return Array<Float32> - 当前变换矩阵
      */
-    public func matrix(): Matrix4
-
-    /*
+    public func matrix(): Array<Float32>
+	
+	/*
      * 设置将应用于合成的变换。调用此方法时，scaleMode属性将设置为None。
-     * 
-     * @param matrix - 要设置的变换矩阵
+	 * 
+	 * @param value - 要设置的变换矩阵。按以下顺序提供六个Float32值：
+	 *   - values[0]: scaleX - 水平缩放因子，控制X轴方向的缩放。
+     *   - values[1]: skewX - 水平倾斜角度，控制X轴方向的倾斜。
+     *   - values[2]: transX - 水平平移距离，控制X轴方向的平移。
+     *   - values[3]: skewY - 垂直倾斜角度，控制Y轴方向的倾斜。
+     *   - values[4]: scaleY - 垂直缩放因子，控制Y轴方向的缩放。
+     *   - values[5]: transY - 垂直平移距离，控制Y轴方向的平移。
      */
-    public func setMatrix(matrix: Matrix4): Unit
+    public func setMatrix(values: Array<Float32>): Unit
 
     /*
      * 渲染时对图像的缩放比例。范围从 0.0 到 1.0。小于 1.0 的缩放因子可能导致输出
@@ -504,52 +516,16 @@ public class PAGImageViewController <: XComponentController {
      * 异步设置pag文件路径，该路径可以是网络路径或本地路径。
      * 
 	 * @param path - 加载pag文件的路径。可以是网络路径或本地路径
-	 * @param callback - 自定义回调函数
+	 * @param callback - 自定义回调函数。这里操作动画仅支持在回调函数中控制动画
 	 * @param maxFrameRate - 可选参数，设置最大帧率，默认为 30.0
      */
     public func setPathAsync(path: String, callback: (Option<PAGFile>) -> Unit, maxFrameRate!: Float64 = 30.0): Unit
 
-}
-```
-
-#### 2.3 Matrix4类
-
-```cangjie
-/**
- * 表示一个 4x4 的矩阵对象，用于图形计算、变换等操作
- */
-public class Matrix4 {
-    /*
-     * 存储矩阵的16个元素，按列主序（column-major order）排列
+	/*
+     * 立即释放 PAGImaegViewController 实例所使用的资源
+	 *
      */
-    public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
-
-    /*
-     * 矩阵是否为单位矩阵的标记（内部使用）
-     */
-    var _identity: Bool = true
-
-    /*
-     * 是否已计算单位矩阵状态的标记（内部使用）
-     */
-    var _identityCalculated: Bool = false
-
-    /*
-     * 与底层 C 语言库绑定的指针，表示对应的底层对象（仅内部使用）
-     */
-    private var ptr: Int64
-
-    /**
-     * 默认构造函数，初始化为单位矩阵
-     */
-    public init()
-
-    /**
-     * 使用指定矩阵数据构造 Matrix4 对象
-     *
-     * @param props - 包含16个 Float32 元素的数组，按列主序排列
-     */
-    public init(props: Array<Float32>)
+    public func releaseAll(): Unit
 }
 ```
 
@@ -2209,5 +2185,46 @@ public abstract class VideoDecoder {
      * 设置可以创建的硬件视频解码器的最大数量。
      */
     public static func setMaxHardwareDecoderCount(maxCount: Int32): Unit
+}
+```
+
+##### 3.23 Matrix4类
+
+```cangjie
+/**
+ * 表示一个 4x4 的矩阵对象，用于图形计算、变换等操作
+ */
+public class Matrix4 {
+    /*
+     * 存储矩阵的16个元素，按列主序（column-major order）排列
+     */
+    public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
+
+    /*
+     * 矩阵是否为单位矩阵的标记（内部使用）
+     */
+    var _identity: Bool = true
+
+    /*
+     * 是否已计算单位矩阵状态的标记（内部使用）
+     */
+    var _identityCalculated: Bool = false
+
+    /*
+     * 与底层 C 语言库绑定的指针，表示对应的底层对象（仅内部使用）
+     */
+    private var ptr: Int64
+
+    /**
+     * 默认构造函数，初始化为单位矩阵
+     */
+    public init()
+
+    /**
+     * 使用指定矩阵数据构造 Matrix4 对象
+     *
+     * @param props - 包含16个 Float32 元素的数组，按列主序排列
+     */
+    public init(props: Array<Float32>)
 }
 ```

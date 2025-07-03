@@ -22,8 +22,7 @@ static std::shared_ptr<PAGSolidLayer> getPAGSolidLayer(const int64_t ptr) {
     if (ptr == 0) {
         return nullptr;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     if (layer == nullptr) {
         return nullptr;

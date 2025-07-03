@@ -9,7 +9,7 @@
 #include "cj_pag_layer_handle.h"
 #include <pag/pag.h>
 
-extern "C" {// cangjie [PAGComposition] ffi
+extern "C" { // cangjie [PAGComposition] ffi
 long long cj_PAGComposition_Make(int width, int height);
 long long cj_PAGComposition_width(const int64_t ptr);
 long long cj_PAGComposition_height(const int64_t ptr);
@@ -29,8 +29,8 @@ void cj_PAGComposition_swapLayerAt(const int64_t ptr, const int64_t index1, cons
 CJBytesArray cj_PAGComposition_audioBytes(const int64_t ptr);
 long long cj_PAGComposition_audioStartTime(const int64_t ptr);
 MarkersPAGLayer cj_PAGComposition_audioMarkers(const int64_t ptr);
-CJInt64Array cj_PAGComposition_getLayersByName(const int64_t ptr, char* layerName);
+CJInt64Array cj_PAGComposition_getLayersByName(const int64_t ptr, char *layerName);
 CJInt64Array cj_PAGComposition_getLayersUnderPoint(const int64_t ptr, float localX, float localY);
 }
 
-#endif //LIBPAG_CJ_CJ_PAG_COMPOSITION_H
+#endif // LIBPAG_CJ_CJ_PAG_COMPOSITION_H
