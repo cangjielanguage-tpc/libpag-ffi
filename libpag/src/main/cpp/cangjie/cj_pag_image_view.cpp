@@ -6,38 +6,37 @@
 
 namespace pag {
 extern "C" {
-static std::unordered_map<std::string, std::shared_ptr<CJPAGImageView>> ViewMap = {};
-typedef void (*stateCallback)(uint8_t);
-static stateCallback playingStateCallback = NULL;
-typedef void (*progressCallback)(int64_t);
-static progressCallback playingProgressCallback = NULL;
-int64_t totalFrame = 0;
+static std::unordered_map<std::string, std::shared_ptr<CJPAGImageView>> ImageViewMap = {};
 
 void CJPAGImageView::onAnimationStart(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(0);
+        playingStateCallback(0, g_imageView);
     }
 }
 void CJPAGImageView::onAnimationCancel(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(1);
+        playingStateCallback(1, g_imageView);
     }
 }
 void CJPAGImageView::onAnimationEnd(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(2);
+        playingStateCallback(2, g_imageView);
     }
 }
 void CJPAGImageView::onAnimationRepeat(PAGAnimator *) {
+    std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(3);
+        playingStateCallback(3, g_imageView);
     }
 }
 
 void CJPAGImageView::onAnimationUpdate(PAGAnimator *animator) {
+    std::lock_guard lock_guard(locker);
     if (playingProgressCallback) {
-        auto targetFrame = ProgressToFrame(animator->progress(), totalFrame);
-        playingProgressCallback(targetFrame);
+        playingProgressCallback(g_imageView);
     }
     Frame frame = 0;
     auto decoder = getDecoderInternal();
@@ -47,35 +46,103 @@ void CJPAGImageView::onAnimationUpdate(PAGAnimator *animator) {
     handleFrame(frame);
 }
 
-int64_t cj_PAGImageViewController_createPAGImageView() {
-    // 生成唯一 ID
-    const std::string id = "PAGImageView" + std::to_string(tgfx::UniqueID::Next());
-
-    // 创建 shared_ptr 并保存到全局映射（防止对象被销毁）
-    auto cView = std::make_shared<CJPAGImageView>(id);
-    cView->_animator = PAGAnimator::MakeFrom(cView);
-    
-    ViewMap.emplace(id, cView); // 假设 ViewMap 是全局的 std::map
-
-    // 返回原始指针（转换为 int64_t）
-    return reinterpret_cast<int64_t>(cView.get());
-}
-
-void cj_PAGImageViewController_setComposition(const int64_t cjImageView, const int64_t native, float maxFrameRate)
-{
-    if (cjImageView == 0 || native == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGImageViewController]", "[setComposition]---CJImageView: %{public}ld, CJPAGLayerHandle: %{public}ld", cjImageView, native);
+void cj_PAGImageViewController_onAnimatorStateChange(const int64_t cjImageView,
+                                                     CJPAGImageView::stateCallback callback) {
+    if (cjImageView == 0) {
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_onAnimatorStateChange", "view is null");
+        return;
+    }
+    view->g_imageView = cjImageView;
+    view->playingStateCallback = callback;
+}
+
+void cj_PAGImageViewController_onAnimatorProgress(const int64_t cjImageView,
+                                                  CJPAGImageView::progressCallback callback) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_onAnimatorProgress", "view is null");
+        return;
+    }
+    view->g_imageView = cjImageView;
+    view->playingProgressCallback = callback;
+}
+
+void CJPAGImageView::invalidSize() {
+    if (targetWindow && _window) {
+        targetWindow->invalidSize();
+        OH_NativeWindow_NativeWindowHandleOpt(_window, GET_BUFFER_GEOMETRY, &_height, &_width);
+    } else {
+        _width = 0;
+        _height = 0;
+    }
+    invalidDecoder();
+}
+
+void cj_PAGImageViewController_SetSurfaceId(const int64_t cjImageView, int64_t surfaceId) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_SetSurfaceId", "view is null");
+        return;
+    }
+    view->create(surfaceId);
+}
+
+void cj_PAGImageViewController_ChangeSurface(const int64_t cjImageView) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_ChangeSurface", "view is null");
+        return;
+    }
+    view->invalidSize();
+}
+
+int64_t cj_PAGImageViewController_createPAGImageView() {
+    std::string id = "PAGImageView" + std::to_string(tgfx::UniqueID::Next());
+    auto imageView = std::make_shared<CJPAGImageView>(id);
+    imageView->_animator = PAGAnimator::MakeFrom(imageView);
+    ImageViewMap.emplace(id, imageView);
+    return reinterpret_cast<int64_t>(imageView.get());
+}
+
+void cj_PAGImageViewController_destroyJPAGImageView(const char *id) {
+    if (id == nullptr || id[0] == '\0') {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_destroyJPAGView",
+                     "id is null or empty.");
+        return;
+    }
+    ImageViewMap.erase(id);
+}
+
+void cj_PAGImageViewController_setComposition(const int64_t cjImageView, const int64_t native, double maxFrameRate,
+                                              bool isNull) {
+    if (cjImageView == 0 || native == 0) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGImageViewController]",
+                     "[setComposition]---CJImageView: %{public}ld, CJPAGLayerHandle: %{public}ld", cjImageView, native);
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view == nullptr) {
         return;
     }
-    
-    CJPAGLayerHandle* cjPAGLayerHandle;
-    cjPAGLayerHandle = (CJPAGLayerHandle*)native;
+    CJPAGLayerHandle *cjPAGLayerHandle = (CJPAGLayerHandle *)native;
     std::shared_ptr<pag::PAGLayer> layer = cjPAGLayerHandle->get();
+    if (isNull) {
+        view->setComposition(nullptr, 30.0f);
+        return;
+    }
     if (layer && layer->layerType() == LayerType::PreCompose) {
         std::shared_ptr<pag::PAGComposition> pagComposition = std::static_pointer_cast<PAGComposition>(layer);
         view->setComposition(pagComposition, maxFrameRate);
@@ -84,14 +151,12 @@ void cj_PAGImageViewController_setComposition(const int64_t cjImageView, const i
     }
 }
 
-int cj_PAGImageViewController_scaleMode(const int64_t cjImageView)
-{
+int cj_PAGImageViewController_scaleMode(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_scaleMode", "Pointer is null");
         return 0;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     int scaleMode = PAGScaleMode::LetterBox;
     if (view != nullptr) {
         scaleMode = view->scaleMode();
@@ -99,89 +164,106 @@ int cj_PAGImageViewController_scaleMode(const int64_t cjImageView)
     return scaleMode;
 }
 
-void cj_PAGImageViewController_setScaleMode(const int64_t cjImageView, const int32_t scaleMode)
-{
+void cj_PAGImageViewController_setScaleMode(const int64_t cjImageView, const int32_t scaleMode) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setScaleMode", "Pointer is null");
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
         view->setScaleMode(scaleMode);
     }
     return;
 }
 
-CJFloat32Array cj_PAGImageViewController_matrix(const int64_t cjImageView)
-{
+CJFloat32Array cj_PAGImageViewController_matrix(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_matrix", "Pointer is null");
         return {};
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     auto matrix = Matrix::I();
     if (view != nullptr) {
         matrix = view->matrix();
     }
-    float* buf = CreateMatrix(matrix);
+    float *buf = CreateMatrix(matrix);
     return CJFloat32Array{9, buf};
 }
 
-void cj_PAGImageViewController_setMatrix(const int64_t cjImageView, float* bytes)
-{
+void cj_PAGImageViewController_matrixFromArray(const int64_t cjImageView, float values[9]) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_matrixFromArray", "Pointer is null");
+        return;
+    }
+    auto matrix = Matrix::I();
+    if (view != nullptr) {
+        matrix = view->matrix();
+        matrix.get9(values);
+    }
+}
+
+void cj_PAGImageViewController_setMatrix(const int64_t cjImageView, float *bytes) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setMatrix", "Pointer is null");
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
         view->setMatrix(GetMatrix(bytes));
     }
     return;
 }
 
-float cj_PAGImageViewController_renderScale(const int64_t cjImageView)
-{
+void cj_PAGImageViewController_setMatrixFromArray(const int64_t cjImageView, float values[9]) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setMatrixFromArray", "Pointer is null");
+        return;
+    }
+    if (view != nullptr) {
+        Matrix matrix = {};
+        matrix.setAll(values[0], values[1], values[2], values[3], values[4], values[5], 0, 0, 1);
+        view->setMatrix(matrix);
+    }
+}
+
+float cj_PAGImageViewController_renderScale(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_renderScale", "Pointer is null");
-        return -1.0;
+        return 1.0f;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
         return view->renderScale();
     }
-    return -1.0;
+    return 1.0f;
 }
 
-void cj_PAGImageViewController_setRenderScale(const int64_t cjImageView, double renderScale)
-{
+void cj_PAGImageViewController_setRenderScale(const int64_t cjImageView, float renderScale) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setRenderScale", "Pointer is null");
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
-    double value = renderScale;
-    if (renderScale < 0.0 || renderScale > 1.0) {
-        value = 1.0f;
-    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
-        view->setRenderScale(value);
+        view->setRenderScale(renderScale);
     }
 }
 
-bool cj_PAGImageViewController_cacheAllFramesInMemory(const int64_t cjImageView)
-{
+bool cj_PAGImageViewController_cacheAllFramesInMemory(const int64_t cjImageView) {
     if (cjImageView == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_cacheAllFramesInMemory", "Pointer is null");
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_cacheAllFramesInMemory",
+                     "Pointer is null");
         return false;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     bool cacheAllFramesInMemory = false;
     if (view != nullptr) {
         cacheAllFramesInMemory = view->cacheAllFramesInMemory();
@@ -189,27 +271,24 @@ bool cj_PAGImageViewController_cacheAllFramesInMemory(const int64_t cjImageView)
     return cacheAllFramesInMemory;
 }
 
-void cj_PAGImageViewController_setCacheAllFramesInMemory(const int64_t cjImageView, bool enable)
-{
+void cj_PAGImageViewController_setCacheAllFramesInMemory(const int64_t cjImageView, bool enable) {
     if (cjImageView == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setCacheAllFramesInMemory", "Pointer is null");
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setCacheAllFramesInMemory",
+                     "Pointer is null");
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
         view->setCacheAllFramesInMemory(enable);
     }
 }
 
-double cj_PAGImageViewController_currentFrame(const int64_t cjImageView)
-{
+int64_t cj_PAGImageViewController_currentFrame(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_currentFrame", "Pointer is null");
-        return 0.0; 
+        return 0.0;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     int64_t currentFrame = 0;
     if (view != nullptr) {
         currentFrame = view->currentFrame();
@@ -217,42 +296,36 @@ double cj_PAGImageViewController_currentFrame(const int64_t cjImageView)
     return currentFrame;
 }
 
-void cj_PAGImageViewController_setCurrentFrame(const int64_t cjImageView, double currentFrame)
-{
+void cj_PAGImageViewController_setCurrentFrame(const int64_t cjImageView, int64_t currentFrame) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setCurrentFrame", "Pointer is null");
-        return; 
+        return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
     if (view != nullptr) {
         view->setCurrentFrame(currentFrame);
     }
 }
 
-CJPixelMap cj_PAGImageViewController_currentImage(const int64_t cjImageView)
-{
+CJPixelMap cj_PAGImageViewController_currentImage(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_currentImage", "Pointer is null");
-        return {}; 
+        return {};
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
-    if (view != nullptr) {
+    if (view == nullptr) {
         return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
     }
     return view->getCurrentPixelMap();
 }
 
-void cj_PAGImageViewController_play(const int64_t cjImageView)
-{
+void cj_PAGImageViewController_play(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_play", "Pointer is null");
-        return; 
+        return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     if (view != nullptr) {
         auto animator = view->getAnimator();
@@ -262,14 +335,12 @@ void cj_PAGImageViewController_play(const int64_t cjImageView)
     }
 }
 
-bool cj_PAGImageViewController_isPlaying(const int64_t cjImageView)
-{
+bool cj_PAGImageViewController_isPlaying(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_isPlaying", "Pointer is null");
-        return false; 
+        return false;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     bool isPlaying = false;
     if (view != nullptr) {
@@ -281,14 +352,12 @@ bool cj_PAGImageViewController_isPlaying(const int64_t cjImageView)
     return isPlaying;
 }
 
-void cj_PAGImageViewController_pause(const int64_t cjImageView)
-{
+void cj_PAGImageViewController_pause(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_pause", "Pointer is null");
-        return; 
+        return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     if (view != nullptr) {
         auto animator = view->getAnimator();
@@ -298,14 +367,12 @@ void cj_PAGImageViewController_pause(const int64_t cjImageView)
     }
 }
 
-int64_t cj_PAGImageViewController_repeatCount(const int64_t cjImageView)
-{
+int64_t cj_PAGImageViewController_repeatCount(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_repeatCount", "Pointer is null");
-        return 0; 
+        return 0;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     int64_t repeatCount = 0;
     if (view != nullptr) {
@@ -317,14 +384,12 @@ int64_t cj_PAGImageViewController_repeatCount(const int64_t cjImageView)
     return repeatCount;
 }
 
-void cj_PAGImageViewController_setRepeatCount(const int64_t cjImageView, const int64_t repeatCount)
-{
+void cj_PAGImageViewController_setRepeatCount(const int64_t cjImageView, const int64_t repeatCount) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_setRepeatCount", "Pointer is null");
-        return; 
+        return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     if (view != nullptr) {
         auto animator = view->getAnimator();
@@ -334,14 +399,12 @@ void cj_PAGImageViewController_setRepeatCount(const int64_t cjImageView, const i
     }
 }
 
-bool cj_PAGImageViewController_flush(const int64_t cjImageView)
-{
+bool cj_PAGImageViewController_flush(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_flush", "Pointer is null");
-        return false; 
+        return false;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     bool flushResult = false;
     if (view != nullptr) {
@@ -350,31 +413,27 @@ bool cj_PAGImageViewController_flush(const int64_t cjImageView)
     return flushResult;
 }
 
-const char *cj_PAGImageViewController_uniqueID(const int64_t cjImageView)
-{
+const char *cj_PAGImageViewController_uniqueID(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_uniqueID", "Pointer is null");
         return "";
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     if (view == nullptr) {
         return nullptr;
     }
     std::string id = view->id;
-    char *uniqueID = pag::cj_string_To_UTF8((char *)id.c_str(),"ISO-8859-1");
+    char *uniqueID = pag::cj_string_To_UTF8((char *)id.c_str(), "ISO-8859-1");
     return uniqueID;
 }
 
-void cj_PAGImageViewController_update(const int64_t cjImageView)
-{
+void cj_PAGImageViewController_update(const int64_t cjImageView) {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_update", "Pointer is null");
         return;
     }
-    CJPAGImageView* view;
-    view = (CJPAGImageView*)cjImageView;
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
 
     if (view != nullptr) {
         auto animator = view->getAnimator();
@@ -384,6 +443,17 @@ void cj_PAGImageViewController_update(const int64_t cjImageView)
     }
 }
 
+void cj_PAGImageViewController_release(const int64_t cjImageView) {
+    if (cjImageView == 0) {
+        return;
+    }
+    CJPAGImageView *view = (CJPAGImageView *)cjImageView;
+    if (!view) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_release", "imageview is null");
+        return;
+    }
+    view->release();
+}
 
 std::shared_ptr<PAGDecoder> CJPAGImageView::getDecoderInternal() {
     if (targetWindow == nullptr || _composition == nullptr) {
@@ -429,7 +499,7 @@ Frame CJPAGImageView::currentFrame() {
     return ProgressToFrame(_animator->progress(), _decoder->numFrames());
 }
 
-void CJPAGImageView::setComposition(std::shared_ptr<PAGComposition> composition, float frameRate) {
+void CJPAGImageView::setComposition(std::shared_ptr<PAGComposition> composition, double frameRate) {
     std::lock_guard lock_guard(locker);
     if (_animator == nullptr) {
         return;
@@ -450,11 +520,9 @@ void CJPAGImageView::setScaleMode(int scaleMode) {
     refreshMatrixFromScaleMode();
 }
 
-int CJPAGImageView::scaleMode() {
-    return _scaleMode;
-}
+int CJPAGImageView::scaleMode() { return _scaleMode; }
 
-void CJPAGImageView::setMatrix(const class Matrix& matrix) {
+void CJPAGImageView::setMatrix(const class Matrix &matrix) {
     std::lock_guard lock_guard(locker);
     _matrix = ToTGFX(matrix);
     _scaleMode = PAGScaleMode::None;
@@ -477,9 +545,7 @@ void CJPAGImageView::setRenderScale(float renderScale) {
     invalidDecoder();
 }
 
-float CJPAGImageView::renderScale() {
-    return _renderScale;
-}
+float CJPAGImageView::renderScale() { return _renderScale; }
 
 void CJPAGImageView::setCacheAllFramesInMemory(bool cacheAllFramesInMemory) {
     std::lock_guard lock_guard(locker);
@@ -492,9 +558,7 @@ void CJPAGImageView::setCacheAllFramesInMemory(bool cacheAllFramesInMemory) {
     }
 }
 
-bool CJPAGImageView::cacheAllFramesInMemory() {
-  return _cacheAllFramesInMemory;
-}
+bool CJPAGImageView::cacheAllFramesInMemory() { return _cacheAllFramesInMemory; }
 
 bool CJPAGImageView::flush() {
     std::lock_guard lock_guard(locker);
@@ -512,9 +576,8 @@ void CJPAGImageView::refreshMatrixFromScaleMode() {
     if (_decoder == nullptr) {
         return;
     }
-
-    _matrix = ToTGFX(ApplyScaleMode(_scaleMode, _decoder->width() / _renderScale,
-                                    _decoder->height() / _renderScale, _width, _height));
+    _matrix = ToTGFX(ApplyScaleMode(_scaleMode, _decoder->width() / _renderScale, _decoder->height() / _renderScale,
+                                    _width, _height));
 }
 
 bool CJPAGImageView::handleFrame(Frame frame) {
@@ -536,7 +599,7 @@ bool CJPAGImageView::handleFrame(Frame frame) {
 
 std::pair<tgfx::Bitmap, std::shared_ptr<tgfx::Image>> CJPAGImageView::getImage(Frame frame) {
     if (_cacheAllFramesInMemory && images.find(frame) != images.end()) {
-      return images[frame];
+        return images[frame];
     }
 
     tgfx::Bitmap bitmap;
@@ -597,50 +660,58 @@ bool CJPAGImageView::present(std::shared_ptr<tgfx::Image> image) {
     return true;
 }
 
-
 CJPixelMap CJPAGImageView::getCurrentPixelMap() {
     std::lock_guard lock_guard(locker);
     if (currentBitmap.isEmpty()) {
         return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
     }
-
-    //把 create PixelMap 移到 cangjie 代码中。
-    // create PixelMap
     int32_t width = currentBitmap.width();
     int32_t height = currentBitmap.height();
-    uint8_t pixelFormat = currentBitmap.colorType() == tgfx::ColorType::RGBA_8888
-                          ? 2 // PIXEL_FORMAT_RGBA_8888
-                          : 3; // PIXEL_FORMAT_BGRA_8888;
-    uint8_t alphaType = 2; //OHOS_PIXEL_MAP_ALPHA_TYPE_PREMUL;
+    int size = currentBitmap.byteSize();
+    tgfx::ColorType colorType = currentBitmap.colorType();
+    uint8_t pixelFormat = 2; // RGBA_8888
+    uint8_t alphaType = 2;
     bool editable = false;
 
-    /*
-     * 使用指定的ImageInfo将一个整数像素复制到 dstPixels。复制从 (srcX，srcY) 开始，并且不超过位图（width()，height()）。
-     * 仅当像素转换可行时，才会复制像素。如果像素被复制到 dstPixels，则返回true。
-     * bool readPixels(const ImageInfo& dstInfo, void* dstPixels, int srcX = 0, int srcY = 0) const;
-    */
-    void* pixelMapAddress = nullptr;
-    bool flag = currentBitmap.readPixels(currentBitmap.info(), pixelMapAddress);
-    if (!flag) {
-        return CJPixelMap{0, nullptr, alphaType, editable, pixelFormat, height, width};
-    }
-    
-    //返回像素的字节大小。
-    int size = currentBitmap.byteSize();
-    //返回像素的行字节数。
+    uint8_t *buf = new uint8_t[size];
+    void *pixels = currentBitmap.lockPixels();
 
-    auto bytes = reinterpret_cast<const uint8_t*>(pixelMapAddress);
-    uint8_t* buf = new uint8_t[size];
-    for (int i = 0; i < size; i++) {
-        buf[i] = bytes[i];
-    }
+    if (pixels != nullptr) {
+        memcpy(buf, pixels, size);
+        currentBitmap.unlockPixels();
 
-    return CJPixelMap{size, buf, alphaType, editable, pixelFormat, height, width};
+        if (colorType == tgfx::ColorType::RGBA_8888) {
+            // Convert RGBA to BGRA (every 4 bytes is one pixel)
+            for (int i = 0; i < size; i += 4) {
+                std::swap(buf[i], buf[i + 2]); // R ↔ B
+            }
+            pixelFormat = 3; // Set as BGRA_8888
+        }
+        return CJPixelMap{size, buf, alphaType, editable, pixelFormat, height, width};
+    } else {
+        delete[] buf;
+        currentBitmap.unlockPixels();
+        return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
+    }
+}
+
+void CJPAGImageView::create(int64_t surfaceId) {
+    std::lock_guard lock_guard(locker);
+    OH_NativeWindow_CreateNativeWindowFromSurfaceId(surfaceId, &_window);
+    targetWindow = tgfx::EGLWindow::MakeFrom(reinterpret_cast<EGLNativeWindowType>(_window));
+    invalidSize();
+    _animator->update();
 }
 
 void CJPAGImageView::release() {
     std::lock_guard lock_guard(locker);
-    //TODO：如果后续传入函数，需要处理。
+    OH_NativeWindow_DestroyNativeWindow(_window);
+    if (playingProgressCallback) {
+        playingProgressCallback = nullptr;
+    }
+    if (playingStateCallback) {
+        playingStateCallback = nullptr;
+    }
     if (_animator) {
         _animator = nullptr;
     }
@@ -648,4 +719,4 @@ void CJPAGImageView::release() {
     invalidDecoder();
 }
 }
-}
+} // namespace pag

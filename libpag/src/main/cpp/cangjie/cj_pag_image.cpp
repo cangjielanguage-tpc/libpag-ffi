@@ -158,17 +158,29 @@ ColorType ToTGFXColorType(int ohPixelFormat) {
 }
 
 int64_t cj_PAGImage_FromPixelMap(CJPixelMap pixelMap) {
-    std::shared_ptr<PAGImage> image = PAGImage::FromPixels(pixelMap.buf, pixelMap.width, pixelMap.height,
-                                              pixelMap.size, ColorType::BGRA_8888,
-                                              AlphaType::Unknown);
-
-    CJPAGImage *handler = new CJPAGImage(image);
-    if (handler == NULL) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGImage]", "[FromPixelMap]-new CJPAGImage error.");
+    auto imageInfo = tgfx::ImageInfo::Make(static_cast<int>(pixelMap.width), static_cast<int>(pixelMap.height),
+                                           tgfx::ColorType::BGRA_8888, tgfx::AlphaType::Premultiplied,
+                                           static_cast<int>(pixelMap.size / pixelMap.height));
+    bool alphaOnly =
+        (imageInfo.colorType() == tgfx::ColorType::ALPHA_8) || (imageInfo.colorType() == tgfx::ColorType::Gray_8);
+    tgfx::Bitmap bitmap;
+    if (!bitmap.allocPixels(imageInfo.width(), imageInfo.height(), alphaOnly)) {
         return -1;
     }
-    return (int64_t)handler;
+    bitmap.writePixels(imageInfo, pixelMap.buf);
+    auto image = tgfx::Image::MakeFrom(bitmap);
+    if (!image) {
+        return -1;
+    }
+    auto pagImage = pag::StillImage::MakeFrom(std::move(image));
+    if (!pagImage) {
+        return -1;
+    }
+    auto handler = new CJPAGImage(pagImage);
+    if (!handler) {
+        return -1;
+    }
+    return reinterpret_cast<int64_t>(handler);
 }
-
 }
 } // namespace pag

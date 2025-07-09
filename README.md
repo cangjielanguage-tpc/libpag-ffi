@@ -2,7 +2,7 @@
 <h1>libpag-cj</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v.0.0.1-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v.0.0.2-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v0.60.7-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-NA-red" style="display: inline-block;" />
@@ -123,7 +123,6 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 internal import ohos.base.*
 internal import ohos.component.*
 internal import ohos.state_manage.*
-internal import ohos.router.*
 internal import ohos.resource_manager.*
 internal import std.sync.*
 internal import std.time.*
@@ -169,7 +168,49 @@ class EntryView {
 #### PAGImageView
 
 ```cangjie
+internal import ohos.base.*
+internal import ohos.component.*
+internal import ohos.state_manage.*
+internal import ohos.resource_manager.*
+internal import std.sync.*
+internal import std.time.*
+import ohos.state_macro_manage.*
+import libpag4cj.*
 
+@Entry
+@Component
+class EntryView {
+    @State
+    var controller: PAGImageViewController = PAGImageViewController()
+
+    protected func aboutToAppear(): Unit {
+        var path = '/data/storage/el1/bundle/entry/resources/resfile/resfile_test.pag'
+        // 设置要播放的pag文件路径。目前resfile目录下的pag文件只能通过绝对路径设置'/data/storage/el1/bundle/entry/resources/resfile/'+pag文件名
+        this.controller.setPath(path)
+        // 设置动画播放次数。小于等于0表示循环播放
+        this.controller.setRepeatCount(-1)
+        Timer.once(50 * Duration.millisecond) {
+            =>
+            // 显示动画首帧
+            this.controller.update()
+        }
+    }
+    func build() {
+        Column(20) {
+            Column {
+                PAGImageView(controller: this.controller)
+            }.width(90.percent).height(60.percent)
+            Row(50) {
+                Button('播放').width(100).height(50).onClick {
+                    => this.controller.play()
+                }
+                Button('暂停').width(100).height(50).onClick {
+                    => this.controller.pause()
+                }
+            }
+        }.width(100.percent).height(100.percent).padding(top: 20, left: 10, right: 10)
+    }
+}
 ```
 
 ## 约束和限制

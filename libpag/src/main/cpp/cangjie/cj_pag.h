@@ -5,10 +5,10 @@
 #ifndef LIBPAG4CJ_CJ_PAG_H
 #define LIBPAG4CJ_CJ_PAG_H
 
-#include <pag/pag.h>
 #include "./cj_string_util.h"
+#include <pag/pag.h>
 
 extern "C" {
 char *cj_pag_sdkVersion();
 }
-#endif //LIBPAG4CJ_CJ_PAG_H
+#endif // LIBPAG4CJ_CJ_PAG_H

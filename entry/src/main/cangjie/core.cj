@@ -727,36 +727,6 @@ class Core {
                                     showToast("该动画文件使用的标签等级为${value}")
                                 }
                             }
-
-                        CustomText(text: 'PAGComposition')
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
-
-                        Button('').width(90.percent).height(35).shape(ShapeType.Normal).onClick {
-                            =>
-                        }
                     }.width(100.percent)
                 }
             }.width(100.percent).height(40.percent).scrollBar(BarState.Off)

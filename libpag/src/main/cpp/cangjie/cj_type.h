@@ -5,8 +5,8 @@
 #ifndef LIBPAG_CJ_CJ_TYPE_H
 #define LIBPAG_CJ_CJ_TYPE_H
 
-#include "cj_marker.h"
 #include "../../external/include/pag/types.h"
+#include "cj_marker.h"
 #include <hilog/log.h>
 
 extern "C" {

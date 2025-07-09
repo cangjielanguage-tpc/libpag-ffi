@@ -4,10 +4,15 @@
 
 #pragma once
 
-#include <pag/pag.h>
+#include "cj_type.h"
 #include <hilog/log.h>
 #include <multimedia/image_framework/image/pixelmap_native.h>
-#include "cj_type.h"
+#include <pag/pag.h>
+#include <rendering/editing/StillImage.h>
+#include <tgfx/core/Bitmap.h>
+#include <tgfx/core/ColorType.h>
+#include <tgfx/core/Image.h>
+#include <tgfx/core/ImageInfo.h>
 
 namespace pag {
 class CJPAGImage {

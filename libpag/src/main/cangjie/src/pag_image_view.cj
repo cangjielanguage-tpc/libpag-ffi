@@ -12,28 +12,32 @@ import ohos.state_macro_manage.*
 
 @Component
 public class PAGImageView {
-    //@Watch[watchViewController]
-    //@Link
     var controller: PAGImageViewController
 
     func build() {
         Column() {
-        // SURFACE TEXTURE
-        //    XComponent(id:this.controller.uniqueID(),`type`:XComponentType.TEXTURE,controller:controller).width(100.percent).height(100.percent)
+            XComponent(id: this.controller.uniqueID(), `type`: XComponentType.TEXTURE, controller: controller)
+                .width(100.percent)
+                .height(100.percent)
         }.width(100.percent).height(100.percent)
     }
 
-    protected override func onPageHide(): Unit {}
-
-    protected override func onPageShow(): Unit {
-        this.controller.update()
+    protected func aboutToAppear(): Unit {
+        this.controller.attachToView(this.controller.getImageView())
+        if (imageViewControllerMap.contains(this.controller.getImageView())) {
+            imageViewControllerMap[this.controller.getImageView()] = this.controller
+        } else {
+            imageViewControllerMap.add(this.controller.getImageView(), this.controller)
+        }
     }
 
-    protected override func aboutToAppear(): Unit {
-        this.controller.attachToView(this)
-    }
-
-    protected override func aboutToDisappear(): Unit {
-        this.controller.detachFromView()
+    protected func aboutToDisappear() {
+        if (imageViewControllerMap.contains(this.controller.getImageView())) {
+            imageViewControllerMap.remove(this.controller.getImageView())
+        }
+        this.controller.detachFromView();
+        if (let Some(value) <- this.controller.getComposition()) {
+            value.nativeRelease()
+        }
     }
 }

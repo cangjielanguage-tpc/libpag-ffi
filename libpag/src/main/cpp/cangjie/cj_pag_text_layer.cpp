@@ -11,8 +11,7 @@ static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
     if (ptr == 0) {
         return nullptr;
     }
-    CJPAGLayerHandle *instance;
-    instance = (CJPAGLayerHandle *)ptr;
+    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     if (!instance) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "getPAGTextLayer", "instance is null");
         return nullptr;
@@ -27,8 +26,7 @@ static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
     return nullptr;
 }
 
-void cj_PAGTextLayer_release(const int64_t ptr)
-{
+void cj_PAGTextLayer_release(const int64_t ptr) {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGTextLayer_release", "ptr is null.");
         return;
@@ -92,8 +90,7 @@ void cj_PAGTextLayer_setFont(const int64_t ptr, const int64_t fontptr) {
         return;
     }
 
-    PAGFont *pagFont;
-    pagFont = (PAGFont *)fontptr;
+    PAGFont *pagFont = (PAGFont *)fontptr;
     textLayer->setFont(*pagFont);
 }
 

@@ -123,7 +123,7 @@ struct PAGTextData {
 
 public class PAGFile <: PAGComposition {
     private var ptrPAGFile: Int64 = 0
-
+    private static let cacheDir: String = '/data/storage/el2/base'
     init(nativeLayer: Int64) {
         super(nativeLayer)
         if (ptrPAGFile != 0) {
@@ -163,6 +163,7 @@ public class PAGFile <: PAGComposition {
     public static func LoadFromPath(path: String): Option<PAGFile> {
         unsafe {
             PAGFont.initFontFallback()
+            PAGDiskCache.SetCacheDir(cacheDir)
             let p = LibC.mallocCString(path)
             let instanceId = cj_PAGFile_LoadFromPath(p)
             LibC.free(p)
@@ -183,6 +184,7 @@ public class PAGFile <: PAGComposition {
     public static func LoadFromPathAsync(filePath: String, callback: (Option<PAGFile>) -> Unit): Unit {
         unsafe {
             PAGFont.initFontFallback()
+            PAGDiskCache.SetCacheDir(cacheDir)
             if (filePath == '') {
                 callback(Option<PAGFile>.None)
             }
@@ -238,6 +240,7 @@ public class PAGFile <: PAGComposition {
     public static func LoadFromBytes(bytes: Array<UInt8>): Option<PAGFile> {
         unsafe {
             PAGFont.initFontFallback()
+            PAGDiskCache.SetCacheDir(cacheDir)
             let path: String = ''
             let p = LibC.mallocCString(path)
             let handle = acquireArrayRawData(bytes)
@@ -257,6 +260,7 @@ public class PAGFile <: PAGComposition {
      */
     public static func LoadFromAssets(manager: ResourceManager, name: String): Option<PAGFile> {
         PAGFont.initFontFallback()
+        PAGDiskCache.SetCacheDir(cacheDir)
         try {
             let data: Array<UInt8> = manager.getRawFileContent(name)
             var file: Option<PAGFile> = PAGFile.LoadFromBytes(data)

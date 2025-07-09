@@ -5,13 +5,13 @@
 package libpag4cj
 
 public enum PAGTextJustification {
-  | Left   //0
-  | Center //1
-  | Right  //2
-  | FullJustifyLastLineLeft   //3
-  | FullJustifyLastLineRight  //4
-  | FullJustifyLastLineCenter //5
-  | FullJustifyLastLineFull   //6
+    | Left //0
+    | Center //1
+    | Right //2
+    | FullJustifyLastLineLeft //3
+    | FullJustifyLastLineRight //4
+    | FullJustifyLastLineCenter //5
+    | FullJustifyLastLineFull //6
 
     public func justificationToUint8(value: PAGTextJustification): UInt8 {
         match (value) {
@@ -50,10 +50,10 @@ public class PAGText <: ToString {
      * Readonly, external modifications are not valid.
      */
     public var boxTextRect: Rect = Rect(
-      left: 0.0,
-      top: 0.0,
-      right: 0.0,
-      bottom: 0.0
+        left: 0.0,
+        top: 0.0,
+        right: 0.0,
+        bottom: 0.0
     )
     /**
      * Readonly, external modifications are not valid.
@@ -117,29 +117,29 @@ public class PAGText <: ToString {
 
     public func toString(): String {
         let str: String = '''
-                                            PAGText:
-                                            (applyFill = ${applyFill}),
-                                            (applyStroke = ${applyStroke}),
-                                            (baselineShift = ${baselineShift}),
-                                            (boxText = ${boxText}),
-                                            (boxTextRect= ${boxTextRect.toString()}),
-                                            (firstBaseLine = ${firstBaseLine}),
-                                            (fauxBold = ${fauxBold}),
-                                            (fauxItalic = ${fauxItalic}),
-                                            (fillColor = ${fillColor}),
-                                            (fontSize = ${fontSize}),
-                                            (strokeColor = ${strokeColor}),
-                                            (strokeOverFill = ${strokeOverFill}),
-                                            (strokeWidth = ${strokeWidth}),
-                                            (justification = ${justification.justificationToUint8(justification)}),
-                                            (leading = ${leading}),
-                                            (tracking = ${tracking}),
-                                            (backgroundColor = ${backgroundColor}),
-                                            (backgroundAlpha = ${backgroundAlpha}),
-                                            (fontFamily = ${fontFamily}),
-                                            (fontStyle = ${fontStyle}),
-                                            (text = ${text})
-                                            '''
+        PAGText:
+        (applyFill = ${applyFill}),
+        (applyStroke = ${applyStroke}),
+        (baselineShift = ${baselineShift}),
+        (boxText = ${boxText}),
+        (boxTextRect= ${boxTextRect.toString()}),
+        (firstBaseLine = ${firstBaseLine}),
+        (fauxBold = ${fauxBold}),
+        (fauxItalic = ${fauxItalic}),
+        (fillColor = ${fillColor}),
+        (fontSize = ${fontSize}),
+        (strokeColor = ${strokeColor}),
+        (strokeOverFill = ${strokeOverFill}),
+        (strokeWidth = ${strokeWidth}),
+        (justification = ${justification.justificationToUint8(justification)}),
+        (leading = ${leading}),
+        (tracking = ${tracking}),
+        (backgroundColor = ${backgroundColor}),
+        (backgroundAlpha = ${backgroundAlpha}),
+        (fontFamily = ${fontFamily}),
+        (fontStyle = ${fontStyle}),
+        (text = ${text})
+        '''
         return str
     }
 }

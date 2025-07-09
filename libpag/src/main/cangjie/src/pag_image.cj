@@ -89,13 +89,11 @@ public class PAGImage {
                 let dst: Array<UInt8> = Array<UInt8>(nums, repeat: 0)
                 pixelMap.readPixelsToBuffer(dst)
                 let imageInfo: ImageInfo = pixelMap.getImageInfo()
-
-                let pixelFormat: UInt8 = getPAGColorTypeFromPixelMapFormat(PixelMapFormat.BGRA_8888)
-
+                let pixelFormat: UInt8 = 4 // PixelMapFormat.BGRA_8888
                 let handle = acquireArrayRawData(dst)
-                let alphaType: UInt8 = 0 // AlphaType.UNKNOWN
-                let cjpp: CJPixelMap = CJPixelMap(nums, handle.pointer, alphaType, pixelMap.isEditable, pixelFormat, imageInfo.size.height, imageInfo.size.width)
-
+                let alphaType: UInt8 = 2 // AlphaType.PREMUL
+                let cjpp: CJPixelMap = CJPixelMap(nums, handle.pointer, alphaType, pixelMap.isEditable, pixelFormat,
+                    imageInfo.size.height, imageInfo.size.width)
                 let nativeImage = cj_PAGImage_FromPixelMap(cjpp)
                 if (nativeImage <= 0) {
                     return Option<PAGImage>.None
