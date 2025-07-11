@@ -130,7 +130,6 @@ Color ToColor(int value) {
     return {static_cast<uint8_t>(red), static_cast<uint8_t>(green), static_cast<uint8_t>(blue)};
 }
 
-
 CJPAGVideoRange *CreateVideoRange(const PAGVideoRange &videoRange) {
     CJPAGVideoRange *result = new CJPAGVideoRange();
 
@@ -162,5 +161,36 @@ CJPAGVideoRange *CreateVideoRanges(const std::vector<PAGVideoRange> &videoRanges
     }
     return result;
 }
+
+void safe_memcpy(void* dest, uint32_t dest_size, const void* src, uint32_t src_size) {
+    if (!dest || !src) {
+        throw std::invalid_argument("safe_memcpy null pointer passed to safe_memcpy.");
+    }
+    if (dest_size < src_size) {
+        throw std::runtime_error("safe_memcpy insufficient space in the target buffer.");
+    }
+    std::memcpy(dest, src, src_size);
+}
+}
+
+CJBytesArray stringToCJBytesArray(const std::string& str) {
+    CJBytesArray result;
+    if (str.empty()){
+        return result;
+    }
+    result.size = static_cast<int64_t>(str.size());
+    result.buf = static_cast<uint8_t*>(malloc(result.size));
+    if (result.buf == nullptr) {
+        throw std::bad_alloc();
+    }
+    safe_memcpy(result.buf, static_cast<uint32_t>(result.size), str.data(), static_cast<uint32_t>(result.size));
+    return result;
+}
+
+std::string CJBytesArraytoString(const CJBytesArray& bytes) {
+    if (bytes.buf == nullptr || bytes.size <= 0) {
+        return "";
+    }
+    return std::string(reinterpret_cast<const char*>(bytes.buf), bytes.size);
 }
 } // namespace pag

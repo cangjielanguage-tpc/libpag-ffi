@@ -12,7 +12,7 @@ foreign {
 
     func cj_PAGLayer_layerType(ptr: Int64): Int8
 
-    func cj_PAGLayer_layerName(ptr: Int64): CString
+    func cj_PAGLayer_layerName(ptr: Int64): CJBytesArray
 
     func cj_PAGLayer_matrix(ptr: Int64, buf: VArray<Float32, $9>): Unit
 
@@ -161,9 +161,10 @@ public open class PAGLayer {
      */
     public func layerName(): String {
         unsafe {
-            let retC: CString = cj_PAGLayer_layerName(ptr)
-            let ret = retC.toString()
-            return ret
+            let res: CJBytesArray = cj_PAGLayer_layerName(ptr)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
 

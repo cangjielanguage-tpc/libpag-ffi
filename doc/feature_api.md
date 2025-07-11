@@ -504,13 +504,6 @@ public class PAGImageViewController <: XComponentController {
      * @param listener - 要移除的 PAGImageViewListener 监听器
      */
     public func removeListener(listener: PAGImageViewListener): Unit
-    
-    /*
-     * 立即渲染当前图像帧。注意，之前对 PAGImageView 的所有更改将在此方法调用后生效。如果 play() 方法已经被调用，则无需手动调用此方法，因为它将在每一帧自动调用。如果内容已更改，则返回 true
-     * 
-     * @return Bool - 内容是否发生变化
-     */
-    public func flush(): Bool
 
 	/*
      * 异步设置pag文件路径，该路径可以是网络路径或本地路径。

@@ -37,7 +37,7 @@ extern "C" { // cangjie [PAGLayer] ffi
 long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, char *password);
 long long cj_PAGLayer_makeByURL(char *filePath, char *password);
 int8_t cj_PAGLayer_layerType(const int64_t ptr);
-char *cj_PAGLayer_layerName(const int64_t ptr);
+CJBytesArray cj_PAGLayer_layerName(const int64_t ptr);
 void cj_PAGLayer_matrix(const int64_t ptr, float buf[]);
 void cj_PAGLayer_setMatrix(const int64_t ptr, float *buf);
 void cj_PAGLayer_resetMatrix(const int64_t ptr);
@@ -89,7 +89,7 @@ double cj_PAGTextLayer_fontSize(const int64_t ptr);
 void cj_PAGTextLayer_setFontSize(const int64_t ptr, double fontSize);
 long long cj_PAGTextLayer_strokeColor(const int64_t ptr);
 void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color);
-char *cj_PAGTextLayer_text(const int64_t ptr);
+CJBytesArray cj_PAGTextLayer_text(const int64_t ptr);
 void cj_PAGTextLayer_setText(const int64_t ptr, char *t);
 void cj_PAGTextLayer_reset(const int64_t ptr);
 void cj_PAGTextLayer_release(const int64_t ptr);

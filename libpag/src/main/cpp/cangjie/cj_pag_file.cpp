@@ -141,30 +141,29 @@ int64_t cj_PAGFile_numVideos(const int64_t ptr) {
     return file->numVideos();
 }
 
-const char *cj_PAGFile_path(const int64_t ptr) {
+CJBytesArray cj_PAGFile_path(const int64_t ptr) {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "Pointer is null.");
-        return nullptr;
+        return {};
     }
     CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
     if (layer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "Layer is null.");
-        return nullptr;
+        return {};
     }
     std::shared_ptr<pag::PAGLayer> pagLayer = layer->get();
     if (!pagLayer) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "PAGLayer is null.");
-        return nullptr;
+        return {};
     }
     std::shared_ptr<pag::File> file = pagLayer->getFile();
     if (!file) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "getFile() returned null.");
-        return nullptr;
+        return {};
     }
     const std::string &str = file->path;
-    char *cstr = new char[str.size() + 1];
-    std::strcpy(cstr, str.c_str());
-    return cstr;
+CJBytesArray result = stringToCJBytesArray(str);
+return result;
 }
 
 PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index) {
@@ -212,15 +211,12 @@ PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index) {
     data.boxTextRect[1] = textDocument->boxTextPos.y;
     data.boxTextRect[2] = textDocument->boxTextSize.x;
     data.boxTextRect[3] = textDocument->boxTextSize.y;
-    char *strFontFamily = new char[textDocument->fontFamily.size() + 1];
-    std::strcpy(strFontFamily, textDocument->fontFamily.c_str());
-    data.fontFamily = strFontFamily;
-    char *strFontStyle = new char[textDocument->fontStyle.size() + 1];
-    std::strcpy(strFontStyle, textDocument->fontStyle.c_str());
-    data.fontStyle = strFontStyle;
-    char *strText = new char[textDocument->text.size() + 1];
-    std::strcpy(strText, textDocument->text.c_str());
-    data.text = strText;
+const std::string strFontFamily = textDocument->fontFamily;
+data.fontFamily = stringToCJBytesArray(strFontFamily);
+const std::string strFontStyle = textDocument->fontStyle;
+data.fontStyle = stringToCJBytesArray(strFontStyle);
+const std::string strText = textDocument->text;
+data.fontStyle = stringToCJBytesArray(strText);
     return data;
 }
 
@@ -251,8 +247,6 @@ void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data) 
     text->fauxBold = data.fauxBold;
     text->fauxItalic = data.fauxItalic;
     text->fillColor = ToColor(data.fillColor);
-    text->fontFamily = data.fontFamily;
-    text->fontStyle = data.fontStyle;
     text->fontSize = data.fontSize;
     text->strokeColor = ToColor(data.strokeColor);
     text->strokeOverFill = data.strokeOverFill;
@@ -262,7 +256,9 @@ void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data) 
     text->tracking = data.tracking;
     text->backgroundColor = ToColor(data.backgroundColor);
     text->backgroundAlpha = data.backgroundAlpha;
-    text->text = data.text;
+    text->fontFamily = CJBytesArraytoString(data.fontFamily);
+    text->fontStyle = CJBytesArraytoString(data.fontStyle);
+    text->text = CJBytesArraytoString(data.text);
     file->replaceText(index, text);
     return;
 }

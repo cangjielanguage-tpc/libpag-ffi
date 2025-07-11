@@ -80,3 +80,21 @@ public func ToColor(value: Int64): Color {
     let blue: UInt32 = (((color) >> 0) & 0xFF)
     return Color(UInt8(red), UInt8(green), UInt8(blue))
 }
+
+@FastNative
+foreign func free_CJBytesArray(ptr: CJBytesArray): Unit
+
+func BytesArrayToString(res: CJBytesArray): String {
+    unsafe {
+        let size: Int64 = res.size
+        let buf: CPointer<UInt8> = res.buf
+        let bytes: Array<UInt8> = Array<UInt8>(size, repeat: 0)
+        for (i in 0..size) {
+            if (buf.isNotNull()) {
+                bytes[i] = buf.read(i)
+            }
+        }
+        let str = String.fromUtf8(bytes)
+        return str
+    }
+}

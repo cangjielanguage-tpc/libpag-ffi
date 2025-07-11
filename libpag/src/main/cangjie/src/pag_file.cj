@@ -23,7 +23,7 @@ foreign {
 
     func cj_PAGFile_numVideos(ptr: Int64): Int64
 
-    func cj_PAGFile_path(ptr: Int64): CString
+    func cj_PAGFile_path(ptr: Int64): CJBytesArray
 
     func cj_PAGFile_getTextData(ptr: Int64, index: Int32): PAGTextData
 
@@ -70,9 +70,9 @@ struct PAGTextData {
     var backgroundColor: UInt32 = 0
     var justification: UInt8 = 0
     var boxTextRect = VArray<Float32, $4>({i => 0.0})
-    var fontFamily: CString = unsafe { LibC.mallocCString("") }
-    var fontStyle: CString = unsafe { LibC.mallocCString("") }
-    var text: CString = unsafe { LibC.mallocCString("") }
+    var fontFamily: CJBytesArray
+    var fontStyle: CJBytesArray
+    var text: CJBytesArray
 
     public init(
         applyFill: Bool,
@@ -93,9 +93,9 @@ struct PAGTextData {
         backgroundColor: UInt32,
         justification: UInt8,
         boxTextRect: VArray<Float32, $4>,
-        fontFamily: CString,
-        fontStyle: CString,
-        text: CString
+        fontFamily: CJBytesArray,
+        fontStyle: CJBytesArray,
+        text: CJBytesArray
     ) {
         this.applyFill = applyFill
         this.applyStroke = applyStroke
@@ -115,9 +115,9 @@ struct PAGTextData {
         this.backgroundColor = backgroundColor
         this.justification = justification
         this.boxTextRect = boxTextRect
-        this.fontFamily = fontFamily
-        this.fontStyle = fontStyle
-        this.text = text
+        this.fontFamily = CJBytesArray(fontFamily.size, fontFamily.buf)
+        this.fontStyle = CJBytesArray(fontStyle.size, fontStyle.buf)
+        this.text = CJBytesArray(text.size, text.buf)
     }
 }
 
@@ -317,10 +317,10 @@ public class PAGFile <: PAGComposition {
      */
     public func path(): String {
         unsafe {
-            let str: CString = cj_PAGFile_path(ptrPAGFile)
-            let path = str.toString()
-            LibC.free(str)
-            return path
+            let res: CJBytesArray = cj_PAGFile_path(ptrPAGFile)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
 
@@ -348,9 +348,6 @@ public class PAGFile <: PAGComposition {
             pagText.fillColor = data.fillColor
             pagText.strokeColor = data.strokeColor
             pagText.backgroundColor = data.backgroundColor
-            pagText.fontFamily = data.fontFamily.toString().clone()
-            pagText.fontStyle = data.fontStyle.toString().clone()
-            pagText.text = data.text.toString().clone()
             pagText.justification = uint8ToJustification(data.justification)
             pagText.boxTextRect = Rect(
                 left: data.boxTextRect[0],
@@ -358,12 +355,12 @@ public class PAGFile <: PAGComposition {
                 right: data.boxTextRect[2],
                 bottom: data.boxTextRect[3]
             )
-            let fontFamily: CString = data.fontFamily
-            let fontStyle: CString = data.fontStyle
-            let text: CString = data.text
-            LibC.free(fontFamily)
-            LibC.free(fontStyle)
-            LibC.free(text)
+            pagText.fontFamily = BytesArrayToString(data.fontFamily)
+            free_CJBytesArray(data.fontFamily)
+            pagText.fontStyle = BytesArrayToString(data.fontStyle)
+            free_CJBytesArray(data.fontStyle)
+            pagText.text = BytesArrayToString(data.text)
+            free_CJBytesArray(data.text)
             return pagText
         }
     }
@@ -379,10 +376,9 @@ public class PAGFile <: PAGComposition {
             boxTextRect[0] = pagText.boxTextRect.top
             boxTextRect[0] = pagText.boxTextRect.right
             boxTextRect[0] = pagText.boxTextRect.bottom
-            let fontFamily = LibC.mallocCString(pagText.fontFamily)
-            let fontStyle = LibC.mallocCString(pagText.fontStyle)
-            let text = LibC.mallocCString(pagText.text)
-
+            let fontFamily: CString = LibC.mallocCString(pagText.fontFamily)
+            let fontStyle: CString = LibC.mallocCString(pagText.fontStyle)
+            let text: CString = LibC.mallocCString(pagText.text)
             var data: PAGTextData = PAGTextData(
                 pagText.applyFill,
                 pagText.applyStroke,
@@ -402,9 +398,9 @@ public class PAGFile <: PAGComposition {
                 pagText.backgroundColor,
                 pagText.justification.justificationToUint8(pagText.justification),
                 boxTextRect,
-                fontFamily,
-                fontStyle,
-                text
+                CJBytesArray(fontFamily.size(), fontFamily.getChars()),
+                CJBytesArray(fontStyle.size(), fontStyle.getChars()),
+                CJBytesArray(text.size(), text.getChars()),
             )
             cj_PAGFile_replaceText(ptrPAGFile, index, data)
             LibC.free(fontFamily)

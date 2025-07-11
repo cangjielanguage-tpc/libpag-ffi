@@ -3,7 +3,7 @@
  */
 
 #include "cj_type.h"
-
+#include <hilog/log.h>
 namespace pag {
 extern "C" {
 AlphaType getAlphaType(const uint8_t alphaType) {
@@ -98,8 +98,7 @@ void free_CJPAGVideoRangeArray(CJPAGVideoRangeArray ptr) {
 void free_CJBytesArray(CJBytesArray ptr) {
     uint8_t *buf = ptr.buf;
     if (buf != nullptr) {
-        delete[] buf;
-        buf = nullptr;
+        free(buf);
     }
 }
 

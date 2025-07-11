@@ -30,9 +30,9 @@ typedef struct {
     uint32_t backgroundColor;
     uint8_t justification;
     float boxTextRect[4];
-    const char *fontFamily;
-    const char *fontStyle;
-    const char *text;
+    CJBytesArray fontFamily;
+    CJBytesArray fontStyle;
+    CJBytesArray text;
 } PAGTextData;
 
 extern "C" {
@@ -43,7 +43,7 @@ int64_t cj_PAGFile_tagLevel(const int64_t ptr);
 int64_t cj_PAGFile_numTexts(const int64_t ptr);
 int64_t cj_PAGFile_numImages(const int64_t ptr);
 int64_t cj_PAGFile_numVideos(const int64_t ptr);
-const char *cj_PAGFile_path(const int64_t ptr);
+CJBytesArray cj_PAGFile_path(const int64_t ptr);
 PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index);
 void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data);
 void cj_PAGFile_replaceImage(const int64_t ptrPAGFile, int32_t index, const int64_t ptrPAGImage);

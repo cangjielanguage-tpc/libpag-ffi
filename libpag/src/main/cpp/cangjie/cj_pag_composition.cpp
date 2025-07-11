@@ -375,7 +375,6 @@ CJBytesArray cj_PAGComposition_audioBytes(const int64_t ptr) {
     int size = audioBytes->length();
     uint8_t *buf = audioBytes->data();
     uint8_t *bytes = new uint8_t[size];
-    // TODO: 是否替换成 memcpy()函数 ？？？
     for (int i = 0; i < size; i++) {
         bytes[i] = buf[i];
     }

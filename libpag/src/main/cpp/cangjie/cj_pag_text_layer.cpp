@@ -142,16 +142,15 @@ void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color) {
     textLayer->setStrokeColor(colors);
 }
 
-char *cj_PAGTextLayer_text(const int64_t ptr) {
+CJBytesArray cj_PAGTextLayer_text(const int64_t ptr) {
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[text]-the pointer of PAGTextLayer is null.");
-        return nullptr;
+        return {};
     }
     std::string text = textLayer->text();
-    char *cstr = new char[text.size() + 1];
-    std::strcpy(cstr, text.c_str());
-    return cstr;
+    CJBytesArray result = stringToCJBytesArray(text);
+    return result;
 }
 
 void cj_PAGTextLayer_setText(const int64_t ptr, char *t) {

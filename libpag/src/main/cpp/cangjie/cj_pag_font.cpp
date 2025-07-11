@@ -3,6 +3,7 @@
  */
 
 #include "cj_pag_font.h"
+#include "cj_helper.h"
 
 namespace pag {
 extern "C" {
@@ -57,21 +58,20 @@ void cj_PAGFont_setFallbackFontPaths(char *fontPaths[], int lenfn, int *ttcIndic
     PAGFont::SetFallbackFontPaths(fallbackList, ttcList);
 }
 
-char *cj_PAGFont_getFontFamily(const int64_t ptr) {
+CJBytesArray cj_PAGFont_getFontFamily(const int64_t ptr) {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[getFontFamily]-the pointer of PAGFont is null.");
-        return nullptr;
+        return {};
     }
     CJPAGFont *instance = (CJPAGFont *)ptr;
     if (instance == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[getFontFamily]-the pointer of CJPAGFont is null.");
-        return nullptr;
+        return {};
     }
     PAGFont font = instance->get();
     const std::string fontFamily = font.fontFamily;
-    char *cstr = new char[fontFamily.size() + 1];
-    std::strcpy(cstr, fontFamily.c_str());
-    return cstr;
+    CJBytesArray result = stringToCJBytesArray(fontFamily);
+    return result;
 }
 
 char *cj_PAGFont_getFontStyle(const int64_t ptr) {

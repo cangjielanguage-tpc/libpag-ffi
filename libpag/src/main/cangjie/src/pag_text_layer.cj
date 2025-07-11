@@ -24,7 +24,7 @@ foreign {
 
     func cj_PAGTextLayer_setStrokeColor(ptr: Int64, color: Int64): Unit
 
-    func cj_PAGTextLayer_text(ptr: Int64): CString
+    func cj_PAGTextLayer_text(ptr: Int64): CJBytesArray
 
     func cj_PAGTextLayer_setText(ptr: Int64, t: CString): Unit
 
@@ -136,10 +136,10 @@ public class PAGTextLayer <: PAGLayer {
      */
     public func text(): String {
         unsafe {
-            let retC: CString = cj_PAGTextLayer_text(ptr)
-            let ret = retC.toString()
-            LibC.free(retC)
-            return ret
+            let res: CJBytesArray = cj_PAGTextLayer_text(ptr)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
 
