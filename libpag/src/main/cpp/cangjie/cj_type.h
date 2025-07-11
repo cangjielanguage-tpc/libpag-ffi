@@ -7,12 +7,11 @@
 
 #include "../../external/include/pag/types.h"
 #include "cj_marker.h"
-#include <hilog/log.h>
 
 extern "C" {
 
 struct CJBytesArray {
-    long long size;
+    int64_t size;
     uint8_t *buf;
 };
 

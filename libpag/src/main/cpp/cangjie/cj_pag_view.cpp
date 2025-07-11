@@ -270,19 +270,18 @@ bool cj_PAGViewController_isPlaying(const int64_t jView) {
     return animator->isRunning();
 }
 
-const char *cj_PAGViewController_uniqueID(const int64_t jView) {
+CJBytesArray cj_PAGViewController_uniqueID(const int64_t jView) {
     if (jView == 0) {
-        return "";
+        return {};
     }
     CJPAGView *view = (CJPAGView *)jView;
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_uniqueID", "view is null");
-        return "";
+        return {};
     }
     std::string str = view->id;
-    char *cstr = new char[str.size() + 1];
-    std::strcpy(cstr, str.c_str());
-    return cstr;
+    CJBytesArray result = stringToCJBytesArray(str);
+    return result;
 }
 
 void cj_PAGViewController_setSync(const int64_t jView, bool isSync) {

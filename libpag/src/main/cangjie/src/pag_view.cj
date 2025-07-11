@@ -144,7 +144,7 @@ foreign {
 
     func cj_PAGViewController_play(jView: Int64): Unit
 
-    func cj_PAGViewController_uniqueID(jView: Int64): CString
+    func cj_PAGViewController_uniqueID(jView: Int64): CJBytesArray
 
     func cj_PAGViewController_update(jView: Int64): Unit
 
@@ -272,9 +272,9 @@ public class PAGViewController <: XComponentController {
             jView = cj_PAGViewController_createJPAGView()
             cj_PAGViewController_onAnimatorStateChange(jView, onStateChange)
             cj_PAGViewController_onAnimatorProgress(jView, onProgressUpdate)
-            let uniqueID: CString = cj_PAGViewController_uniqueID(jView)
-            id = uniqueID.toString()
-            LibC.free(uniqueID)
+            let res: CJBytesArray = cj_PAGViewController_uniqueID(jView)
+            id = BytesArrayToString(res)
+            free_CJBytesArray(res)
         }
     }
 
@@ -832,10 +832,10 @@ public class PAGViewController <: XComponentController {
             if (jView == 0) {
                 return ""
             }
-            let id: CString = cj_PAGViewController_uniqueID(jView)
-            let str = id.toString()
-            LibC.free(id)
-            return str
+            let res: CJBytesArray = cj_PAGViewController_uniqueID(jView)
+            id = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return id
         }
     }
 

@@ -20,7 +20,7 @@ foreign {
     func cj_PAGFont_setFallbackFontPaths(handlefns: CPointer<CString>, lenfn: Int64, handlettcs: CPointer<Int32>,
         lenttc: Int64): Unit
 
-    func cj_PAGFont_getFontFamily(ptr: Int64): CString
+    func cj_PAGFont_getFontFamily(ptr: Int64): CJBytesArray
 
     func cj_PAGFont_getFontStyle(ptr: Int64): CString
 }
@@ -192,10 +192,10 @@ public class PAGFont {
 
     static func getFontFamily(ptr: Int64): String {
         unsafe {
-            let retC: CString = cj_PAGFont_getFontFamily(ptr)
-            let ret = retC.toString()
-            LibC.free(retC)
-            return ret
+            let res: CJBytesArray = cj_PAGFont_getFontFamily(ptr)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
     static func getFontStyle(ptr: Int64): String {

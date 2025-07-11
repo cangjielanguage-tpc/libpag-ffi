@@ -86,16 +86,15 @@ bool cj_PAGLayer_isPAGFile(const int64_t ptr) {
     return flag;
 }
 
-char *cj_PAGLayer_layerName(const int64_t ptr) {
+CJBytesArray cj_PAGLayer_layerName(const int64_t ptr) {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGLayer]", "[layerName]-the pointer of PAGLayer is null.");
-        return nullptr;
+        return {};
     }
     CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
     std::string layerName = instance->get()->layerName();
-    char *cstr = new char[layerName.size() + 1];
-    std::strcpy(cstr, layerName.c_str());
-    return cstr;
+    CJBytesArray result = stringToCJBytesArray(layerName);
+    return result;
 }
 
 void cj_PAGLayer_matrix(const int64_t ptr, float buf[]) {

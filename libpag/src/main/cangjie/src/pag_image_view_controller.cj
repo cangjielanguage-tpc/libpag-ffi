@@ -605,7 +605,7 @@ public class PAGImageViewController <: XComponentController {
      * already called, there is no need to call it manually since it will be automatically called
      * every frame. Returns true if the content has changed.
      */
-    public func flush(): Bool {
+    private func flush(): Bool {
         unsafe {
             return cj_PAGImageViewController_flush(cjImageView)
         }
