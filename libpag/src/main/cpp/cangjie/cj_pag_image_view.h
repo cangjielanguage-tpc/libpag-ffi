@@ -18,6 +18,7 @@
 #include "tgfx/gpu/Surface.h"
 #include "tgfx/gpu/Window.h"
 #include <EGL/eglplatform.h>
+#include <algorithm>
 #include <hilog/log.h>
 #include <native_window/external_window.h>
 #include <pag/pag.h>
@@ -113,5 +114,4 @@ private:
     std::unordered_map<Frame, std::pair<tgfx::Bitmap, std::shared_ptr<tgfx::Image>>> images;
 };
 } // namespace pag
-
 #endif // LIBPAG4CJ_CJ_PAG_IMAGE_VIEW_H

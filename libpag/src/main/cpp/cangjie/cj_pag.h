@@ -4,7 +4,6 @@
 
 #ifndef LIBPAG4CJ_CJ_PAG_H
 #define LIBPAG4CJ_CJ_PAG_H
-
 #include "./cj_string_util.h"
 #include <pag/pag.h>
 

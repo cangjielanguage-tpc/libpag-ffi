@@ -15,12 +15,14 @@ public:
 
     virtual ~CJPAGPlayer();
 
-    std::shared_ptr<pag::PAGPlayer> get() {
+    std::shared_ptr<pag::PAGPlayer> get()
+    {
         std::lock_guard lock_guard(locker);
         return pagPlayer;
     }
 
-    void clear() {
+    void clear()
+    {
         std::lock_guard lock_guard(locker);
         pagPlayer = nullptr;
     }

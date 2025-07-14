@@ -32,5 +32,4 @@ MarkersPAGLayer cj_PAGComposition_audioMarkers(const int64_t ptr);
 CJInt64Array cj_PAGComposition_getLayersByName(const int64_t ptr, char *layerName);
 CJInt64Array cj_PAGComposition_getLayersUnderPoint(const int64_t ptr, float localX, float localY);
 }
-
 #endif // LIBPAG_CJ_CJ_PAG_COMPOSITION_H

@@ -7,35 +7,40 @@
 namespace pag {
 static std::unordered_map<std::string, std::shared_ptr<CJPAGView>> ViewMap = {};
 
-void CJPAGView::onAnimationStart(PAGAnimator *) {
+void CJPAGView::onAnimationStart(PAGAnimator *)
+{
     std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(0, g_jView);
+        playingStateCallback(static_cast<int>(AnimationState::Start), g_jView);
     }
 }
 
-void CJPAGView::onAnimationCancel(PAGAnimator *) {
+void CJPAGView::onAnimationCancel(PAGAnimator *)
+{
     std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(1, g_jView);
+        playingStateCallback(static_cast<int>(AnimationState::Cancel), g_jView);
     }
 }
 
-void CJPAGView::onAnimationEnd(PAGAnimator *) {
+void CJPAGView::onAnimationEnd(PAGAnimator *)
+{
     std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(2, g_jView);
+        playingStateCallback(static_cast<int>(AnimationState::End), g_jView);
     }
 }
 
-void CJPAGView::onAnimationRepeat(PAGAnimator *) {
+void CJPAGView::onAnimationRepeat(PAGAnimator *)
+{
     std::lock_guard lock_guard(locker);
     if (playingStateCallback) {
-        playingStateCallback(3, g_jView);
+        playingStateCallback(static_cast<int>(AnimationState::Repeat), g_jView);
     }
 }
 
-void CJPAGView::onAnimationUpdate(PAGAnimator *animator) {
+void CJPAGView::onAnimationUpdate(PAGAnimator *animator)
+{
     std::lock_guard lock_guard(locker);
     if (playingProgressCallback) {
         playingProgressCallback(g_jView);
@@ -46,7 +51,8 @@ void CJPAGView::onAnimationUpdate(PAGAnimator *animator) {
     }
 }
 
-void CJPAGView::release() {
+void CJPAGView::release()
+{
     std::lock_guard lock_guard(locker);
     if (playingProgressCallback) {
         playingProgressCallback = nullptr;
@@ -66,8 +72,8 @@ void CJPAGView::release() {
 CJPAGView::~CJPAGView() { release(); }
 
 extern "C" {
-
-int64_t cj_PAGViewController_createJPAGView() {
+int64_t cj_PAGViewController_createJPAGView()
+{
     std::string id = "PAGView" + std::to_string(tgfx::UniqueID::Next());
     auto cView = std::make_shared<CJPAGView>(id);
     cView->animator = PAGAnimator::MakeFrom(cView);
@@ -75,7 +81,8 @@ int64_t cj_PAGViewController_createJPAGView() {
     return reinterpret_cast<int64_t>(cView.get());
 }
 
-void cj_PAGViewController_destroyJPAGView(const char *id) {
+void cj_PAGViewController_destroyJPAGView(const char *id)
+{
     if (id == nullptr || id[0] == '\0') {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_destroyJPAGView", "id is null or empty.");
         return;
@@ -83,13 +90,15 @@ void cj_PAGViewController_destroyJPAGView(const char *id) {
     ViewMap.erase(id);
 }
 
-bool cj_PAGViewController_flush(const int64_t jView) {
+bool cj_PAGViewController_flush(const int64_t jView)
+{
     if (jView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_flush", "Pointer is null");
         return false;
     }
     bool flushResult = false;
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_flush", "view is null");
         return flushResult;
@@ -101,11 +110,13 @@ bool cj_PAGViewController_flush(const int64_t jView) {
     return flushResult;
 }
 
-void cj_PAGViewController_update(const int64_t jView) {
+void cj_PAGViewController_update(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_update", "view is null");
         return;
@@ -118,11 +129,13 @@ void cj_PAGViewController_update(const int64_t jView) {
     }
 }
 
-void cj_PAGViewController_setProgress(const int64_t jView, double value) {
+void cj_PAGViewController_setProgress(const int64_t jView, double value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setProgress", "view is null");
         return;
@@ -138,11 +151,13 @@ void cj_PAGViewController_setProgress(const int64_t jView, double value) {
     }
 }
 
-double cj_PAGViewController_getProgress(const int64_t jView) {
+double cj_PAGViewController_getProgress(const int64_t jView)
+{
     if (jView == 0) {
         return 0.0;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getProgress", "view is null");
         return 0.0;
@@ -155,13 +170,16 @@ double cj_PAGViewController_getProgress(const int64_t jView) {
     return animator->progress();
 }
 
-void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition, bool isNull) {
+void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrComposition, bool isNull)
+{
     if (jView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setComposition", "Pointer is null");
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptrComposition;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
+    intptr_t ptrCompositionInt = static_cast<intptr_t>(ptrComposition);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrCompositionInt);
     auto layer = instance->get();
     auto player = view->getPlayer();
     auto animator = view->getAnimator();
@@ -183,11 +201,13 @@ void cj_PAGViewController_setComposition(const int64_t jView, const int64_t ptrC
     }
 }
 
-void cj_PAGViewController_setRepeatCount(const int64_t jView, int32_t repeatCount) {
+void cj_PAGViewController_setRepeatCount(const int64_t jView, int32_t repeatCount)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setRepeatCount", "view is null");
         return;
@@ -200,11 +220,13 @@ void cj_PAGViewController_setRepeatCount(const int64_t jView, int32_t repeatCoun
     animator->setRepeatCount(repeatCount);
 }
 
-int32_t cj_PAGViewController_repeatCount(const int64_t jView) {
+int32_t cj_PAGViewController_repeatCount(const int64_t jView)
+{
     if (jView == 0) {
         return 0;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_repeatCount", "view is null");
         return 0;
@@ -217,11 +239,13 @@ int32_t cj_PAGViewController_repeatCount(const int64_t jView) {
     return animator->repeatCount();
 }
 
-void cj_PAGViewController_play(const int64_t jView) {
+void cj_PAGViewController_play(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_play", "view is null");
         return;
@@ -236,11 +260,13 @@ void cj_PAGViewController_play(const int64_t jView) {
     animator->start();
 }
 
-void cj_PAGViewController_pause(const int64_t jView) {
+void cj_PAGViewController_pause(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_pause", "view is null");
         return;
@@ -253,11 +279,13 @@ void cj_PAGViewController_pause(const int64_t jView) {
     animator->cancel();
 }
 
-bool cj_PAGViewController_isPlaying(const int64_t jView) {
+bool cj_PAGViewController_isPlaying(const int64_t jView)
+{
     if (jView == 0) {
         return false;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_isPlaying", "view is null");
         return false;
@@ -270,25 +298,29 @@ bool cj_PAGViewController_isPlaying(const int64_t jView) {
     return animator->isRunning();
 }
 
-CJBytesArray cj_PAGViewController_uniqueID(const int64_t jView) {
+CJBytesArray cj_PAGViewController_uniqueID(const int64_t jView)
+{
     if (jView == 0) {
-        return {};
+        return {0, nullptr};
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_uniqueID", "view is null");
-        return {};
+        return {0, nullptr};
     }
     std::string str = view->id;
     CJBytesArray result = stringToCJBytesArray(str);
     return result;
 }
 
-void cj_PAGViewController_setSync(const int64_t jView, bool isSync) {
+void cj_PAGViewController_setSync(const int64_t jView, bool isSync)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setSync", "view is null");
         return;
@@ -301,11 +333,13 @@ void cj_PAGViewController_setSync(const int64_t jView, bool isSync) {
     animator->setSync(isSync);
 }
 
-bool cj_PAGViewController_isSync(const int64_t jView) {
+bool cj_PAGViewController_isSync(const int64_t jView)
+{
     if (jView == 0) {
         return false;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_isSync", "view is null");
         return false;
@@ -318,11 +352,13 @@ bool cj_PAGViewController_isSync(const int64_t jView) {
     return animator->isSync();
 }
 
-void cj_PAGViewController_setVideoEnabled(const int64_t jView, bool value) {
+void cj_PAGViewController_setVideoEnabled(const int64_t jView, bool value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setVideoEnabled", "view is null");
         return;
@@ -335,11 +371,13 @@ void cj_PAGViewController_setVideoEnabled(const int64_t jView, bool value) {
     player->setVideoEnabled(value);
 }
 
-bool cj_PAGViewController_videoEnabled(const int64_t jView) {
+bool cj_PAGViewController_videoEnabled(const int64_t jView)
+{
     if (jView == 0) {
         return false;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_videoEnabled", "view is null");
         return false;
@@ -352,11 +390,13 @@ bool cj_PAGViewController_videoEnabled(const int64_t jView) {
     return player->videoEnabled();
 }
 
-void cj_PAGViewController_setCacheEnabled(const int64_t jView, bool value) {
+void cj_PAGViewController_setCacheEnabled(const int64_t jView, bool value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setCacheEnabled", "view is null");
         return;
@@ -369,11 +409,13 @@ void cj_PAGViewController_setCacheEnabled(const int64_t jView, bool value) {
     player->setCacheEnabled(value);
 }
 
-bool cj_PAGViewController_cacheEnabled(const int64_t jView) {
+bool cj_PAGViewController_cacheEnabled(const int64_t jView)
+{
     if (jView == 0) {
         return false;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_cacheEnabled", "view is null");
         return false;
@@ -386,11 +428,13 @@ bool cj_PAGViewController_cacheEnabled(const int64_t jView) {
     return player->cacheEnabled();
 }
 
-void cj_PAGViewController_setCacheScale(const int64_t jView, float value) {
+void cj_PAGViewController_setCacheScale(const int64_t jView, float value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setCacheScale", "view is null");
         return;
@@ -403,11 +447,13 @@ void cj_PAGViewController_setCacheScale(const int64_t jView, float value) {
     player->setCacheScale(value);
 }
 
-float cj_PAGViewController_cacheScale(const int64_t jView) {
+float cj_PAGViewController_cacheScale(const int64_t jView)
+{
     if (jView == 0) {
         return 1.0;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_cacheScale", "view is null");
         return 1.0;
@@ -420,11 +466,13 @@ float cj_PAGViewController_cacheScale(const int64_t jView) {
     return player->cacheScale();
 }
 
-void cj_PAGViewController_setMaxFrameRate(const int64_t jView, float value) {
+void cj_PAGViewController_setMaxFrameRate(const int64_t jView, float value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setMaxFrameRate", "view is null");
         return;
@@ -437,28 +485,33 @@ void cj_PAGViewController_setMaxFrameRate(const int64_t jView, float value) {
     player->setMaxFrameRate(value);
 }
 
-float cj_PAGViewController_maxFrameRate(const int64_t jView) {
+float cj_PAGViewController_maxFrameRate(const int64_t jView)
+{
+    constexpr float DEFAULT_MAX_FRAME_RATE = 60.0f;
     if (jView == 0) {
-        return 60.0;
+        return DEFAULT_MAX_FRAME_RATE;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_maxFrameRate", "view is null");
-        return 60.0;
+        return DEFAULT_MAX_FRAME_RATE;
     }
     auto player = view->getPlayer();
     if (!player) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_maxFrameRate", "player is null");
-        return 60.0;
+        return DEFAULT_MAX_FRAME_RATE;
     }
     return player->maxFrameRate();
 }
 
-void cj_PAGViewController_setScaleMode(const int64_t jView, int32_t value) {
+void cj_PAGViewController_setScaleMode(const int64_t jView, int32_t value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setScaleMode", "view is null");
         return;
@@ -471,13 +524,15 @@ void cj_PAGViewController_setScaleMode(const int64_t jView, int32_t value) {
     player->setScaleMode(value);
 }
 
-int32_t cj_PAGViewController_scaleMode(const int64_t jView) {
+int32_t cj_PAGViewController_scaleMode(const int64_t jView)
+{
     int scaleMode = PAGScaleMode::LetterBox;
     if (jView == 0) {
         return scaleMode;
     }
 
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_scaleMode", "view is null");
         return scaleMode;
@@ -491,11 +546,13 @@ int32_t cj_PAGViewController_scaleMode(const int64_t jView) {
     return scaleMode;
 }
 
-void cj_PAGViewController_setMatrix(const int64_t jView, float values[9]) {
+void cj_PAGViewController_setMatrix(const int64_t jView, float values[9])
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setMatrix", "view is null");
         return;
@@ -506,15 +563,26 @@ void cj_PAGViewController_setMatrix(const int64_t jView, float values[9]) {
         return;
     }
     Matrix matrix = {};
-    matrix.setAll(values[0], values[1], values[2], values[3], values[4], values[5], 0, 0, 1);
+    float scaleX = values[0];
+    float skewX = values[1];
+    float transX = values[2];
+    float skewY = values[3];
+    float scaleY = values[4];
+    float transY = values[5];
+    constexpr float MATRIX_HX = 0.0f;
+    constexpr float MATRIX_HY = 0.0f;
+    constexpr float MATRIX_W = 1.0f;
+    matrix.setAll(scaleX, skewX, transX, skewY, scaleY, transY, MATRIX_HX, MATRIX_HY, MATRIX_W);
     player->setMatrix(matrix);
 }
 
-void cj_PAGViewController_matrix(const int64_t jView, float values[9]) {
+void cj_PAGViewController_matrix(const int64_t jView, float values[9])
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_matrix", "view is null");
         return;
@@ -530,11 +598,13 @@ void cj_PAGViewController_matrix(const int64_t jView, float values[9]) {
     }
 }
 
-int32_t cj_PAGViewController_currentFrame(const int64_t jView) {
+int32_t cj_PAGViewController_currentFrame(const int64_t jView)
+{
     if (jView == 0) {
         return 0;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_currentFrame", "view is null");
         return 0;
@@ -547,23 +617,25 @@ int32_t cj_PAGViewController_currentFrame(const int64_t jView) {
     return player->currentFrame();
 }
 
-CJInt64Array cj_PAGViewController_getLayersUnderPoint(const int64_t jView, float x, float y) {
+CJInt64Array cj_PAGViewController_getLayersUnderPoint(const int64_t jView, float x, float y)
+{
     if (jView == 0) {
-        return {};
+        return {0, nullptr};
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getLayersUnderPoint", "view is null");
-        return {};
+        return {0, nullptr};
     }
     auto player = view->getPlayer();
     if (!player) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getLayersUnderPoint", "player is null");
-        return {};
+        return {0, nullptr};
     }
     std::vector<std::shared_ptr<PAGLayer>> pagLayers = player->getLayersUnderPoint(x, y);
     if (pagLayers.empty()) {
-        return {};
+        return {0, nullptr};
     }
     long long size = pagLayers.size();
     int64_t *arr = new int64_t[size];
@@ -571,7 +643,7 @@ CJInt64Array cj_PAGViewController_getLayersUnderPoint(const int64_t jView, float
         std::shared_ptr<PAGLayer> pagLayer = pagLayers[i];
         if (!pagLayer) {
             delete[] arr;
-            return {};
+            return {0, nullptr};
         }
         CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(pagLayer);
         arr[i] = (int64_t)cjlayer;
@@ -579,17 +651,20 @@ CJInt64Array cj_PAGViewController_getLayersUnderPoint(const int64_t jView, float
     return CJInt64Array{size, arr};
 }
 
-void cj_PAGViewController_getBounds(const int64_t jView, const int64_t ptrCJPAGLayerHandle, float values[4]) {
+void cj_PAGViewController_getBounds(const int64_t jView, const int64_t ptrCJPAGLayerHandle, float values[4])
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getBounds", "view is null");
         return;
     }
     auto player = view->getPlayer();
-    CJPAGLayerHandle *layerHandle = (CJPAGLayerHandle *)ptrCJPAGLayerHandle;
+    intptr_t ptrCJPAGLayerHandleInt = static_cast<intptr_t>(ptrCJPAGLayerHandle);
+    CJPAGLayerHandle *layerHandle = reinterpret_cast<CJPAGLayerHandle *>(ptrCJPAGLayerHandleInt);
     if (!player || !layerHandle || !layerHandle->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_getBounds", "layerHandle or player is null");
         return;
@@ -597,17 +672,23 @@ void cj_PAGViewController_getBounds(const int64_t jView, const int64_t ptrCJPAGL
     std::shared_ptr<pag::PAGLayer> layer = layerHandle->get();
     layer->setVisible(false);
     Rect rect = player->getBounds(layer);
-    values[0] = rect.left;
-    values[1] = rect.top;
-    values[2] = rect.right;
-    values[3] = rect.bottom;
+    constexpr int INDEX_LEFT = 0;
+    constexpr int INDEX_TOP = 1;
+    constexpr int INDEX_RIGHT = 2;
+    constexpr int INDEX_BOTTOM = 3;
+    values[INDEX_LEFT] = rect.left;
+    values[INDEX_TOP] = rect.top;
+    values[INDEX_RIGHT] = rect.right;
+    values[INDEX_BOTTOM] = rect.bottom;
 }
 
-void cj_PAGViewController_freeCache(const int64_t jView) {
+void cj_PAGViewController_freeCache(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_freeCache", "view is null");
         return;
@@ -625,11 +706,13 @@ void cj_PAGViewController_freeCache(const int64_t jView) {
     surface->freeCache();
 }
 
-bool cj_PAGViewController_useDiskCache(const int64_t jView) {
+bool cj_PAGViewController_useDiskCache(const int64_t jView)
+{
     if (jView == 0) {
         return false;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_useDiskCache", "view is null");
         return false;
@@ -642,11 +725,13 @@ bool cj_PAGViewController_useDiskCache(const int64_t jView) {
     return player->useDiskCache();
 }
 
-void cj_PAGViewController_setUseDiskCache(const int64_t jView, bool value) {
+void cj_PAGViewController_setUseDiskCache(const int64_t jView, bool value)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setUseDiskCache", "view is null");
         return;
@@ -659,11 +744,13 @@ void cj_PAGViewController_setUseDiskCache(const int64_t jView, bool value) {
     player->setUseDiskCache(value);
 }
 
-int64_t cj_PAGViewController_duration(const int64_t jView) {
+int64_t cj_PAGViewController_duration(const int64_t jView)
+{
     if (jView == 0) {
         return 0;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_setUseDiskCache", "view is null");
         return 0;
@@ -676,11 +763,13 @@ int64_t cj_PAGViewController_duration(const int64_t jView) {
     return player->duration();
 }
 
-void cj_PAGViewController_SetSurfaceId(const int64_t jView, int64_t surfaceId) {
+void cj_PAGViewController_SetSurfaceId(const int64_t jView, int64_t surfaceId)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_SetSurfaceId", "view is null");
         return;
@@ -696,11 +785,13 @@ void cj_PAGViewController_SetSurfaceId(const int64_t jView, int64_t surfaceId) {
     player->setSurface(pag::PAGSurface::MakeFrom(drawable));
 }
 
-void cj_PAGViewController_ChangeSurface(const int64_t jView) {
+void cj_PAGViewController_ChangeSurface(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_ChangeSurface", "view is null");
         return;
@@ -718,11 +809,13 @@ void cj_PAGViewController_ChangeSurface(const int64_t jView) {
     surface->updateSize();
 }
 
-void cj_PAGViewController_release(const int64_t jView) {
+void cj_PAGViewController_release(const int64_t jView)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_release", "view is null");
         return;
@@ -730,11 +823,13 @@ void cj_PAGViewController_release(const int64_t jView) {
     view->release();
 }
 
-void cj_PAGViewController_onAnimatorStateChange(const int64_t jView, CJPAGView::stateCallback callback) {
+void cj_PAGViewController_onAnimatorStateChange(const int64_t jView, CJPAGView::stateCallback callback)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_onAnimatorStateChange", "view is null");
         return;
@@ -743,11 +838,13 @@ void cj_PAGViewController_onAnimatorStateChange(const int64_t jView, CJPAGView::
     view->playingStateCallback = callback;
 }
 
-void cj_PAGViewController_onAnimatorProgress(const int64_t jView, CJPAGView::progressCallback callback) {
+void cj_PAGViewController_onAnimatorProgress(const int64_t jView, CJPAGView::progressCallback callback)
+{
     if (jView == 0) {
         return;
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     if (!view) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGViewController_onAnimatorProgress", "view is null");
         return;
@@ -756,11 +853,13 @@ void cj_PAGViewController_onAnimatorProgress(const int64_t jView, CJPAGView::pro
     view->playingProgressCallback = callback;
 }
 
-CJPixelMap cj_PAGViewController_makeSnapshot(const int64_t jView) {
+CJPixelMap cj_PAGViewController_makeSnapshot(const int64_t jView)
+{
     if (jView == 0) {
         return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
     }
-    CJPAGView *view = (CJPAGView *)jView;
+    intptr_t viewPtrInt = static_cast<intptr_t>(jView);
+    CJPAGView *view = reinterpret_cast<CJPAGView *>(viewPtrInt);
     auto player = view->getPlayer();
     if (player == nullptr) {
         return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};

@@ -10,7 +10,6 @@
 #include "pag/file.h"
 
 namespace pag {
-
 typedef struct {
     bool applyFill;
     bool applyStroke;

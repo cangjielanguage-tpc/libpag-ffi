@@ -7,9 +7,9 @@
 
 namespace pag {
 extern "C" {
-
 long long cj_PAGSolidLayer_make(const int64_t duration, const int64_t width, const int64_t height,
-                                pag::Color solidColor, const uint8_t opacity) {
+                                pag::Color solidColor, const uint8_t opacity)
+{
     if (width <= 0 || height <= 0 || duration <= 0) {
         return -1;
     }
@@ -18,11 +18,13 @@ long long cj_PAGSolidLayer_make(const int64_t duration, const int64_t width, con
     return (int64_t)cjlayer;
 }
 
-static std::shared_ptr<PAGSolidLayer> getPAGSolidLayer(const int64_t ptr) {
+static std::shared_ptr<PAGSolidLayer> getPAGSolidLayer(const int64_t ptr)
+{
     if (ptr == 0) {
         return nullptr;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     if (layer == nullptr) {
         return nullptr;
@@ -33,7 +35,8 @@ static std::shared_ptr<PAGSolidLayer> getPAGSolidLayer(const int64_t ptr) {
     return nullptr;
 }
 
-long long cj_PAGSolidLayer_solidColor(const int64_t ptr) {
+long long cj_PAGSolidLayer_solidColor(const int64_t ptr)
+{
     std::shared_ptr<PAGSolidLayer> solidLayer = getPAGSolidLayer(ptr);
     if (solidLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGSolidLayer]",
@@ -46,7 +49,8 @@ long long cj_PAGSolidLayer_solidColor(const int64_t ptr) {
     return res;
 }
 
-void cj_PAGSolidLayer_setSolidColor(const int64_t ptr, const int64_t solidColor) {
+void cj_PAGSolidLayer_setSolidColor(const int64_t ptr, const int64_t solidColor)
+{
     std::shared_ptr<PAGSolidLayer> solidLayer = getPAGSolidLayer(ptr);
     if (solidLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGSolidLayer]",

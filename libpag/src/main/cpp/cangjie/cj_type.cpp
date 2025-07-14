@@ -4,9 +4,11 @@
 
 #include "cj_type.h"
 #include <hilog/log.h>
+
 namespace pag {
 extern "C" {
-AlphaType getAlphaType(const uint8_t alphaType) {
+AlphaType getAlphaType(const uint8_t alphaType)
+{
     if (alphaType == 0) { // not initialized.uint8_t Unknown = 0
         return AlphaType::Unknown;
     } else if (alphaType == 1) { // Pixels are opaque.uint8_t  Opaque = 1
@@ -20,7 +22,8 @@ AlphaType getAlphaType(const uint8_t alphaType) {
     }
 }
 
-ColorType getColorType(const uint8_t colorType) {
+ColorType getColorType(const uint8_t colorType)
+{
     if (colorType == 0) {
         return ColorType::Unknown;
     } else if (colorType == 1) {
@@ -38,7 +41,8 @@ ColorType getColorType(const uint8_t colorType) {
     }
 }
 
-void free_CPointer_CJMarker(CJMarker *ptr) {
+void free_CPointer_CJMarker(CJMarker *ptr)
+{
     if (ptr != nullptr) {
         /*
          * Each CJMarker. mComment (char *) in the array is released in Cangjie using LibC. free (mComment). Directly
@@ -49,7 +53,8 @@ void free_CPointer_CJMarker(CJMarker *ptr) {
     }
 }
 
-void free_CPointer_CJPAGVideoRange(CJPAGVideoRange *ptr) {
+void free_CPointer_CJPAGVideoRange(CJPAGVideoRange *ptr)
+{
     if (ptr != nullptr) {
         /*
          * There are no member variables of CJPAGVideoRange in the array that need to be released. Directly release the
@@ -60,49 +65,59 @@ void free_CPointer_CJPAGVideoRange(CJPAGVideoRange *ptr) {
     }
 }
 
-void free_CPointer_UInt8(uint8_t *ptr) {
+void free_CPointer_UInt8(uint8_t *ptr)
+{
     if (ptr != nullptr) {
         delete[] ptr;
         ptr = nullptr;
     }
 }
 
-void free_CPointer_Int64(int64_t *ptr) {
+void free_CPointer_Int64(int64_t *ptr)
+{
     if (ptr != nullptr) {
         delete[] ptr;
         ptr = nullptr;
     }
 }
 
-void free_CPointer_Float32(float *ptr) {
+void free_CPointer_Float32(float *ptr)
+{
     if (ptr != nullptr) {
         delete[] ptr;
         ptr = nullptr;
     }
 }
 
-void free_MarkersPAGLayer(MarkersPAGLayer ptr) {
+void free_MarkersPAGLayer(MarkersPAGLayer ptr)
+{
     CJMarker *markers = ptr.markers;
     if (markers != nullptr) {
         free(markers);
     }
 }
 
-void free_CJPAGVideoRangeArray(CJPAGVideoRangeArray ptr) {
+void free_CJPAGVideoRangeArray(CJPAGVideoRangeArray ptr)
+{
     CJPAGVideoRange *buf = ptr.buf;
     if (buf != nullptr) {
         free(buf);
     }
 }
 
-void free_CJBytesArray(CJBytesArray ptr) {
+void free_CJBytesArray(CJBytesArray ptr)
+{
+    if (ptr.size == 0) {
+        return;
+    }
     uint8_t *buf = ptr.buf;
     if (buf != nullptr) {
         free(buf);
     }
 }
 
-void free_CJPtrArray(CJInt64Array ptr) {
+void free_CJPtrArray(CJInt64Array ptr)
+{
     int64_t *buf = ptr.buf;
     if (buf != nullptr) {
         free(buf);

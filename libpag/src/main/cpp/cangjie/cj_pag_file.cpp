@@ -5,12 +5,11 @@
 #include "cj_pag_file.h"
 
 namespace pag {
-
 extern "C" {
-
 uint32_t cj_PAGFile_MaxSupportedTagLevel() { return pag::PAGFile::MaxSupportedTagLevel(); }
 
-int64_t cj_PAGFile_LoadFromPath(const char *path) {
+int64_t cj_PAGFile_LoadFromPath(const char *path)
+{
     if (path == nullptr || path[0] == '\0') {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_LoadFromPath", "Path is null or empty.");
         return 0;
@@ -29,7 +28,8 @@ int64_t cj_PAGFile_LoadFromPath(const char *path) {
     }
 }
 
-int64_t cj_PAGFile_LoadFromBytes(uint8_t *bytes, size_t length, const char *path) {
+int64_t cj_PAGFile_LoadFromBytes(uint8_t *bytes, size_t length, const char *path)
+{
     if (bytes == NULL || length == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_LoadFromBytes",
                      "Input bytes is NULL or length is zero.");
@@ -49,12 +49,14 @@ int64_t cj_PAGFile_LoadFromBytes(uint8_t *bytes, size_t length, const char *path
     }
 }
 
-int64_t cj_PAGFile_tagLevel(const int64_t ptr) {
+int64_t cj_PAGFile_tagLevel(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_tagLevel", "Input pointer is null.");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (layer == NULL) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_tagLevel", "Layer is null.");
         return -1;
@@ -72,12 +74,14 @@ int64_t cj_PAGFile_tagLevel(const int64_t ptr) {
     return file->tagLevel();
 }
 
-int64_t cj_PAGFile_numTexts(const int64_t ptr) {
+int64_t cj_PAGFile_numTexts(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numTexts", "Input pointer is null.");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (layer == NULL) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numTexts", "Layer is null.");
         return -1;
@@ -95,12 +99,14 @@ int64_t cj_PAGFile_numTexts(const int64_t ptr) {
     return file->numTexts();
 }
 
-int64_t cj_PAGFile_numImages(const int64_t ptr) {
+int64_t cj_PAGFile_numImages(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numImages", "Pointer is null.");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (layer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numImages", "Layer is null.");
         return -1;
@@ -118,12 +124,14 @@ int64_t cj_PAGFile_numImages(const int64_t ptr) {
     return file->numImages();
 }
 
-int64_t cj_PAGFile_numVideos(const int64_t ptr) {
+int64_t cj_PAGFile_numVideos(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numVideos", "Pointer is null.");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (layer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_numVideos", "Layer is null.");
         return -1;
@@ -141,38 +149,42 @@ int64_t cj_PAGFile_numVideos(const int64_t ptr) {
     return file->numVideos();
 }
 
-CJBytesArray cj_PAGFile_path(const int64_t ptr) {
+CJBytesArray cj_PAGFile_path(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "Pointer is null.");
-        return {};
+        return {0, nullptr};
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (layer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "Layer is null.");
-        return {};
+        return {0, nullptr};
     }
     std::shared_ptr<pag::PAGLayer> pagLayer = layer->get();
     if (!pagLayer) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "PAGLayer is null.");
-        return {};
+        return {0, nullptr};
     }
     std::shared_ptr<pag::File> file = pagLayer->getFile();
     if (!file) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_path", "getFile() returned null.");
-        return {};
+        return {0, nullptr};
     }
     const std::string &str = file->path;
-CJBytesArray result = stringToCJBytesArray(str);
-return result;
+    CJBytesArray result = stringToCJBytesArray(str);
+    return result;
 }
 
-PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index) {
+PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index)
+{
     PAGTextData data;
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getTextData", "ptr is null");
         return data;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getTextData", "layer or layer->get() is null");
         return data;
@@ -207,25 +219,31 @@ PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index) {
     data.backgroundColor = MakeColorInt(textDocument->backgroundColor.red, textDocument->backgroundColor.green,
                                         textDocument->backgroundColor.blue);
     data.justification = textDocument->justification;
-    data.boxTextRect[0] = textDocument->boxTextPos.x;
-    data.boxTextRect[1] = textDocument->boxTextPos.y;
-    data.boxTextRect[2] = textDocument->boxTextSize.x;
-    data.boxTextRect[3] = textDocument->boxTextSize.y;
-const std::string strFontFamily = textDocument->fontFamily;
-data.fontFamily = stringToCJBytesArray(strFontFamily);
-const std::string strFontStyle = textDocument->fontStyle;
-data.fontStyle = stringToCJBytesArray(strFontStyle);
-const std::string strText = textDocument->text;
-data.fontStyle = stringToCJBytesArray(strText);
+    constexpr int BOX_TEXT_LEFT = 0;
+    constexpr int BOX_TEXT_TOP = 1;
+    constexpr int BOX_TEXT_WIDTH = 2;
+    constexpr int BOX_TEXT_HEIGHT = 3;
+    data.boxTextRect[BOX_TEXT_LEFT] = textDocument->boxTextPos.x;
+    data.boxTextRect[BOX_TEXT_TOP] = textDocument->boxTextPos.y;
+    data.boxTextRect[BOX_TEXT_WIDTH] = textDocument->boxTextSize.x;
+    data.boxTextRect[BOX_TEXT_HEIGHT] = textDocument->boxTextSize.y;
+    const std::string strFontFamily = textDocument->fontFamily;
+    data.fontFamily = stringToCJBytesArray(strFontFamily);
+    const std::string strFontStyle = textDocument->fontStyle;
+    data.fontStyle = stringToCJBytesArray(strFontStyle);
+    const std::string strText = textDocument->text;
+    data.fontStyle = stringToCJBytesArray(strText);
     return data;
 }
 
-void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data) {
+void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceText", "ptr is null");
         return;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceText", "layer or layer->get() is null");
         return;
@@ -240,7 +258,12 @@ void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data) 
     text->applyStroke = data.applyStroke;
     text->baselineShift = data.baselineShift;
     text->boxText = data.boxText;
-    Rect rect = Rect::MakeXYWH(data.boxTextRect[0], data.boxTextRect[1], data.boxTextRect[2], data.boxTextRect[3]);
+    constexpr int BOX_TEXT_LEFT = 0;
+    constexpr int BOX_TEXT_TOP = 1;
+    constexpr int BOX_TEXT_WIDTH = 2;
+    constexpr int BOX_TEXT_HEIGHT = 3;
+    Rect rect = Rect::MakeXYWH(data.boxTextRect[BOX_TEXT_LEFT], data.boxTextRect[BOX_TEXT_TOP],
+                               data.boxTextRect[BOX_TEXT_WIDTH], data.boxTextRect[BOX_TEXT_HEIGHT]);
     text->boxTextPos = {rect.x(), rect.y()};
     text->boxTextSize = {rect.width(), rect.height()};
     text->firstBaseLine = data.firstBaseLine;
@@ -263,12 +286,14 @@ void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data) 
     return;
 }
 
-void cj_PAGFile_replaceImage(const int64_t ptrPAGFile, int32_t index, const int64_t ptrPAGImage) {
+void cj_PAGFile_replaceImage(const int64_t ptrPAGFile, int32_t index, const int64_t ptrPAGImage)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceImage", "ptrPAGFile is null");
         return;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceImage", "layer or layer->get() is null");
         return;
@@ -283,7 +308,8 @@ void cj_PAGFile_replaceImage(const int64_t ptrPAGFile, int32_t index, const int6
     pagFile->replaceImage(index, pagImage);
 }
 
-void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerName, const int64_t ptrPAGImage) {
+void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerName, const int64_t ptrPAGImage)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceImageByName", "ptrPAGFile is null");
         return;
@@ -292,7 +318,8 @@ void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerNa
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceImageByName", "layerName is null or empty");
         return;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_replaceImageByName", "layer or layer->get() is null");
         return;
@@ -308,26 +335,28 @@ void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerNa
 }
 
 CJInt64Array cj_PAGFile_getLayersByEditableIndex(const int64_t ptrPAGFile, const int32_t index,
-                                                 const int32_t layerType) {
+                                                 const int32_t layerType)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getLayersByEditableIndex", "ptrPAGFile is null");
-        return {};
+        return {0, nullptr};
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getLayersByEditableIndex",
                      "layer or layer->get() is null");
-        return {};
+        return {0, nullptr};
     }
     std::shared_ptr<PAGFile> pagFile = std::static_pointer_cast<PAGFile>(layer->get());
     if (!pagFile) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getLayersByEditableIndex", "pagFile is null");
-        return {};
+        return {0, nullptr};
     }
     std::vector<std::shared_ptr<PAGLayer>> pagLayers =
         pagFile->getLayersByEditableIndex(index, static_cast<pag::LayerType>(layerType));
     if (pagLayers.empty()) {
-        return {};
+        return {0, nullptr};
     }
     const size_t size = pagLayers.size();
     auto *arr = new int64_t[size];
@@ -335,7 +364,7 @@ CJInt64Array cj_PAGFile_getLayersByEditableIndex(const int64_t ptrPAGFile, const
         std::shared_ptr<PAGLayer> pagLayer = pagLayers[i];
         if (!pagLayer) {
             delete[] arr;
-            return {};
+            return {0, nullptr};
         }
         CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(pagLayer);
         arr[i] = (int64_t)cjlayer;
@@ -343,20 +372,22 @@ CJInt64Array cj_PAGFile_getLayersByEditableIndex(const int64_t ptrPAGFile, const
     return CJInt64Array{static_cast<int64_t>(size), arr};
 }
 
-CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int32_t layerType) {
+CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int32_t layerType)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getEditableIndices", "ptrPAGFile is null");
-        return {};
+        return {0, nullptr};
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getEditableIndices", "layer or layer->get() is null");
-        return {};
+        return {0, nullptr};
     }
     std::shared_ptr<PAGFile> pagFile = std::static_pointer_cast<PAGFile>(layer->get());
     if (!pagFile) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getEditableIndices", "pagFile is null");
-        return {};
+        return {0, nullptr};
     }
     std::vector<int> data = pagFile->getEditableIndices(static_cast<pag::LayerType>(layerType));
     long long size = data.size();
@@ -367,12 +398,14 @@ CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int32
     return CJInt64Array{size, arr};
 }
 
-int32_t cj_PAGFile_timeStretchMode(const int64_t ptrPAGFile) {
+int32_t cj_PAGFile_timeStretchMode(const int64_t ptrPAGFile)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_timeStretchMode", "ptrPAGFile is null");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_timeStretchMode", "layer or layer->get() is null");
         return -1;
@@ -385,12 +418,14 @@ int32_t cj_PAGFile_timeStretchMode(const int64_t ptrPAGFile) {
     return pagFile->timeStretchMode();
 }
 
-void cj_PAGFile_setTimeStretchMode(const int64_t ptrPAGFile, int32_t mode) {
+void cj_PAGFile_setTimeStretchMode(const int64_t ptrPAGFile, int32_t mode)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_setTimeStretchMode", "ptrPAGFile is null");
         return;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_setTimeStretchMode", "layer or layer->get() is null");
         return;
@@ -404,12 +439,14 @@ void cj_PAGFile_setTimeStretchMode(const int64_t ptrPAGFile, int32_t mode) {
     return;
 }
 
-void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration) {
+void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_setDuration", "ptrPAGFile is null");
         return;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_setDuration", "layer or layer->get() is null");
         return;
@@ -422,12 +459,14 @@ void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration) {
     pagFile->setDuration(duration);
 }
 
-int64_t cj_PAGFile_duration(const int64_t ptrPAGFile) {
+int64_t cj_PAGFile_duration(const int64_t ptrPAGFile)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_duration", "ptrPAGFile is null");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_duration", "layer or layer->get() is null");
         return -1;
@@ -440,12 +479,14 @@ int64_t cj_PAGFile_duration(const int64_t ptrPAGFile) {
     return pagFile->duration();
 }
 
-int64_t cj_PAGFile_copyOriginal(const int64_t ptrPAGFile) {
+int64_t cj_PAGFile_copyOriginal(const int64_t ptrPAGFile)
+{
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_copyOriginal", "ptrPAGFile is null");
         return -1;
     }
-    CJPAGLayerHandle *layer = (CJPAGLayerHandle *)ptrPAGFile;
+    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
+    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!layer || !layer->get()) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_copyOriginal", "layer or layer->get() is null");
         return -1;
@@ -468,12 +509,14 @@ int64_t cj_PAGFile_copyOriginal(const int64_t ptrPAGFile) {
     return (int64_t)handler;
 }
 
-void cj_PAGFile_release(const int64_t ptr) {
+void cj_PAGFile_release(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_release", "Pointer is null");
         return;
     }
-    CJPAGLayerHandle *pagFile = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *pagFile = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (pagFile) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_release", "Invalid instance");
         return;
