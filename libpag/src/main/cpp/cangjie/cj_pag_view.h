@@ -30,16 +30,17 @@ public:
 
     void release();
 
-    std::shared_ptr<PAGPlayer> getPlayer() {
+    std::shared_ptr<PAGPlayer> getPlayer()
+    {
         std::lock_guard lock_guard(locker);
         return player;
     }
 
-    std::shared_ptr<PAGAnimator> getAnimator() {
+    std::shared_ptr<PAGAnimator> getAnimator()
+    {
         std::lock_guard lock_guard(locker);
         return animator;
     }
-
     std::string id;
     int64_t g_jView = 0;
     std::shared_ptr<PAGAnimator> animator = nullptr;

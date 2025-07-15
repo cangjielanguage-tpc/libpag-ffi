@@ -16,12 +16,14 @@ public:
 
     virtual ~CJPAGLayerHandle();
 
-    std::shared_ptr<pag::PAGLayer> get() {
+    std::shared_ptr<pag::PAGLayer> get()
+    {
         std::lock_guard lock_guard(locker);
         return layer;
     }
 
-    void reset() {
+    void reset()
+    {
         std::lock_guard lock_guard(locker);
         layer = nullptr;
     }
@@ -30,7 +32,6 @@ private:
     std::shared_ptr<pag::PAGLayer> layer;
     std::mutex locker;
 };
-
 } // namespace pag
 
 extern "C" { // cangjie [PAGLayer] ffi

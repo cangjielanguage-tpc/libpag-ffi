@@ -6,15 +6,16 @@
 
 namespace pag {
 extern "C" {
-
-static std::shared_ptr<PAGComposition> getPAGComposition(std::shared_ptr<pag::PAGLayer> layer) {
+static std::shared_ptr<PAGComposition> getPAGComposition(std::shared_ptr<pag::PAGLayer> layer)
+{
     if (layer && layer->layerType() == LayerType::PreCompose) {
         return std::static_pointer_cast<PAGComposition>(layer);
     }
     return nullptr;
 }
 
-long long cj_PAGComposition_Make(int width, int height) {
+long long cj_PAGComposition_Make(int width, int height)
+{
     std::shared_ptr<PAGComposition> pagComposition = PAGComposition::Make(width, height);
     if (!pagComposition) {
         return 0;
@@ -23,13 +24,15 @@ long long cj_PAGComposition_Make(int width, int height) {
     return (int64_t)handler;
 }
 
-long long cj_PAGComposition_width(const int64_t ptr) {
+long long cj_PAGComposition_width(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[width]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -38,13 +41,15 @@ long long cj_PAGComposition_width(const int64_t ptr) {
     return pagComposition->width();
 }
 
-long long cj_PAGComposition_height(const int64_t ptr) {
+long long cj_PAGComposition_height(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "PAGComposition]",
                      "[height]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -53,13 +58,15 @@ long long cj_PAGComposition_height(const int64_t ptr) {
     return pagComposition->height();
 }
 
-void cj_PAGComposition_setContentSize(const int64_t ptr, int width, int height) {
+void cj_PAGComposition_setContentSize(const int64_t ptr, int width, int height)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[setContentSize]-the pointer of PAGComposition is null.");
         return;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -68,13 +75,15 @@ void cj_PAGComposition_setContentSize(const int64_t ptr, int width, int height) 
     return pagComposition->setContentSize(width, height);
 }
 
-long long cj_PAGComposition_numChildren(const int64_t ptr) {
+long long cj_PAGComposition_numChildren(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[numChildren]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
@@ -85,13 +94,15 @@ long long cj_PAGComposition_numChildren(const int64_t ptr) {
     return pagComposition->numChildren();
 }
 
-long long cj_PAGComposition_getLayerAt(const int64_t ptr, const int64_t index) {
+long long cj_PAGComposition_getLayerAt(const int64_t ptr, const int64_t index)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[getLayerAt]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> pagLayer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(pagLayer);
@@ -107,7 +118,8 @@ long long cj_PAGComposition_getLayerAt(const int64_t ptr, const int64_t index) {
     return (int64_t)cjlayer;
 }
 
-long long cj_PAGComposition_getLayerIndex(const int64_t ptr, const int64_t nativeLayer) {
+long long cj_PAGComposition_getLayerIndex(const int64_t ptr, const int64_t nativeLayer)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[getLayerIndex]", "the pointer of PAGComposition is null.");
         return -1;
@@ -116,14 +128,16 @@ long long cj_PAGComposition_getLayerIndex(const int64_t ptr, const int64_t nativ
         return -1;
     }
     // Obtain the CJPAGLayerHandle corresponding to the native layer, and then obtain the PAGLayer.
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[getLayerIndex]", "[getLayerIndex]-the PAGLayer is null.");
         return -1;
     }
     // Retrieve the CJPAGLayerHandle corresponding to the current PAGComposition
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -134,20 +148,23 @@ long long cj_PAGComposition_getLayerIndex(const int64_t ptr, const int64_t nativ
     return layerIndex;
 }
 
-void cj_PAGComposition_setLayerIndex(const int64_t ptr, const int64_t nativeLayer, const int64_t index) {
+void cj_PAGComposition_setLayerIndex(const int64_t ptr, const int64_t nativeLayer, const int64_t index)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[setLayerIndex]-the pointer of PAGComposition is null.");
         return;
     }
     // Obtain the CJPAGLayerHandle corresponding to the native layer, and then obtain the PAGLayer.
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         return;
     }
     // Retrieve the CJPAGLayerHandle corresponding to the current PAGComposition
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
@@ -158,7 +175,8 @@ void cj_PAGComposition_setLayerIndex(const int64_t ptr, const int64_t nativeLaye
     pagComposition->setLayerIndex(pagLayer, index);
 }
 
-bool cj_PAGComposition_addLayer(const int64_t ptr, const int64_t nativeLayer) {
+bool cj_PAGComposition_addLayer(const int64_t ptr, const int64_t nativeLayer)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[addLayer]-the pointer of PAGComposition is null.");
@@ -168,13 +186,15 @@ bool cj_PAGComposition_addLayer(const int64_t ptr, const int64_t nativeLayer) {
         return false;
     }
     // Obtain the CJPAGLayerHandle corresponding to the native layer, and then obtain the PAGLayer.
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         return false;
     }
     // Retrieve the CJPAGLayerHandle corresponding to the current PAGComposition
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -185,7 +205,8 @@ bool cj_PAGComposition_addLayer(const int64_t ptr, const int64_t nativeLayer) {
     return res;
 }
 
-bool cj_PAGComposition_addLayerAt(const int64_t ptr, const int64_t nativeLayer, const int64_t index) {
+bool cj_PAGComposition_addLayerAt(const int64_t ptr, const int64_t nativeLayer, const int64_t index)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[addLayerAt]-the pointer of PAGComposition is null.");
@@ -195,12 +216,14 @@ bool cj_PAGComposition_addLayerAt(const int64_t ptr, const int64_t nativeLayer, 
                      "[addLayerAt]-the pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         return false;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -211,7 +234,8 @@ bool cj_PAGComposition_addLayerAt(const int64_t ptr, const int64_t nativeLayer, 
     return res;
 }
 
-bool cj_PAGComposition_contains(const int64_t ptr, const int64_t nativeLayer) {
+bool cj_PAGComposition_contains(const int64_t ptr, const int64_t nativeLayer)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[contains]-the pointer of PAGComposition is null.");
@@ -220,12 +244,14 @@ bool cj_PAGComposition_contains(const int64_t ptr, const int64_t nativeLayer) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]", "[contains]-the pointer of PAGLayer is null.");
         return false;
     }
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         return false;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -236,7 +262,8 @@ bool cj_PAGComposition_contains(const int64_t ptr, const int64_t nativeLayer) {
     return res;
 }
 
-long long cj_PAGComposition_removeLayer(const int64_t ptr, const int64_t nativeLayer) {
+long long cj_PAGComposition_removeLayer(const int64_t ptr, const int64_t nativeLayer)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[removeLayer]-the pointer of PAGComposition is null.");
@@ -246,12 +273,14 @@ long long cj_PAGComposition_removeLayer(const int64_t ptr, const int64_t nativeL
                      "[removeLayer]-the pointer of PAGLayer is null.");
         return 0;
     }
-    CJPAGLayerHandle *cjlayer = (CJPAGLayerHandle *)nativeLayer;
+    intptr_t nativeLayerInt = static_cast<intptr_t>(nativeLayer);
+    CJPAGLayerHandle *cjlayer = reinterpret_cast<CJPAGLayerHandle *>(nativeLayerInt);
     std::shared_ptr<PAGLayer> pagLayer = cjlayer->get();
     if (pagLayer == nullptr) {
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -266,13 +295,15 @@ long long cj_PAGComposition_removeLayer(const int64_t ptr, const int64_t nativeL
     return (int64_t)cjremoveLayer;
 }
 
-long long cj_PAGComposition_removeLayerAt(const int64_t ptr, const int64_t index) {
+long long cj_PAGComposition_removeLayerAt(const int64_t ptr, const int64_t index)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[removeLayerAt]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -287,13 +318,15 @@ long long cj_PAGComposition_removeLayerAt(const int64_t ptr, const int64_t index
     return (int64_t)cjremoveLayer;
 }
 
-void cj_PAGComposition_removeAllLayers(const int64_t ptr) {
+void cj_PAGComposition_removeAllLayers(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[removeAllLayers]-the pointer of PAGComposition is null.");
         return;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
@@ -304,7 +337,8 @@ void cj_PAGComposition_removeAllLayers(const int64_t ptr) {
     return pagComposition->removeAllLayers();
 }
 
-void cj_PAGComposition_swapLayer(const int64_t ptr, const int64_t nativeLayer1, const int64_t nativeLayer2) {
+void cj_PAGComposition_swapLayer(const int64_t ptr, const int64_t nativeLayer1, const int64_t nativeLayer2)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[swapLayer]-the pointer of PAGComposition is null.");
@@ -318,18 +352,21 @@ void cj_PAGComposition_swapLayer(const int64_t ptr, const int64_t nativeLayer1, 
                      "[swapLayer]-the pointer of PAGLayer2 is null.");
         return;
     }
-    CJPAGLayerHandle *cjlayer1 = (CJPAGLayerHandle *)nativeLayer1;
+    intptr_t nativeLayer1Int = static_cast<intptr_t>(nativeLayer1);
+    CJPAGLayerHandle *cjlayer1 = reinterpret_cast<CJPAGLayerHandle *>(nativeLayer1Int);
     std::shared_ptr<PAGLayer> pagLayer1 = cjlayer1->get();
     if (pagLayer1 == nullptr) {
         return;
     }
-    CJPAGLayerHandle *cjlayer2 = (CJPAGLayerHandle *)nativeLayer2;
+    intptr_t nativeLayer2Int = static_cast<intptr_t>(nativeLayer2);
+    CJPAGLayerHandle *cjlayer2 = reinterpret_cast<CJPAGLayerHandle *>(nativeLayer2Int);
 
     std::shared_ptr<PAGLayer> pagLayer2 = cjlayer2->get();
     if (pagLayer2 == nullptr) {
         return;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -338,13 +375,15 @@ void cj_PAGComposition_swapLayer(const int64_t ptr, const int64_t nativeLayer1, 
     pagComposition->swapLayer(pagLayer1, pagLayer2);
 }
 
-void cj_PAGComposition_swapLayerAt(const int64_t ptr, const int64_t index1, const int64_t index2) {
+void cj_PAGComposition_swapLayerAt(const int64_t ptr, const int64_t index1, const int64_t index2)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[swapLayerAt]-the pointer of PAGComposition is null.");
         return;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -353,14 +392,16 @@ void cj_PAGComposition_swapLayerAt(const int64_t ptr, const int64_t index1, cons
     return pagComposition->swapLayerAt(index1, index2);
 }
 
-CJBytesArray cj_PAGComposition_audioBytes(const int64_t ptr) {
+CJBytesArray cj_PAGComposition_audioBytes(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[audioBytes]-the pointer of PAGComposition is null.");
         return CJBytesArray{0, nullptr};
     }
     // Retrieve pag:: PAGComposition from CJPAGLayerHandle and call audiobytes
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
@@ -381,13 +422,15 @@ CJBytesArray cj_PAGComposition_audioBytes(const int64_t ptr) {
     return CJBytesArray{size, bytes};
 }
 
-long long cj_PAGComposition_audioStartTime(const int64_t ptr) {
+long long cj_PAGComposition_audioStartTime(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[audioStartTime]-the pointer of PAGComposition is null.");
         return 0;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
@@ -398,13 +441,15 @@ long long cj_PAGComposition_audioStartTime(const int64_t ptr) {
     return pagComposition->audioStartTime();
 }
 
-MarkersPAGLayer cj_PAGComposition_audioMarkers(const int64_t ptr) {
+MarkersPAGLayer cj_PAGComposition_audioMarkers(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[audioMarkers]-the pointer of PAGComposition is null.");
         return MarkersPAGLayer{0, nullptr};
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
 
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
@@ -423,74 +468,67 @@ MarkersPAGLayer cj_PAGComposition_audioMarkers(const int64_t ptr) {
     return MarkersPAGLayer{size, arr};
 }
 
-CJInt64Array cj_PAGComposition_getLayersByName(const int64_t ptr, char *layerName) {
+CJInt64Array cj_PAGComposition_getLayersByName(const int64_t ptr, char *layerName)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[getLayersByName]-the pointer of PAGComposition is null.");
         return CJInt64Array{0, nullptr};
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
-
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
         return CJInt64Array{0, nullptr};
     }
-
     const std::string &ln = layerName;
     std::vector<std::shared_ptr<PAGLayer>> pagLayers = pagComposition->getLayersByName(ln);
     if (pagLayers.empty()) {
         return CJInt64Array{0, nullptr};
     }
-
     long long size = pagLayers.size();
-
     int64_t *arr = new int64_t[size];
     for (size_t i = 0; i < pagLayers.size(); i++) {
         std::shared_ptr<PAGLayer> pagLayer = pagLayers[i];
         if (pagLayer == nullptr) {
-            return {};
+            return CJInt64Array{0, nullptr};
         }
 
         CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(pagLayer);
         arr[i] = (int64_t)cjlayer;
     }
-
     return CJInt64Array{size, arr};
 }
 
-CJInt64Array cj_PAGComposition_getLayersUnderPoint(const int64_t ptr, float localX, float localY) {
+CJInt64Array cj_PAGComposition_getLayersUnderPoint(const int64_t ptr, float localX, float localY)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGComposition]",
                      "[getLayersUnderPoint]-the pointer of PAGComposition is null.");
         return CJInt64Array{0, nullptr};
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
-
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     std::shared_ptr<pag::PAGLayer> layer = instance->get();
     std::shared_ptr<pag::PAGComposition> pagComposition = getPAGComposition(layer);
     if (pagComposition == nullptr) {
         return CJInt64Array{0, nullptr};
     }
-
     std::vector<std::shared_ptr<PAGLayer>> pagLayers = pagComposition->getLayersUnderPoint(localX, localY);
     if (pagLayers.empty()) {
         return CJInt64Array{0, nullptr};
     }
-
     long long size = pagLayers.size();
     int64_t *arr = new int64_t[size];
-
     for (size_t i = 0; i < pagLayers.size(); i++) {
         std::shared_ptr<PAGLayer> pagLayer = pagLayers[i];
         if (pagLayer == nullptr) {
-            return {};
+            return CJInt64Array{0, nullptr};
         }
-
         CJPAGLayerHandle *cjlayer = new CJPAGLayerHandle(pagLayer);
         arr[i] = (int64_t)cjlayer;
     }
-
     return CJInt64Array{size, arr};
 }
 }

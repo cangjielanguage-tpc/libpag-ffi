@@ -4,7 +4,6 @@
 
 #ifndef LIBPAG4CJ_CJ_PAG_DISK_CACHE_H
 #define LIBPAG4CJ_CJ_PAG_DISK_CACHE_H
-
 #include "../../external/platform/NativePlatform.h"
 #include "cj_type.h"
 #include "rendering/caches/DiskCache.h"

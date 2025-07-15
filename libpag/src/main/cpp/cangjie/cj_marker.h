@@ -6,7 +6,6 @@
 #define LIBPAG_CJ_CJ_MARKER_H
 
 extern "C" {
-
 typedef struct {
     long long mStartTime;
     long long mDuration;

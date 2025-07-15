@@ -613,7 +613,7 @@ public class PAGImageViewController <: XComponentController {
 
     public func uniqueID(): String {
         unsafe {
-            if(cjImageView==0){
+            if (cjImageView == 0) {
                 return ""
             }
             let retC: CString = cj_PAGImageViewController_uniqueID(cjImageView)

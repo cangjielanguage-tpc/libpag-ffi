@@ -4,12 +4,10 @@
 
 #ifndef LIBPAG_CJ_CJ_TYPE_H
 #define LIBPAG_CJ_CJ_TYPE_H
-
 #include "../../external/include/pag/types.h"
 #include "cj_marker.h"
 
 extern "C" {
-
 struct CJBytesArray {
     int64_t size;
     uint8_t *buf;
@@ -68,7 +66,6 @@ void free_CJBytesArray(CJBytesArray ptr);
 void free_CJPtrArray(CJInt64Array ptr);
 }
 } // namespace pag
-
 
 /**
  * Describes how to interpret the alpha component of a pixel.

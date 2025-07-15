@@ -21,12 +21,14 @@ public:
 
     virtual ~CJPAGImage();
 
-    std::shared_ptr<PAGImage> get() {
+    std::shared_ptr<PAGImage> get()
+    {
         std::lock_guard lock_guard(locker);
         return pagImage;
     }
 
-    void clear() {
+    void clear()
+    {
         std::lock_guard lock_guard(locker);
         pagImage = nullptr;
     }

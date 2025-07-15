@@ -4,7 +4,6 @@
 
 #ifndef LIBPAG4CJ_CJ_MATRIX_H
 #define LIBPAG4CJ_CJ_MATRIX_H
-
 #include "cj_type.h"
 #include <pag/pag.h>
 

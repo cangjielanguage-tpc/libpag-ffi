@@ -7,11 +7,13 @@
 
 namespace pag {
 extern "C" {
-static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
+static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr)
+{
     if (ptr == 0) {
         return nullptr;
     }
-    CJPAGLayerHandle *instance = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!instance) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "getPAGTextLayer", "instance is null");
         return nullptr;
@@ -26,18 +28,21 @@ static std::shared_ptr<PAGTextLayer> getPAGTextLayer(const int64_t ptr) {
     return nullptr;
 }
 
-void cj_PAGTextLayer_release(const int64_t ptr) {
+void cj_PAGTextLayer_release(const int64_t ptr)
+{
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGTextLayer_release", "ptr is null.");
         return;
     }
-    CJPAGLayerHandle *player = (CJPAGLayerHandle *)ptr;
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *player = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     player->reset();
     delete player;
     return;
 }
 
-long long cj_PAGTextLayer_make(const int64_t duration, char *text, float fontSize, char *fontFamily, char *fontStyle) {
+long long cj_PAGTextLayer_make(const int64_t duration, char *text, float fontSize, char *fontFamily, char *fontStyle)
+{
     std::string textStr = text;
     std::string ff = fontFamily;
     std::string fs = fontStyle;
@@ -47,7 +52,8 @@ long long cj_PAGTextLayer_make(const int64_t duration, char *text, float fontSiz
     return (int64_t)cjlayer;
 }
 
-long long cj_PAGTextLayer_fillColor(const int64_t ptr) {
+long long cj_PAGTextLayer_fillColor(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -59,7 +65,8 @@ long long cj_PAGTextLayer_fillColor(const int64_t ptr) {
     return res;
 }
 
-void cj_PAGTextLayer_setFillColor(const int64_t ptr, const int64_t color) {
+void cj_PAGTextLayer_setFillColor(const int64_t ptr, const int64_t color)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -71,7 +78,8 @@ void cj_PAGTextLayer_setFillColor(const int64_t ptr, const int64_t color) {
     textLayer->setFillColor(colors);
 }
 
-long long cj_PAGTextLayer_font(const int64_t ptr) {
+long long cj_PAGTextLayer_font(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[font]-the pointer of PAGTextLayer is null.");
@@ -82,19 +90,21 @@ long long cj_PAGTextLayer_font(const int64_t ptr) {
     return (int64_t)ptrPAGFont;
 }
 
-void cj_PAGTextLayer_setFont(const int64_t ptr, const int64_t fontptr) {
+void cj_PAGTextLayer_setFont(const int64_t ptr, const int64_t fontptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
                      "[setFont]-the pointer of PAGTextLayer is null.");
         return;
     }
-
-    PAGFont *pagFont = (PAGFont *)fontptr;
+    intptr_t fontptrInt = static_cast<intptr_t>(fontptr);
+    PAGFont *pagFont = reinterpret_cast<PAGFont *>(fontptrInt);
     textLayer->setFont(*pagFont);
 }
 
-double cj_PAGTextLayer_fontSize(const int64_t ptr) {
+double cj_PAGTextLayer_fontSize(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -105,7 +115,8 @@ double cj_PAGTextLayer_fontSize(const int64_t ptr) {
     return fontSize;
 }
 
-void cj_PAGTextLayer_setFontSize(const int64_t ptr, double fontSize) {
+void cj_PAGTextLayer_setFontSize(const int64_t ptr, double fontSize)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -116,7 +127,8 @@ void cj_PAGTextLayer_setFontSize(const int64_t ptr, double fontSize) {
     textLayer->setFontSize(fontSize);
 }
 
-long long cj_PAGTextLayer_strokeColor(const int64_t ptr) {
+long long cj_PAGTextLayer_strokeColor(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -130,7 +142,8 @@ long long cj_PAGTextLayer_strokeColor(const int64_t ptr) {
     return strokeColor;
 }
 
-void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color) {
+void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -142,18 +155,20 @@ void cj_PAGTextLayer_setStrokeColor(const int64_t ptr, const int64_t color) {
     textLayer->setStrokeColor(colors);
 }
 
-CJBytesArray cj_PAGTextLayer_text(const int64_t ptr) {
+CJBytesArray cj_PAGTextLayer_text(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[text]-the pointer of PAGTextLayer is null.");
-        return {};
+        return {0, nullptr};
     }
     std::string text = textLayer->text();
     CJBytesArray result = stringToCJBytesArray(text);
     return result;
 }
 
-void cj_PAGTextLayer_setText(const int64_t ptr, char *t) {
+void cj_PAGTextLayer_setText(const int64_t ptr, char *t)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
@@ -164,7 +179,8 @@ void cj_PAGTextLayer_setText(const int64_t ptr, char *t) {
     textLayer->setText(text);
 }
 
-void cj_PAGTextLayer_reset(const int64_t ptr) {
+void cj_PAGTextLayer_reset(const int64_t ptr)
+{
     std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[reset]-the pointer of PAGTextLayer is null.");

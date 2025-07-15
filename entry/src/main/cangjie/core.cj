@@ -727,6 +727,15 @@ class Core {
                                     showToast("该动画文件使用的标签等级为${value}")
                                 }
                             }
+
+                        // releaseAll
+                        Button('立即释放资源')
+                            .width(90.percent)
+                            .height(35)
+                            .shape(ShapeType.Normal)
+                            .onClick {
+                                => this.controller.releaseAll()
+                            }
                     }.width(100.percent)
                 }
             }.width(100.percent).height(40.percent).scrollBar(BarState.Off)
