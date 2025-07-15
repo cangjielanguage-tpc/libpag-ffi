@@ -4,10 +4,11 @@
 
 #ifndef LIBPAG4CJ_CJ_PAG_H
 #define LIBPAG4CJ_CJ_PAG_H
-#include "./cj_string_util.h"
+#include "cj_helper.h"
+#include "cj_type.h"
 #include <pag/pag.h>
 
 extern "C" {
-char *cj_pag_sdkVersion();
+CJBytesArray cj_pag_sdkVersion();
 }
 #endif // LIBPAG4CJ_CJ_PAG_H

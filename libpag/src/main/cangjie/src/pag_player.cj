@@ -263,7 +263,7 @@ public class PAGPlayer {
             var values = VArray<Float32, $9>({i => 0.0})
             cj_PAGPlayer_matrix(ptrCJPAGPlayer, inout values)
             var data: Array<Float32> = Array<Float32>(6, repeat: 0.0)
-            for (i in 0..5) {
+            for (i in 0..6) {
                 data[i] = values[i]
             }
             return data

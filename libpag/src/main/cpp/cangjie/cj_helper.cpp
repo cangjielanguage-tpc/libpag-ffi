@@ -15,16 +15,9 @@ CJMarker *CreateMarker(const Marker *marker)
     long long startTime = marker->startTime;
     long long duration = marker->duration;
     std::string commentStr = marker->comment;
-    // The string is ISO-8859-1 encoded and needs to be converted to UTF-8 encoding.
-    char *comment = cj_string_To_UTF8((char *)commentStr.c_str(), "ISO-8859-1");
-    if (comment == nullptr) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "Init", "[CreateMarker]-get the Marker.comment failed: %{public}s",
-                     comment);
-        return nullptr;
-    }
     result->mStartTime = startTime;
     result->mDuration = duration;
-    result->mComment = comment;
+    result->mComment = stringToCJBytesArray(commentStr);
     return result;
 }
 
@@ -104,7 +97,7 @@ CJPixelMap MakeSnapshot(std::shared_ptr<PAGSurface> surface)
     int32_t width = imageInfo.width();
     int32_t height = imageInfo.height();
     uint8_t pixelFormat = 3; // PIXEL_FORMAT_BGRA_8888;
-    uint8_t alphaType = 2;   // OHOS_PIXEL_MAP_ALPHA_TYPE_PREMUL;
+    uint8_t alphaType = 2; // OHOS_PIXEL_MAP_ALPHA_TYPE_PREMUL;
     bool editable = true;
 
     uint8_t *bytes = pixels->data();
@@ -167,15 +160,19 @@ CJPAGVideoRange *CreateVideoRanges(const std::vector<PAGVideoRange> &videoRanges
     return result;
 }
 
-void safe_memcpy(void *dest, uint32_t dest_size, const void *src, uint32_t src_size)
+void safe_copy(void *dest, uint32_t dest_size, const void *src, uint32_t src_size)
 {
     if (!dest || !src) {
-        throw std::invalid_argument("safe_memcpy null pointer passed to safe_memcpy.");
+        throw std::invalid_argument("safe_copy null pointer passed to safe_copy.");
     }
     if (dest_size < src_size) {
-        throw std::runtime_error("safe_memcpy insufficient space in the target buffer.");
+        throw std::runtime_error("safe_copy insufficient space in the target buffer.");
     }
-    std::memcpy(dest, src, src_size);
+    uint8_t *dest_ptr = static_cast<uint8_t *>(dest);
+    const uint8_t *src_ptr = static_cast<const uint8_t *>(src);
+    for (uint32_t i = 0; i < src_size; ++i) {
+        dest_ptr[i] = src_ptr[i];
+    }
 }
 }
 
@@ -190,7 +187,7 @@ CJBytesArray stringToCJBytesArray(const std::string &str)
     if (result.buf == nullptr) {
         throw std::bad_alloc();
     }
-    safe_memcpy(result.buf, static_cast<uint32_t>(result.size), str.data(), static_cast<uint32_t>(result.size));
+    safe_copy(result.buf, static_cast<uint32_t>(result.size), str.data(), static_cast<uint32_t>(result.size));
     return result;
 }
 

@@ -7,7 +7,7 @@ package libpag4cj
 internal import ohos.hilog.*
 
 @FastNative
-foreign func cj_pag_sdkVersion(): CString
+foreign func cj_pag_sdkVersion(): CJBytesArray
 
 public class PAG {
     /**
@@ -15,10 +15,10 @@ public class PAG {
      */
     public static func sdkVersion(): String {
         unsafe {
-            let retC: CString = cj_pag_sdkVersion()
-            let ret = retC.toString()
-            LibC.free(retC)
-            return ret
+            let res: CJBytesArray = cj_pag_sdkVersion()
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
 }

@@ -4,7 +4,7 @@
 <p align="center">
 <img alt="" src="https://img.shields.io/badge/release-v.0.0.2-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v0.60.7-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-NA-red" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
@@ -103,11 +103,11 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 2. 把 libpag4cj 作为三方库依赖引入
     1. 克隆下载项目
 	2. 用DevEco Studio打开工程，选中libpag目录，点击顶部菜单栏“Build”-“Make Module ‘libpag’”构建
-    3. 构建成功后，在libpag的build目录中找到libpag.har，将libpag.har拷贝到需要引入的工程中。例如，在需要引入的工程entry目录下新建一个third-party目录，将libpag.har拷贝进去
-	4. 打开 entry/oh-package.json5 在 “dependencies” 字段下添加'@cangjie-tpc/libpag':   "file:../entry/third-party/libpag.har"
+    3. 构建成功后，在libpag的build目录中找到libpag.har，将libpag.har拷贝到需要引入的工程中。例如，在需要引入的工程entry目录下新建一个har目录，将libpag.har拷贝进去
+	4. 打开 entry/oh-package.json5 在 “dependencies” 字段下添加'@cangjie-tpc/libpag':   "file:../entry/har/libpag.har"
       ```json
       "dependencies": {
-        '@cangjie-tpc/libpag': "file:../entry/third-party/libpag.har"
+        '@cangjie-tpc/libpag': "file:../entry/har/libpag.har"
       }
       ```
     5. 在项目中使用 libpag
@@ -147,6 +147,12 @@ class EntryView {
             this.controller.update()
         }
     }
+
+    protected func aboutToDisappear() {
+        // 需要在不再使用时调用 releaseAll() 来释放资源
+        this.controller.releaseAll()
+    }
+
     func build() {
         Column(20) {
             Column {
@@ -195,6 +201,12 @@ class EntryView {
             this.controller.update()
         }
     }
+
+    protected func aboutToDisappear() {
+        // 需要在不再使用时调用 releaseAll() 来释放资源
+        this.controller.releaseAll()
+    }
+
     func build() {
         Column(20) {
             Column {

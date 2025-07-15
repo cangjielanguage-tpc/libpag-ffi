@@ -5,7 +5,6 @@
 #ifndef LIBPAG4CJ_CJ_PAG_FONT_H
 #define LIBPAG4CJ_CJ_PAG_FONT_H
 
-#include "cj_string_util.h"
 #include "cj_type.h"
 #include <hilog/log.h>
 #include <pag/pag.h>
@@ -16,7 +15,7 @@ long long cj_PAGFont_registerFontBytes(int *data, int size, const int32_t ttcInd
 void cj_PAGFont_unregisterFont(const int64_t ptr);
 void cj_PAGFont_setFallbackFontPaths(char *fontPaths[], int lenfn, int *ttcIndices, int lenttc);
 CJBytesArray cj_PAGFont_getFontFamily(const int64_t ptr);
-char *cj_PAGFont_getFontStyle(const int64_t ptr);
+CJBytesArray cj_PAGFont_getFontStyle(const int64_t ptr);
 }
 
 namespace pag {

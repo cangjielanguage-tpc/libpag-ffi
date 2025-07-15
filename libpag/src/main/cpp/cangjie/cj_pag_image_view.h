@@ -44,7 +44,7 @@ void cj_PAGImageViewController_pause(const int64_t cjImageView);
 int64_t cj_PAGImageViewController_repeatCount(const int64_t cjImageView);
 void cj_PAGImageViewController_setRepeatCount(const int64_t cjImageView, const int64_t repeatCount);
 bool cj_PAGImageViewController_flush(const int64_t cjImageView);
-const char *cj_PAGImageViewController_uniqueID(const int64_t cjImageView);
+CJBytesArray cj_PAGImageViewController_uniqueID(const int64_t cjImageView);
 void cj_PAGImageViewController_update(const int64_t cjImageView);
 void cj_PAGImageViewController_SetSurfaceId(const int64_t cjImageView, int64_t surfaceId);
 void cj_PAGImageViewController_ChangeSurface(const int64_t cjImageView);

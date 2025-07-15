@@ -263,9 +263,9 @@ public open class PAGComposition <: PAGLayer {
             let pagMarkers: Array<PAGMarker> = Array<PAGMarker>(size, repeat: PAGMarker(0, 0, ""))
             for (i in 0..size) {
                 let marker: CJMarker = markers.read(i)
-                let mComment: CString = marker.mComment
-                let pagMarker: PAGMarker = PAGMarker(marker.mStartTime, marker.mDuration, mComment.toString())
-                LibC.free(mComment)
+                let mComment: String = BytesArrayToString(marker.mComment)
+                free_CJBytesArray(marker.mComment)
+                let pagMarker: PAGMarker = PAGMarker(marker.mStartTime, marker.mDuration, mComment)
                 pagMarkers[i] = pagMarker
             }
             free_CPointer_CJMarker(markers)
