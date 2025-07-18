@@ -28,6 +28,10 @@ class Core {
         }
     }
 
+    protected func aboutToDisappear() {
+        this.controller.releaseAll()
+    }
+
     func showToast(message: String) {
         PromptAction.showToast(message: message, duration: 2000)
     }
@@ -195,7 +199,7 @@ class Core {
                                 =>
                                 var msg = 'matrix:\n'
                                 var matrix: Array<Float32> = this.controller.matrix()
-                                for (i in 0..5) {
+                                for (i in 0..6) {
                                     msg += "matrix[${i}]:${matrix[i]} \n"
                                 }
                                 showToast(msg);
@@ -431,6 +435,15 @@ class Core {
                                 }
                                 msg += '部分layerName显示空是正常的，底层接口获取到的就是空值'
                                 showToast(msg)
+                            }
+
+                        // releaseAll
+                        Button('立即释放资源')
+                            .width(90.percent)
+                            .height(35)
+                            .shape(ShapeType.Normal)
+                            .onClick {
+                                => this.controller.releaseAll()
                             }
 
                         CustomText(text: 'PAGFile')
@@ -726,15 +739,6 @@ class Core {
                                     let value = file.getOrThrow().tagLevel()
                                     showToast("该动画文件使用的标签等级为${value}")
                                 }
-                            }
-
-                        // releaseAll
-                        Button('立即释放资源')
-                            .width(90.percent)
-                            .height(35)
-                            .shape(ShapeType.Normal)
-                            .onClick {
-                                => this.controller.releaseAll()
                             }
                     }.width(100.percent)
                 }

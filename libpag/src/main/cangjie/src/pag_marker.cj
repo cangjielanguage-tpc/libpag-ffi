@@ -8,9 +8,9 @@ package libpag4cj
 struct CJMarker {
     var mStartTime: Int64
     var mDuration: Int64
-    var mComment: CString
+    var mComment: CJBytesArray
 
-    public CJMarker(startTime: Int64, duration: Int64, comment: CString) {
+    public CJMarker(startTime: Int64, duration: Int64, comment: CJBytesArray) {
         this.mStartTime = startTime
         this.mDuration = duration
         this.mComment = comment

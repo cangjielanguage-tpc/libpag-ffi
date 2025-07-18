@@ -75,22 +75,22 @@ CJBytesArray cj_PAGFont_getFontFamily(const int64_t ptr)
     return result;
 }
 
-char *cj_PAGFont_getFontStyle(const int64_t ptr)
+CJBytesArray cj_PAGFont_getFontStyle(const int64_t ptr)
 {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[getFontStyle]-the pointer of PAGFont is null.");
-        return nullptr;
+        return {0, nullptr};
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGFont *instance = reinterpret_cast<CJPAGFont *>(ptrInt);
     if (instance == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[getFontStyle]-the pointer of CJPAGFont is null.");
-        return nullptr;
+        return {0, nullptr};
     }
     PAGFont font = instance->get();
     const std::string fontStyle = font.fontStyle;
-    char *cstr = cj_string_To_UTF8((char *)fontStyle.c_str(), "ISO-8859-1");
-    return cstr;
+    CJBytesArray result = stringToCJBytesArray(fontStyle);
+    return result;
 }
 }
 } // namespace pag

@@ -2,10 +2,8 @@
  * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
  */
 
-#ifndef LIBPAG_CJ_CJ_TYPE_H
-#define LIBPAG_CJ_CJ_TYPE_H
+#pragma once
 #include "../../external/include/pag/types.h"
-#include "cj_marker.h"
 
 extern "C" {
 struct CJBytesArray {
@@ -21,11 +19,6 @@ struct CJInt64Array {
 struct CJFloat32Array {
     long long size;
     float *buf;
-};
-
-struct MarkersPAGLayer {
-    long long size;
-    CJMarker *markers;
 };
 
 struct CJPAGVideoRange {
@@ -48,6 +41,17 @@ struct CJPixelMap {
     uint8_t pixelFormat;
     int32_t height;
     int32_t width;
+};
+
+typedef struct {
+    long long mStartTime;
+    long long mDuration;
+    CJBytesArray mComment;
+} CJMarker;
+
+struct MarkersPAGLayer {
+    long long size;
+    CJMarker *markers;
 };
 }
 
@@ -88,7 +92,6 @@ typedef struct {
      * pixel components are independent of alpha.UInt8 = 3
      */
     uint8_t Unpremultiplied;
-
 } PAGAlphaType;
 
 /**
@@ -143,4 +146,19 @@ typedef struct {
      */
     uint8_t RGBA_1010102;
 } PAGColorType;
-#endif // LIBPAG_CJ_CJ_TYPE_H
+
+enum class AlphaType : uint8_t {
+    Unknown = 0,
+    Opaque = 1,
+    Premultiplied = 2,
+    Unpremultiplied = 3
+};
+
+enum class ColorType : uint8_t {
+    Unknown = 0,
+    ALPHA_8 = 1,
+    RGBA_8888 = 2,
+    BGRA_8888 = 3,
+    RGB_565 = 4,
+    RGBA_F16 = 6
+};

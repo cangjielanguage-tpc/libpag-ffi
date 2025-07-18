@@ -482,20 +482,20 @@ bool cj_PAGImageViewController_flush(const int64_t cjImageView)
     return flushResult;
 }
 
-const char *cj_PAGImageViewController_uniqueID(const int64_t cjImageView)
+CJBytesArray cj_PAGImageViewController_uniqueID(const int64_t cjImageView)
 {
     if (cjImageView == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImageViewController_uniqueID", "Pointer is null");
-        return "";
+        return {0, nullptr};
     }
     intptr_t cjImageViewInt = static_cast<intptr_t>(cjImageView);
     CJPAGImageView *view = reinterpret_cast<CJPAGImageView *>(cjImageViewInt);
 
     if (view == nullptr) {
-        return nullptr;
+        return {0, nullptr};
     }
     std::string id = view->id;
-    char *uniqueID = pag::cj_string_To_UTF8((char *)id.c_str(), "ISO-8859-1");
+    CJBytesArray uniqueID = stringToCJBytesArray(id);
     return uniqueID;
 }
 

@@ -48,7 +48,7 @@ foreign {
 
     func cj_PAGImageViewController_flush(cjImageView: Int64): Bool
 
-    func cj_PAGImageViewController_uniqueID(cjImageView: Int64): CString
+    func cj_PAGImageViewController_uniqueID(cjImageView: Int64): CJBytesArray
 
     func cj_PAGImageViewController_update(cjImageView: Int64): Unit
 
@@ -190,9 +190,9 @@ public class PAGImageViewController <: XComponentController {
             cjImageView = cj_PAGImageViewController_createPAGImageView()
             cj_PAGImageViewController_onAnimatorStateChange(cjImageView, onImageViewStateChange)
             cj_PAGImageViewController_onAnimatorProgress(cjImageView, onImageViewProgressUpdate)
-            let uniqueID: CString = cj_PAGImageViewController_uniqueID(cjImageView)
-            id = uniqueID.toString()
-            LibC.free(uniqueID)
+            let uniqueID: CJBytesArray = cj_PAGImageViewController_uniqueID(cjImageView)
+            id = BytesArrayToString(uniqueID)
+            free_CJBytesArray(uniqueID)
         }
     }
 
@@ -251,7 +251,7 @@ public class PAGImageViewController <: XComponentController {
      * composition is already added to another PAGImageView, it will be removed from the previous
      * PAGImageView.
      */
-    func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
+    private func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
         this.filePath = ""
         unsafe {
             cj_PAGImageViewController_setComposition(cjImageView, composition, maxFrameRate, false)
@@ -399,7 +399,7 @@ public class PAGImageViewController <: XComponentController {
             var values = VArray<Float32, $9>({i => 0.0})
             cj_PAGImageViewController_matrixFromArray(cjImageView, inout values)
             var data: Array<Float32> = Array<Float32>(6, repeat: 0.0)
-            for (i in 0..5) {
+            for (i in 0..6) {
                 data[i] = values[i]
             }
             return data
@@ -616,10 +616,10 @@ public class PAGImageViewController <: XComponentController {
             if (cjImageView == 0) {
                 return ""
             }
-            let retC: CString = cj_PAGImageViewController_uniqueID(cjImageView)
-            let ret = retC.toString()
-            LibC.free(retC)
-            return ret
+            let res: CJBytesArray = cj_PAGImageViewController_uniqueID(cjImageView)
+            id = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return id
         }
     }
 
