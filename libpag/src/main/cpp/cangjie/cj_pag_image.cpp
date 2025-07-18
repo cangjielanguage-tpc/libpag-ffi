@@ -159,7 +159,7 @@ void cj_PAGImage_release(const int64_t ptr)
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGImage *pagImage = reinterpret_cast<CJPAGImage *>(ptrInt);
-    if (pagImage) {
+    if (!pagImage) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGImage_release", "Invalid instance");
         return;
     }

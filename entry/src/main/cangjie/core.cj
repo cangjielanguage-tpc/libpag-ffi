@@ -166,12 +166,12 @@ class Core {
                             .shape(ShapeType.Normal)
                             .onClick {
                                 =>
-                                let mode = this.controller.scaleMode()
+                                let mode: PAGScaleMode = this.controller.scaleMode()
                                 match (mode) {
-                                    case 0 => showToast("当前缩放模式:None")
-                                    case 1 => showToast("当前缩放模式:Stretch")
-                                    case 2 => showToast("当前缩放模式:LetterBox")
-                                    case 3 => showToast("当前缩放模式:Zoom")
+                                    case PAGScaleMode.None => showToast("当前缩放模式:None")
+                                    case PAGScaleMode.Stretch => showToast("当前缩放模式:Stretch")
+                                    case PAGScaleMode.LetterBox => showToast("当前缩放模式:LetterBox")
+                                    case PAGScaleMode.Zoom => showToast("当前缩放模式:Zoom")
                                     case _ => ()
                                 }
                             }
@@ -615,10 +615,11 @@ class Core {
                                 } else {
                                     let mode = file.getOrThrow().timeStretchMode()
                                     match (mode) {
-                                        case 0 => showToast("当前拉伸模式:None")
-                                        case 1 => showToast("当前拉伸模式:Scale")
-                                        case 2 => showToast("当前拉伸模式:Repeat")
-                                        case 3 => showToast("当前拉伸模式:RepeatInverted")
+                                        case PAGTimeStretchMode.None => showToast("当前拉伸模式:None")
+                                        case PAGTimeStretchMode.Scale => showToast("当前拉伸模式:Scale")
+                                        case PAGTimeStretchMode.Repeat => showToast("当前拉伸模式:Repeat")
+                                        case PAGTimeStretchMode.RepeatInverted => showToast(
+                                            "当前拉伸模式:RepeatInverted")
                                         case _ => ()
                                     }
                                 }

@@ -37,6 +37,9 @@ public class PAGImageView {
         }
         this.controller.detachFromView();
         if (let Some(value) <- this.controller.getComposition()) {
+            if (value.isRelease) {
+                return
+            }
             value.nativeRelease()
         }
     }

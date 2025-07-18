@@ -74,11 +74,11 @@ foreign {
  * This class allows clients to provide custom behavior for animation lifecycle callbacks
  */
 public class PAGImageViewListener <: IPAGImageViewListener {
-    public var onAnimationStartImpl: (PAGImageViewController) -> Unit
-    public var onAnimationEndImpl: (PAGImageViewController) -> Unit
-    public var onAnimationRepeatImpl: (PAGImageViewController) -> Unit
-    public var onAnimationCancelImpl: (PAGImageViewController) -> Unit
-    public var onAnimationUpdateImpl: (PAGImageViewController) -> Unit
+    private var onAnimationStartImpl: (PAGImageViewController) -> Unit
+    private var onAnimationEndImpl: (PAGImageViewController) -> Unit
+    private var onAnimationRepeatImpl: (PAGImageViewController) -> Unit
+    private var onAnimationCancelImpl: (PAGImageViewController) -> Unit
+    private var onAnimationUpdateImpl: (PAGImageViewController) -> Unit
     public init(
         onAnimationStart!: (PAGImageViewController) -> Unit,
         onAnimationEnd!: (PAGImageViewController) -> Unit,
@@ -355,9 +355,10 @@ public class PAGImageViewController <: XComponentController {
     /**
      * Returns the current scale mode.
      */
-    public func scaleMode(): Int32 {
+    public func scaleMode(): PAGScaleMode {
         unsafe {
-            return cj_PAGImageViewController_scaleMode(cjImageView)
+            let mode = cj_PAGImageViewController_scaleMode(cjImageView)
+            return PAGScaleMode.int32ToMode(mode)
         }
     }
 
@@ -365,13 +366,10 @@ public class PAGImageViewController <: XComponentController {
      * Specifies the rule of how to scale the pag content to fit the PAGImageView's size. The
      * current matrix of the PAGImageView changes when this method is called.
      */
-    public func setScaleMode(scaleMode: Int32): Unit {
-        if (scaleMode != 0 && scaleMode != 1 && scaleMode != 2 && scaleMode != 3) {
-            Hilog.error(0, 'PAGImageViewController', "setScaleMode invalid setting");
-            return
-        }
+    public func setScaleMode(mode: PAGScaleMode): Unit {
+        var value = PAGScaleMode.modeToInt32(mode)
         unsafe {
-            cj_PAGImageViewController_setScaleMode(cjImageView, scaleMode)
+            cj_PAGImageViewController_setScaleMode(cjImageView, value)
         }
     }
 

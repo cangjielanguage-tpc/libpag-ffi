@@ -4,7 +4,6 @@
 
 package libpag4cj
 
-//public class SourceRect <: ToString
 public class Rect <: ToString {
 
     /* Top margin */

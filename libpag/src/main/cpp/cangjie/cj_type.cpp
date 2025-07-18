@@ -47,7 +47,7 @@ void free_CPointer_CJMarker(CJMarker *ptr)
 {
     if (ptr != nullptr) {
         /*
-         * Each CJMarker. mComment (CJBytesArray) in the array is released in Cangjie using free_CJBytesArray free 
+         * Each CJMarker. mComment (CJBytesArray) in the array is released in Cangjie using free_CJBytesArray free
          * (mComment). Directly release the array memory here.
          */
         delete[] ptr;

@@ -126,9 +126,9 @@ public class PAGFile <: PAGComposition {
     private static let cacheDir: String = '/data/storage/el2/base'
     init(nativeLayer: Int64) {
         super(nativeLayer)
-        if (ptrPAGFile != 0) {
+        if (this.ptrPAGFile != 0 && this.ptrPAGFile != nativeLayer) {
             unsafe {
-                cj_PAGImage_release(ptrPAGFile)
+                cj_PAGFile_release(this.ptrPAGFile)
             }
         }
         this.ptrPAGFile = nativeLayer
@@ -486,19 +486,20 @@ public class PAGFile <: PAGComposition {
      * Indicate how to stretch the original duration to fit target duration when file's duration is changed.
      * The default value is PAGTimeStretchMode::Repeat.
      */
-    public func timeStretchMode(): Int32 {
+    public func timeStretchMode(): PAGTimeStretchMode {
         unsafe {
-            return cj_PAGFile_timeStretchMode(ptrPAGFile)
+            let mode = cj_PAGFile_timeStretchMode(ptrPAGFile)
+            return PAGTimeStretchMode.int32ToMode(mode)
         }
     }
 
     /**
      * Set the timeStretchMode of this file.
      */
-    public func setTimeStretchMode(mode: Int32): Unit {
+    public func setTimeStretchMode(mode: PAGTimeStretchMode): Unit {
+        var value = PAGTimeStretchMode.modeToInt32(mode)
         unsafe {
-            cj_PAGFile_setTimeStretchMode(ptrPAGFile, mode)
-            return
+            cj_PAGFile_setTimeStretchMode(ptrPAGFile, value)
         }
     }
 
@@ -537,6 +538,8 @@ public class PAGFile <: PAGComposition {
     public func release(): Unit {
         unsafe {
             cj_PAGFile_release(ptrPAGFile)
+            ptrPAGFile = 0
+            isRelease = true
             return
         }
     }
