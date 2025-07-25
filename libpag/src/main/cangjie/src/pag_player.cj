@@ -63,7 +63,7 @@ foreign {
 }
 
 public class PAGPlayer {
-    var ptrCJPAGPlayer: Int64 = 0
+    private var ptrCJPAGPlayer: Int64 = 0
     private var pagSurface: Option<PAGSurface> = Option<PAGSurface>.None
     private var composition: Option<PAGComposition> = None
 
@@ -71,10 +71,6 @@ public class PAGPlayer {
         unsafe {
             this.ptrCJPAGPlayer = cj_PAGPlayer_createPAGPlayer()
         }
-    }
-
-    public func getPAGPlayer(): Int64 {
-        return ptrCJPAGPlayer
     }
 
     /**
@@ -235,9 +231,10 @@ public class PAGPlayer {
     /*
      * Returns the current scale mode.
      */
-    public func scaleMode(): Int32 {
+    public func scaleMode(): PAGScaleMode {
         unsafe {
-            return cj_PAGPlayer_scaleMode(ptrCJPAGPlayer)
+            let mode = cj_PAGPlayer_scaleMode(ptrCJPAGPlayer)
+            return PAGScaleMode.int32ToMode(mode)
         }
     }
 
@@ -245,11 +242,8 @@ public class PAGPlayer {
      * Specifies the rule of how to scale the pag content to fit the surface size. The matrix
      * changes when this method is called.
      */
-    public func setScaleMode(value: Int32): Unit {
-        if (value != 0 && value != 1 && value != 2 && value != 3) {
-            Hilog.error(0, 'PAGPlayer', "setScaleMode invalid setting");
-            return
-        }
+    public func setScaleMode(mode: PAGScaleMode): Unit {
+        var value = PAGScaleMode.modeToInt32(mode)
         unsafe {
             cj_PAGPlayer_setScaleMode(ptrCJPAGPlayer, value)
         }

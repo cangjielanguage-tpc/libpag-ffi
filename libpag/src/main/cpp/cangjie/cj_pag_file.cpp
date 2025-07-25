@@ -232,7 +232,7 @@ PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index)
     const std::string strFontStyle = textDocument->fontStyle;
     data.fontStyle = stringToCJBytesArray(strFontStyle);
     const std::string strText = textDocument->text;
-    data.fontStyle = stringToCJBytesArray(strText);
+    data.text = stringToCJBytesArray(strText);
     return data;
 }
 
@@ -517,12 +517,11 @@ void cj_PAGFile_release(const int64_t ptr)
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGLayerHandle *pagFile = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
-    if (pagFile) {
+    if (!pagFile) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_release", "Invalid instance");
         return;
     }
     delete pagFile;
-    pagFile = nullptr;
 }
 }
 } // namespace pag

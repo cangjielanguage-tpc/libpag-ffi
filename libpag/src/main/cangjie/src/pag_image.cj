@@ -33,15 +33,15 @@ public class PAGImage {
     var ptrCJPAGImage: Int64 = 0
 
     private init(ptrCJPAGImage: Int64) {
-        if (this.ptrCJPAGImage != 0) {
+        if (this.ptrCJPAGImage != 0 && this.ptrCJPAGImage != ptrCJPAGImage) {
             unsafe {
-                cj_PAGImage_release(ptrCJPAGImage)
+                cj_PAGImage_release(this.ptrCJPAGImage)
             }
         }
         this.ptrCJPAGImage = ptrCJPAGImage
     }
 
-    public prop nativeContext: Int64 {
+    protected prop nativeContext: Int64 {
         get() {
             return this.ptrCJPAGImage
         }
@@ -147,22 +147,20 @@ public class PAGImage {
     /**
      * Returns the current scale mode.
      */
-    public func scaleMode(): Int32 {
+    public func scaleMode(): PAGScaleMode {
         unsafe {
-            return cj_PAGImage_scaleMode(ptrCJPAGImage)
+            let mode = cj_PAGImage_scaleMode(ptrCJPAGImage)
+            return PAGScaleMode.int32ToMode(mode)
         }
     }
 
     /**
      * Specifies the rule of how to scale the image content to fit the original image size.
      */
-    public func setScaleMode(mode: Int32): Unit {
-        if (mode != 0 && mode != 1 && mode != 2 && mode != 3) {
-            Hilog.error(0, 'PAGImage', "setScaleMode invalid setting");
-            return
-        }
+    public func setScaleMode(mode: PAGScaleMode): Unit {
+        var value = PAGScaleMode.modeToInt32(mode)
         unsafe {
-            return cj_PAGImage_setScaleMode(ptrCJPAGImage, mode)
+            return cj_PAGImage_setScaleMode(ptrCJPAGImage, value)
         }
     }
 
@@ -205,6 +203,7 @@ public class PAGImage {
     public func release(): Unit {
         unsafe {
             cj_PAGImage_release(ptrCJPAGImage)
+            ptrCJPAGImage = 0
             return
         }
     }

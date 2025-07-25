@@ -61,11 +61,11 @@ extend<T> ArrayList<T> <: ArrayListExt<T> {
  * This class allows clients to provide custom behavior for animation lifecycle callbacks
  */
 public class PAGViewListener <: IPAGViewListener {
-    public var onAnimationStartImpl: (PAGViewController) -> Unit
-    public var onAnimationEndImpl: (PAGViewController) -> Unit
-    public var onAnimationRepeatImpl: (PAGViewController) -> Unit
-    public var onAnimationCancelImpl: (PAGViewController) -> Unit
-    public var onAnimationUpdateImpl: (PAGViewController) -> Unit
+    private var onAnimationStartImpl: (PAGViewController) -> Unit
+    private var onAnimationEndImpl: (PAGViewController) -> Unit
+    private var onAnimationRepeatImpl: (PAGViewController) -> Unit
+    private var onAnimationCancelImpl: (PAGViewController) -> Unit
+    private var onAnimationUpdateImpl: (PAGViewController) -> Unit
     public init(
         onAnimationStart!: (PAGViewController) -> Unit,
         onAnimationEnd!: (PAGViewController) -> Unit,
@@ -122,7 +122,7 @@ public class PAGViewListener <: IPAGViewListener {
 /**
  * Listener interface for receiving animation lifecycle events from a PAGViewController.
  */
-public interface IPAGViewListener {
+protected interface IPAGViewListener {
     func onAnimationStart(viewController: PAGViewController): Unit
 
     func onAnimationEnd(viewController: PAGViewController): Unit
@@ -591,9 +591,10 @@ public class PAGViewController <: XComponentController {
     /*
      * Returns the current scale mode.
      */
-    public func scaleMode(): Int32 {
+    public func scaleMode(): PAGScaleMode {
         unsafe {
-            return cj_PAGViewController_scaleMode(jView)
+            let mode = cj_PAGViewController_scaleMode(jView)
+            return PAGScaleMode.int32ToMode(mode)
         }
     }
 
@@ -601,13 +602,10 @@ public class PAGViewController <: XComponentController {
      * Specifies the rule of how to scale the pag content to fit the surface size. The matrix
      * changes when this method is called.
      */
-    public func setScaleMode(value: Int32): Unit {
-        if (value != 0 && value != 1 && value != 2 && value != 3) {
-            Hilog.error(0, 'PAGViewController', "setScaleMode invalid setting");
-            return
-        }
+    public func setScaleMode(mode: PAGScaleMode): Unit {
+        var value = PAGScaleMode.modeToInt32(mode)
         unsafe {
-            return cj_PAGViewController_setScaleMode(jView, value)
+            cj_PAGViewController_setScaleMode(jView, value)
         }
     }
 
@@ -914,6 +912,9 @@ public class PAGView {
         }
         this.controller.detachFromView();
         if (let Some(value) <- this.controller.getComposition()) {
+            if (value.isRelease) {
+                return
+            }
             value.nativeRelease()
         }
     }

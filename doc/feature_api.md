@@ -182,16 +182,16 @@ public class PAGViewController <: XComponentController {
 	/*
      * 获取当前缩放模式。
 	 * 
-	 * @return Int32 - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
+	 * @return PAGScaleMode - 缩放模式
      */
-    public func scaleMode(): Int32
+    public func scaleMode(): PAGScaleMode
 
 	/*
      * 指定如何缩放页面内容以适应曲面大小的规则。矩阵调用此方法时会发生变化。
 	 * 
-	 * @param value - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
+	 * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
-    public func setScaleMode(value: Int32): Unit
+    public func setScaleMode(mode: PAGScaleMode): Unit
 	
 	/*
      * 获取当前动画变换矩阵
@@ -318,6 +318,65 @@ public class PAGViewController <: XComponentController {
 
 ```
 
+#### 1.3 PAGViewListener
+PAGView动画监听。
+
+```cangjie
+public class PAGViewListener {
+    /*
+     * 构造一个 PAGViewListener 实例，并指定动画相关的回调函数。
+     *
+     * @param onAnimationStart - 动画开始时触发的回调函数
+     * @param onAnimationEnd - 动画结束时触发的回调函数
+     * @param onAnimationRepeat - 动画重复时触发的回调函数
+     * @param onAnimationCancel - 动画取消时触发的回调函数
+     * @param onAnimationUpdate - 动画更新时触发的回调函数
+     */
+    public init(
+        onAnimationStart: (PAGViewController) -> Unit,
+        onAnimationEnd: (PAGViewController) -> Unit,
+        onAnimationRepeat: (PAGViewController) -> Unit,
+        onAnimationCancel: (PAGViewController) -> Unit,
+        onAnimationUpdate: (PAGViewController) -> Unit
+    )
+
+    /*
+     * 通知动画开始
+     *
+     * @param viewController - 动画控制器
+     */
+    public func onAnimationStart(viewController: PAGViewController): Unit
+
+    /*
+     * 通知动画结束
+     *
+     * @param viewController - 动画控制器
+     */
+    public func onAnimationEnd(viewController: PAGViewController): Unit
+
+    /*
+     * 通知动画重复
+     *
+     * @param viewController - 动画控制器
+     */
+    public func onAnimationRepeat(viewController: PAGViewController): Unit
+
+    /*
+     * 通知动画被取消
+     *
+     * @param viewController - 动画控制器
+     */
+    public func onAnimationCancel(viewController: PAGViewController): Unit
+
+    /*
+     * 通知动画帧更新
+     *
+     * @param viewController - 动画控制器
+     */
+    public func onAnimationUpdate(viewController: PAGViewController): Unit
+}
+```
+
 ### 2. 提供PAGImageView动画播放组件
 
 #### 2.1 PAGImageView
@@ -326,10 +385,10 @@ PAGImageView 主要应用于 UI 列表以及页面中含有多个 pag 文件同�
 ```cangjie
 public class PAGImageView {
     /**
-    * 初始化PAGImageView组件
-    *
-    * @param controller - PAGImageViewController控制器
-    */
+     * 初始化PAGImageView组件
+     *
+     * @param controller - PAGImageViewController控制器
+     */
     PAGImageView(controller: PAGImageViewController)
 }
 ```
@@ -375,16 +434,16 @@ public class PAGImageViewController <: XComponentController {
     /*
      * 获取当前的缩放模式
      * 
-     * @return Int32 - 返回当前的缩放模式
+     * @return PAGScaleMode - 返回当前的缩放模式
      */
-    public func scaleMode(): Int32
+    public func scaleMode(): PAGScaleMode
 
     /*
      * 设置缩放模式
      * 
-     * @param scaleMode - 缩放模式（0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪））
+     * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
-    public func setScaleMode(scaleMode: Int32): Unit
+    public func setScaleMode(mode: PAGScaleMode): Unit
 	
 	/*
      * 获取当前动画变换矩阵
@@ -441,16 +500,16 @@ public class PAGImageViewController <: XComponentController {
     /*
      * 获取 PAGImageView 正在渲染的当前帧数
      * 
-     * @return Float64 - 返回当前帧数
+     * @return Int64 - 返回当前帧数
      */
-    public func currentFrame(): Float64
+    public func currentFrame(): Int64
     
     /*
      * 设置 PAGImageView 到指定帧
      * 
      * @param currentFrame - 指定帧
      */
-    public func setCurrentFrame(currentFrame: Float64): Unit
+    public func setCurrentFrame(currentFrame: Int64): Unit
     
     /*
      * 获取当前 PAGImageView 位图的快照信息
@@ -519,6 +578,78 @@ public class PAGImageViewController <: XComponentController {
 	 *
      */
     public func releaseAll(): Unit
+
+	/*
+     * 获取当前 PAGImageView 实例的唯一标识符
+     *
+	 * @return String - 返回当前 PAGImageView 对象对应的唯一字符串ID
+     */
+    public func uniqueID(): String
+
+	/*
+     * 手动触发动画的帧更新
+	 *
+     */
+    public func update(): Unit
+}
+```
+
+#### 2.3 PAGImageViewListener
+PAGImageView动画监听。
+
+```cangjie
+public class PAGImageViewListener {
+    /*
+     * 构造一个 PAGImageViewListener 实例，并指定图像动画相关的回调函数。
+     *
+     * @param onAnimationStart - 动画开始时触发的回调函数
+     * @param onAnimationEnd - 动画结束时触发的回调函数
+     * @param onAnimationRepeat - 动画重复时触发的回调函数
+     * @param onAnimationCancel - 动画取消时触发的回调函数
+     * @param onAnimationUpdate - 动画更新时触发的回调函数
+     */
+    public init(
+        onAnimationStart: (PAGImageViewController) -> Unit,
+        onAnimationEnd: (PAGImageViewController) -> Unit,
+        onAnimationRepeat: (PAGImageViewController) -> Unit,
+        onAnimationCancel: (PAGImageViewController) -> Unit,
+        onAnimationUpdate: (PAGImageViewController) -> Unit
+    )
+
+    /*
+     * 通知动画开始
+     *
+     * @param imageViewController - 动画控制器
+     */
+    public func onAnimationStart(imageViewController: PAGImageViewController): Unit
+
+    /*
+     * 通知动画结束
+     *
+     * @param imageViewController - 动画控制器
+     */
+    public func onAnimationEnd(imageViewController: PAGImageViewController): Unit
+
+    /*
+     * 通知动画重复
+     *
+     * @param imageViewController - 动画控制器
+     */
+    public func onAnimationRepeat(imageViewController: PAGImageViewController): Unit
+
+    /*
+     * 通知动画被取消
+     *
+     * @param imageViewController - 动画控制器
+     */
+    public func onAnimationCancel(imageViewController: PAGImageViewController): Unit
+
+    /*
+     * 通知动画帧更新
+     *
+     * @param imageViewController - 动画控制器
+     */
+    public func onAnimationUpdate(imageViewController: PAGImageViewController): Unit
 }
 ```
 
@@ -1012,11 +1143,18 @@ public class PAGFile <: PAGComposition {
     public func setDuration(duration: Int64): Unit
 
 	/*
+     * 获取当前的时间拉伸模式的属性值。指示在文件时长发生变化时，如何拉伸原始时长以适应目标时长。默认值为 PAGTimeStretchMode.Repeat。
+     *
+	 * @return PAGTimeStretchMode 返回当前的时间拉伸模式。PAGTimeStretchMode.None（保持原速，不足时显示最后一帧）PAGTimeStretchMode.Scale（调整播放速度以适应时长）PAGTimeStretchMode.Repeat（保持原速，不足时重复内容，默认模式）PAGTimeStretchMode.RepeatInverted（保持原速，不足时反向重复内容）
+     */
+    public func timeStretchMode(): PAGTimeStretchMode
+
+	/*
      * 设置此文件的timeStretchMode。
      *
-	 * @param mode - 要设置的时间拉伸模式。0：None（保持原速，不足时显示最后一帧）:1：Scale（调整播放速度以适应时长）:2：Repeat（保持原速，不足时重复内容，默认模式）:3：RepeatInverted（保持原速，不足时反向重复内容）
+	 * @param mode - 要设置的时间拉伸模式
      */
-    public func setTimeStretchMode(mode: Int32): Unit
+    public func setTimeStretchMode(mode: PAGTimeStretchMode): Unit
 
     /*
      * 此pag文件所需的标记级别。
@@ -1025,13 +1163,10 @@ public class PAGFile <: PAGComposition {
      */
     public func tagLevel(): Int64
 
-	/*
-     * 获取当前的时间拉伸模式的属性值。指示在文件时长发生变化时，如何拉伸原始时长以适应目标时长。默认值为 PAGTimeStretchMode::Repeat。
-     *
-	 * @return Int32 返回当前的时间拉伸模式。0：None（保持原速，不足时显示最后一帧）:1：Scale（调整播放速度以适应时长）:2：Repeat（保持原速，不足时重复内容，默认模式）:3：RepeatInverted（保持原速，不足时反向重复内容）
+    /*
+     * 立即释放 PAGFile 实例使用的资源。
      */
-    public func timeStretchMode(): Int32
-
+    public func release(): Unit
 }
 
 ```
@@ -1156,7 +1291,6 @@ PAG 动画中的图像工具类，支持纹理操作与图像处理。
 
 ```cangjie
 public class PAGImage {
-
     /*
      * 从资源加载pag文件，如果文件不存在或数据不是有效的图像文件，则返回null。
      * 
@@ -1197,18 +1331,6 @@ public class PAGImage {
     public func matrix(): Array<Float32>
 
     /*
-     * 立即释放 PAGImage 实例使用的资源。
-     */
-    public func release(): Unit
-
-    /*
-     * 获取当前缩放模式。
-     * 
-     * @return Int32 - 返回当前缩放模式
-     */
-    public func scaleMode(): Int32
-
-    /*
      * 设置将应用于图像内容的变换。
      * 
      * @param values - 要设置的变换矩阵
@@ -1216,11 +1338,18 @@ public class PAGImage {
     public func setMatrix(values: Array<Float32>): Unit
 
     /*
+     * 获取当前缩放模式。
+     *
+     * @return PAGScaleMode - 返回当前缩放模式
+     */
+    public func scaleMode(): PAGScaleMode
+
+    /*
      * 指定如何缩放图像内容以适应原始图像大小的规则。
      * 
-     * @param mode - 要设置的缩放模式。0：None（内容不缩放）1：Stretch（内容被拉伸以适应）2：LetterBox（内容按原始未缩放图像的宽高比进行缩放）3：Zoom（内容按原始未缩放图像的宽高比进行缩放）
+     * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
-    public func setScaleMode(mode: Int32): Unit
+    public func setScaleMode(mode: PAGScaleMode): Unit
 
     /*
      * 获取图像的宽度（像素）。
@@ -1236,6 +1365,11 @@ public class PAGImage {
      * @returns Option<PAGImage> - 创建成功返回 PAGImage，失败则返回 None。
      */
     public static func fromPixelMap(pixelMap: PixelMap): Option<PAGImage>
+
+    /*
+     * 立即释放 PAGImage 实例使用的资源。
+     */
+    public func release(): Unit
 }
 
 ```
@@ -1377,13 +1511,6 @@ public class PAGLayer {
      * @return Int64 - 本地时间（微秒）
      */
     public func globalToLocalTime(globalTime: Int64): Int64
-
-    /*
-     * 获取当前实例的哈希值。
-     * 
-     * @return Int64 - 当前实例的哈希值
-     */
-    public func hashCode(): Int64
 
     /*
      * 获取层的名称
@@ -1641,13 +1768,6 @@ public class PAGPlayer {
      */
     public func release(): Unit
 
-	/*
-     * 获取当前缩放模式。
-	 * 
-	 * @return Int32 - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
-     */
-    public func scaleMode(): Int32
-
     /*
      * 设置cacheEnabled属性的值。
      * 
@@ -1692,12 +1812,19 @@ public class PAGPlayer {
     public func setProgress(value: Float64): Unit
 
 	/*
+     * 获取当前缩放模式。
+	 * 
+	 * @return PAGScaleMode - 缩放模式
+     */
+    public func scaleMode(): PAGScaleMode
+
+	/*
      * 该设置指定了如何将 PAG 内容缩放以适应目标表面（surface）大小的规则。
 	 * 当调用此方法时，相关的变换矩阵（matrix）会随之更新。
 	 * 
-	 * @param value - 缩放模式。0：None（不缩放）、1：Stretch（拉伸填充）、2：LetterBox（按宽高比缩放并填充黑边，默认模式）、3：Zoom（按宽高比缩放并可能裁剪）
+	 * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
-    public func setScaleMode(value: Int32): Unit
+    public func setScaleMode(mode: PAGScaleMode): Unit
 
     /*
      * 设置PAGPlayer要渲染的PAGSurface对象。
@@ -1736,34 +1863,41 @@ public class PAGPlayer {
     public func videoEnabled(): Bool
 
 }
-
 ```
 
 ##### 3.12 PAGScaleMode
-定义 PAGPlayer 的 setScaleMode 方法中使用的值。
 
 ```cangjie
-public class PAGScaleMode {
+public enum PAGScaleMode <: Equatable<PAGScaleMode> {
+    /**
+     * 内容不缩放。
+     */
+    | None
 
     /**
-     * 内容相对于原始未缩放图像的纵横比进行缩放。这是默认值。
+     * 内容拉伸以适应区域。
      */
-    public static let LetterBox: Int32
+    | Stretch
 
     /**
-     * 内容没有缩放。
+     * 按原始比例缩放，保持宽高比。默认值。
      */
-    public static let None: Int32
+    | LetterBox
 
     /**
-     * 内容被拉伸以适应。
+     * 按原始比例缩放并裁剪一部分。
      */
-    public static let Stretch: Int32
+    | Zoom
 
     /**
-     * 内容被缩放以适应原始未缩放图像的纵横比。这会导致在一个轴上进行裁剪。
+     * 比较两个 `PAGScaleMode` 是否相等。
      */
-    public static let Zoom: Int32
+    public operator func ==(that: PAGScaleMode): Bool
+
+    /**
+     * 比较两个 `PAGScaleMode` 是否不相等。
+     */
+    public operator func !=(that: PAGScaleMode): Bool
 }
 ```
 
@@ -1773,7 +1907,6 @@ PAGShapeLayer 为图形图层，用于处理矢量图形和形状动画。
 ```cangjie
 public class PAGShapeLayer <: PAGLayer {
 }
-    
 ```
 
 ##### 3.14 PAGSolidLayer
@@ -2084,27 +2217,36 @@ public class PAGTextLayer <: PAGLayer {
 定义 PAGFile 的 setTimeStretchMode 方法中使用的值。
 
 ```cangjie
-public class PAGTimeStretchMode {
+public enum PAGTimeStretchMode {
     /**
      * 保持原始播放速度，如果内容的持续时间小于目标持续时间，则显示最后一帧。
      */
-    public static let None: Int32
+    | None
 
     /**
      * 保持原始播放速度，但如果内容的持续时间小于目标持续时间，则重复播放内容。这是默认模式。
      */
-    public static let Repeat: Int32
+    | Repeat
 
     /**
      * 保持原始播放速度，但如果内容的持续时间小于目标持续时间，则反向重复内容。
      */
-    public static let RepeatInverted: Int32
+    | RepeatInverted
 
     /*
      * 更改内容的播放速度以适应目标持续时间。
      */
-    public static let Scale: Int32
+    | Scale
 
+    /**
+     * 比较两个 `PAGTimeStretchMode` 是否相等。
+     */
+    public operator func ==(that: PAGTimeStretchMode): Bool
+
+    /**
+     * 比较两个 `PAGTimeStretchMode` 是否不相等。
+     */
+    public operator func !=(that: PAGTimeStretchMode): Bool
 }
 ```
 
@@ -2203,11 +2345,6 @@ public class Matrix4 {
      */
     var _identityCalculated: Bool = false
 
-    /*
-     * 与底层 C 语言库绑定的指针，表示对应的底层对象（仅内部使用）
-     */
-    private var ptr: Int64
-
     /**
      * 默认构造函数，初始化为单位矩阵
      */
@@ -2219,5 +2356,61 @@ public class Matrix4 {
      * @param props - 包含16个 Float32 元素的数组，按列主序排列
      */
     public init(props: Array<Float32>)
+}
+```
+
+##### 3.24 Rect类
+
+```cangjie
+public class Rect: ToString {
+    /*
+     * 上边距
+     *
+     * @property top - 类型为 Float32，表示矩形的上边距。
+     */
+    public var top: Float32 = 0.0
+
+    /*
+     * 左边距
+     *
+     * @property left - 类型为 Float32，表示矩形的左边距。
+     */
+    public var left: Float32 = 0.0
+
+    /*
+     * 右边距
+     *
+     * @property right - 类型为 Float32，表示矩形的右边距。
+     */
+    public var right: Float32 = 0.0
+
+    /*
+     * 下边距
+     *
+     * @property bottom - 类型为 Float32，表示矩形的下边距。
+     */
+    public var bottom: Float32 = 0.0
+
+    /**
+     * 创建一个默认的 Rect 实例，所有边距初始化为 0.0。
+     */
+    public init() {}
+
+    /**
+     * 根据参数创建一个 Rect 实例。
+     *
+     * @param left - 类型为 Float32，矩形的左边距。
+     * @param top - 类型为 Float32，矩形的上边距。
+     * @param right - 类型为 Float32，矩形的右边距。
+     * @param bottom - 类型为 Float32，矩形的下边距。
+     */
+    public init(left: Float32, top: Float32, right: Float32, bottom: Float32)
+
+    /**
+     * 将 Rect 实例转换为字符串形式并返回。
+     *
+     * @return 类型为 String，表示矩形的字符串描述。
+     */
+    public func toString(): String
 }
 ```
