@@ -51,6 +51,10 @@ public class PAGImage {
      * Creates a PAGImage object from a path of a image file, return null if the file does not exist or it's not a valid image file.
      */
     public static func FromPath(path: String): Option<PAGImage> {
+        if (path.endsWith(".pag")) {
+            Hilog.error(0, "PAGImage", "FromPath path is not a image file")
+            return Option<PAGImage>.None;
+        }
         unsafe {
             let p = LibC.mallocCString(path)
             let instanceId = cj_PAGImage_FromPath(p)

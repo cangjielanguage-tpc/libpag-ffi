@@ -89,7 +89,7 @@ public class PAGDiskCache {
         }
     }
 
-    public static func SetCacheDir(path: String): Unit {
+    protected static func SetCacheDir(path: String): Unit {
         unsafe {
             let p = LibC.mallocCString(path)
             cj_PAGDiskCache_SetCacheDir(p)

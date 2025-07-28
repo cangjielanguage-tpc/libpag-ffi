@@ -47,6 +47,9 @@ int8_t cj_PAGLayer_layerType(const int64_t ptr)
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance->get()) {
+        return LAYER_TYPE_UNKNOWN;
+    }
     LayerType lt = instance->get()->layerType();
     int64_t types = LAYER_TYPE_UNKNOWN;
     switch (lt) {
@@ -89,6 +92,9 @@ bool cj_PAGLayer_isPAGFile(const int64_t ptr)
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance->get()) {
+        return false;
+    }
     bool flag = instance->get()->isPAGFile();
     return flag;
 }

@@ -213,7 +213,7 @@ public class PAGImageViewController <: XComponentController {
      * composition was loaded from a pag file path.
      */
     public func getComposition(): Option<PAGComposition> {
-        if (this.filePath != "") {
+        if (this.filePath == "") {
             return None
         }
         return this.composition

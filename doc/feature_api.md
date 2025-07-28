@@ -1301,7 +1301,7 @@ public class PAGImage {
     public static func LoadFromAssets(manager: ResourceManager, name: String): Option<PAGImage>
 
     /*
-     * 根据指定的字节数据创建PAGImage对象，如果字节为空或不是有效的图像文件，则返回null。
+     * 根据指定的图像字节数据创建PAGImage对象。如果字节为空，则返回null。如果传入的字节数据不是有效的图像数据，将导致不确定行为。
      * 
      * @param path - 图像字节数据
      * @return Option<PAGImage> - 返回PAGImage对象
@@ -1309,7 +1309,7 @@ public class PAGImage {
     public static func FromBytes(bytes: Array<UInt8>): Option<PAGImage>
 
     /*
-     * 从图像文件的路径创建PAGImage对象，如果该文件不存在或不是有效的图像文件，则返回null。
+     * 从图像文件的路径创建PAGImage对象，如果该文件不存在或不是有效的图像文件，则返回null。传入非图像类型的文件路径也可能导致不确定行为。
      * 
      * @param path - 图像文件的沙箱路径.目前只支持/data/storage/el1/bundle/entry/resources/resfile下的沙箱路径。
      * @return Option<PAGImage> - 返回PAGImage对象
