@@ -150,7 +150,7 @@ public open class PAGLayer {
             return cj_PAGLayer_layerType(ptr)
         }
     }
-    public static func getLayerType(nativeLayer: Int64): Int8 {
+    protected static func getLayerType(nativeLayer: Int64): Int8 {
         unsafe {
             return cj_PAGLayer_layerType(nativeLayer)
         }

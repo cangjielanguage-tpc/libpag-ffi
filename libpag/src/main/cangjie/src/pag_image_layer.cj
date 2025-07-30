@@ -32,7 +32,7 @@ public class PAGImageLayer <: PAGLayer {
         }
     }
 
-    public PAGImageLayer(nativeContext: Int64) {
+    protected PAGImageLayer(nativeContext: Int64) {
         super(nativeContext)
     }
 

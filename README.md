@@ -2,7 +2,7 @@
 <h1>libpag-cj</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v.0.0.2-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v.1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjc-v1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-NA-red" style="display: inline-block;" />
@@ -69,6 +69,8 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 9. 构建完成后，在libpag\ohos\libpag\build\default\outputs\default下找到libpag.har，将后缀.har改成.zip，解压，然后将package\libs下的两个目录arm64-v8a和x86_64拷贝到本项目仓库libpag-cj\libpag\libs下
 
 10. 使用 DevEco Studio 构建工程项目, 生成 hap 包即可
+
+如需快速体验，可将[libs](https://gitcode.com/Cangjie-TPC/libpag-cj/tree/libpag-dep)拷贝到本项目仓库libpag-cj\libpag目录下，将libs目录下的zip解压即可
 
 #### 使用说明
 
