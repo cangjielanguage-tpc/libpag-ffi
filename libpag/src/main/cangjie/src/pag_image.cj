@@ -112,7 +112,7 @@ public class PAGImage {
     }
 
     /**
-     * Load a pag file from assets, returns null if the file does not exist or the data is not a valid image file.
+     * Load a image file from assets, returns null if the file does not exist or the data is not a valid image file.
      */
     public static func LoadFromAssets(manager: ResourceManager, name: String): Option<PAGImage> {
         try {

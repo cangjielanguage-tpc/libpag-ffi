@@ -1292,10 +1292,10 @@ PAG 动画中的图像工具类，支持纹理操作与图像处理。
 ```cangjie
 public class PAGImage {
     /*
-     * 从资源加载pag文件，如果文件不存在或数据不是有效的图像文件，则返回null。
+     * 从资源加载图像文件，如果文件不存在或数据不是有效的图像文件，则返回null。传入非图像文件也可能导致不确定行为。
      * 
 	 * @param manager - 资源管理对象
-	 * @param name - resources\rawfile目录下的pag文件名。
+	 * @param name - resources\rawfile目录下的图像文件。
      * @return Option<PAGImage> - 返回PAGImage对象
      */
     public static func LoadFromAssets(manager: ResourceManager, name: String): Option<PAGImage>
@@ -2334,16 +2334,6 @@ public class Matrix4 {
      * 存储矩阵的16个元素，按列主序（column-major order）排列
      */
     public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
-
-    /*
-     * 矩阵是否为单位矩阵的标记（内部使用）
-     */
-    var _identity: Bool = true
-
-    /*
-     * 是否已计算单位矩阵状态的标记（内部使用）
-     */
-    var _identityCalculated: Bool = false
 
     /**
      * 默认构造函数，初始化为单位矩阵
