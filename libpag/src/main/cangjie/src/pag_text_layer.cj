@@ -34,8 +34,12 @@ foreign {
 }
 
 public class PAGTextLayer <: PAGLayer {
-    init(nativeLayer: Int64) {
+    protected init(nativeLayer: Int64) {
         super(nativeLayer)
+    }
+
+    public init(layer: PAGLayer) {
+        super(layer.nativeLayer)
     }
 
     public static func make(duration: Int64, text: String, fontSize: Float32, fontFamily!: String = "",
