@@ -97,7 +97,12 @@ func BytesArrayToString(res: CJBytesArray): String {
                 bytes[i] = buf.read(i)
             }
         }
-        let str = String.fromUtf8(bytes)
+        var str = ""
+        try{
+            str = String.fromUtf8(bytes)
+        } catch (e: Exception) {
+            return ""
+        }
         return str
     }
 }

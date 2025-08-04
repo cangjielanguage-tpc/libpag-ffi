@@ -181,12 +181,18 @@ void cj_PAGTextLayer_setText(const int64_t ptr, char *t)
 
 void cj_PAGTextLayer_reset(const int64_t ptr)
 {
-    std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance || !instance->get()) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[reset]-Invalid handler.");
+        return;
+    }
+    auto textLayer = std::static_pointer_cast<PAGTextLayer>(instance->get());
     if (textLayer == nullptr) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[reset]-the pointer of PAGTextLayer is null.");
         return;
     }
-    textLayer.reset();
+    textLayer->reset();
 }
 }
 } // namespace pag
