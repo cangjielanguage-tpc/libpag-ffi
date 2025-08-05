@@ -78,29 +78,22 @@ void cj_PAGTextLayer_setFillColor(const int64_t ptr, const int64_t color)
     textLayer->setFillColor(colors);
 }
 
-long long cj_PAGTextLayer_font(const int64_t ptr)
+void cj_PAGTextLayer_setFont(const int64_t ptr, char *fontFamily, char *fontStyle)
 {
-    std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
-    if (textLayer == nullptr) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[font]-the pointer of PAGTextLayer is null.");
-        return 0;
-    }
-    PAGFont font = textLayer->font();
-    PAGFont *ptrPAGFont = &font;
-    return (int64_t)ptrPAGFont;
-}
-
-void cj_PAGTextLayer_setFont(const int64_t ptr, const int64_t fontptr)
-{
-    std::shared_ptr<PAGTextLayer> textLayer = getPAGTextLayer(ptr);
-    if (textLayer == nullptr) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]",
-                     "[setFont]-the pointer of PAGTextLayer is null.");
+    if (ptr == 0) {
         return;
     }
-    intptr_t fontptrInt = static_cast<intptr_t>(fontptr);
-    PAGFont *pagFont = reinterpret_cast<PAGFont *>(fontptrInt);
-    textLayer->setFont(*pagFont);
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance || !instance->get()) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[setFont]-the pointer is null.");
+        return;
+    }
+    auto textLayer = std::static_pointer_cast<PAGTextLayer>(instance->get());
+    std::string fontFamilyStr = fontFamily;
+    std::string fontStyleStr = fontStyle;
+    PAGFont pagFont(fontFamilyStr, fontStyleStr);
+    textLayer->setFont(pagFont);
 }
 
 double cj_PAGTextLayer_fontSize(const int64_t ptr)
@@ -181,6 +174,9 @@ void cj_PAGTextLayer_setText(const int64_t ptr, char *t)
 
 void cj_PAGTextLayer_reset(const int64_t ptr)
 {
+    if (ptr == 0) {
+        return;
+    }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
     if (!instance || !instance->get()) {
@@ -193,6 +189,40 @@ void cj_PAGTextLayer_reset(const int64_t ptr)
         return;
     }
     textLayer->reset();
+}
+
+CJBytesArray cj_PAGTextLayer_getFontFamily(const int64_t ptr)
+{
+    if (ptr == 0) {
+        return {0, nullptr};
+    }
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance || !instance->get()) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[getFontFamily]-the pointer is null.");
+        return {0, nullptr};
+    }
+    auto textLayer = std::static_pointer_cast<PAGTextLayer>(instance->get());
+    auto font = textLayer->font();
+    CJBytesArray result = stringToCJBytesArray(font.fontFamily);
+    return result;
+}
+
+CJBytesArray cj_PAGTextLayer_getFontStyle(const int64_t ptr)
+{
+    if (ptr == 0) {
+        return {0, nullptr};
+    }
+    intptr_t ptrInt = static_cast<intptr_t>(ptr);
+    CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance || !instance->get()) {
+        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGTextLayer]", "[getFontStyle]-the pointer is null.");
+        return {0, nullptr};
+    }
+    auto textLayer = std::static_pointer_cast<PAGTextLayer>(instance->get());
+    auto font = textLayer->font();
+    CJBytesArray result = stringToCJBytesArray(font.fontStyle);
+    return result;
 }
 }
 } // namespace pag

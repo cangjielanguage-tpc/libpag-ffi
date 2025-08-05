@@ -22,23 +22,13 @@ long long cj_PAGFont_registerFontBytes(int *data, int size, const int32_t ttcInd
     std::string fontFamilys = fontFamily;
     std::string fontStyles = fontStyle;
     PAGFont font = PAGFont::RegisterFont(data, size, ttcIndex, fontFamilys, fontStyles);
-    PAGFont *ptr = &font;
-    return (int64_t)ptr;
+    CJPAGFont *cjfont = new CJPAGFont(font);
+    return (int64_t)cjfont;
 }
 
-void cj_PAGFont_unregisterFont(const int64_t ptr)
+void cj_PAGFont_unregisterFont(char *fontFamily, char *fontStyle)
 {
-    if (ptr == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[unregisterFont]-the pointer of PAGFont is null.");
-        return;
-    }
-    intptr_t ptrInt = static_cast<intptr_t>(ptr);
-    CJPAGFont *instance = reinterpret_cast<CJPAGFont *>(ptrInt);
-    if (instance == nullptr) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "[PAGFont]", "[unregisterFont]-the pointer of CJPAGFont is null.");
-        return;
-    }
-    PAGFont font = instance->get();
+    PAGFont font(fontFamily, fontStyle);
     PAGFont::UnregisterFont(font);
     return;
 }

@@ -12,9 +12,7 @@ foreign {
 
     func cj_PAGTextLayer_setFillColor(ptr: Int64, color: Int64): Unit
 
-    func cj_PAGTextLayer_font(ptr: Int64): Int64
-
-    func cj_PAGTextLayer_setFont(ptr: Int64, fontptr: Int64): Unit
+    func cj_PAGTextLayer_setFont(ptr: Int64, fontFamily: CString, fontStyle: CString): Unit
 
     func cj_PAGTextLayer_fontSize(ptr: Int64): Float64
 
@@ -31,6 +29,10 @@ foreign {
     func cj_PAGTextLayer_reset(ptr: Int64): Unit
 
     func cj_PAGTextLayer_release(ptrCJPAGPlayer: Int64): Unit
+
+    func cj_PAGTextLayer_getFontFamily(ptr: Int64): CJBytesArray
+
+    func cj_PAGTextLayer_getFontStyle(ptr: Int64): CJBytesArray
 }
 
 public class PAGTextLayer <: PAGLayer {
@@ -82,11 +84,9 @@ public class PAGTextLayer <: PAGLayer {
      */
     public func font(): PAGFont {
         unsafe {
-            let context: Int64 = cj_PAGTextLayer_font(ptr)
-            if (context <= 0) {
-                return PAGFont(context)
-            }
-            return PAGUtils.ToPAGFont(context)
+            let fontFamily: String = getFontFamily(ptr)
+            let fontStyle: String = getFontStyle(ptr)
+            return PAGFont(fontFamily, fontStyle, 0)
         }
     }
 
@@ -95,7 +95,11 @@ public class PAGTextLayer <: PAGLayer {
      */
     public func setFont(font: PAGFont): Unit {
         unsafe {
-            cj_PAGTextLayer_setFont(ptr, font.ptr)
+            let fontFamily = LibC.mallocCString(font.fontFamily)
+            let fontStyle = LibC.mallocCString(font.fontStyle)
+            cj_PAGTextLayer_setFont(ptr, fontFamily, fontStyle)
+            LibC.free(fontFamily)
+            LibC.free(fontStyle)
         }
     }
 
@@ -178,6 +182,24 @@ public class PAGTextLayer <: PAGLayer {
         unsafe {
             cj_PAGTextLayer_release(ptr)
             isRelease = true
+        }
+    }
+
+    protected func getFontFamily(ptr: Int64): String {
+        unsafe {
+            let res: CJBytesArray = cj_PAGTextLayer_getFontFamily(ptr)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
+        }
+    }
+
+    protected func getFontStyle(ptr: Int64): String {
+        unsafe {
+            let res: CJBytesArray = cj_PAGTextLayer_getFontStyle(ptr)
+            let str = BytesArrayToString(res)
+            free_CJBytesArray(res)
+            return str
         }
     }
 }
