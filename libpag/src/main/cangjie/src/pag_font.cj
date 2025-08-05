@@ -15,7 +15,7 @@ foreign {
     func cj_PAGFont_registerFontBytes(data: CPointer<UInt8>, length: Int32, ttcIndex: Int32, fontFamily: CString,
         fontStyle: CString): Int64
 
-    func cj_PAGFont_unregisterFont(ptr: Int64): Unit
+    func cj_PAGFont_unregisterFont(fontFamily: CString, fontStyle: CString): Unit
 
     func cj_PAGFont_setFallbackFontPaths(handlefns: CPointer<CString>, lenfn: Int64, handlettcs: CPointer<Int32>,
         lenttc: Int64): Unit
@@ -26,9 +26,8 @@ foreign {
 }
 
 public class PAGFont {
-
     // Binding with C code, the object pointer returned by C code.
-    public let ptr: Int64
+    protected let ptr: Int64
 
     /**
      * A string with the name of the font family.
@@ -60,17 +59,13 @@ public class PAGFont {
         }
     }
 
-    public init(ptr: Int64) {
-        this.ptr = ptr
-    }
-
-    public init(fontFamily: String, fontStyle: String, ptr: Int64) {
+    protected init(fontFamily: String, fontStyle: String, ptr: Int64) {
         this.fontFamily = fontFamily
         this.fontStyle = fontStyle
         this.ptr = ptr
     }
 
-    private init(fontFamily: String, fontStyle: String) {
+    public init(fontFamily: String, fontStyle: String) {
         this.fontFamily = fontFamily
         this.fontStyle = fontStyle
         this.ptr = 0
@@ -86,15 +81,15 @@ public class PAGFont {
         return registerFont(context, fileName, ttcIndex, fontFamily, fontStyle)
     }
 
-    public static func registerFont(fontPath: String): PAGFont {
+    protected static func registerFont(fontPath: String): PAGFont {
         return registerFont(fontPath, 0)
     }
 
-    public static func registerFont(fontPath: String, ttcIndex: Int32): PAGFont {
+    protected static func registerFont(fontPath: String, ttcIndex: Int32): PAGFont {
         return registerFont(fontPath, ttcIndex, "", "")
     }
 
-    public static func registerFont(fontPath: String, ttcIndex: Int32, fontFamily: String, fontStyle: String): PAGFont {
+    protected static func registerFont(fontPath: String, ttcIndex: Int32, fontFamily: String, fontStyle: String): PAGFont {
         unsafe {
             let f = LibC.mallocCString(fontPath)
             let ff = LibC.mallocCString(fontFamily)
@@ -103,21 +98,19 @@ public class PAGFont {
             LibC.free(f)
             LibC.free(ff)
             LibC.free(fs)
-
-            let pagFlont: PAGFont = PAGFont(fontFamily, fontStyle, id)
-            return pagFlont
+            return PAGUtils.ToPAGFont(id)
         }
     }
 
-    public static func registerFont(manager: Option<AbilityContext>, fileName: String): PAGFont {
+    protected static func registerFont(manager: Option<AbilityContext>, fileName: String): PAGFont {
         return registerFont(manager, fileName, 0)
     }
 
-    public static func registerFont(manager: Option<AbilityContext>, fileName: String, ttcIndex: Int32): PAGFont {
+    protected static func registerFont(manager: Option<AbilityContext>, fileName: String, ttcIndex: Int32): PAGFont {
         return registerFont(manager, fileName, ttcIndex, "", "")
     }
 
-    public static func registerFont(context: Option<AbilityContext>, fileName: String, ttcIndex: Int32,
+    protected static func registerFont(context: Option<AbilityContext>, fileName: String, ttcIndex: Int32,
         fontFamily: String, fontStyle: String): PAGFont {
         let stageContext = getStageContext(context.getOrThrow())
         let resMgr = ResourceManager.getResourceManager(stageContext)
@@ -127,7 +120,7 @@ public class PAGFont {
         } catch (e: BusinessException) {
             Hilog.error(0, "PAGFont",
                 "registerFont getRawFileContent failed, error code: ${e.code}, message: ${e.message}.")
-            return PAGFont("", "")
+            return PAGFont("", "", 0)
         }
     }
 
@@ -146,19 +139,17 @@ public class PAGFont {
             LibC.free(ff)
             LibC.free(fs)
             releaseArrayRawData(handle)
-
-            let pagFlont: PAGFont = PAGFont(fontFamily, fontStyle, id)
-            return pagFlont
+            return PAGUtils.ToPAGFont(id)
         }
     }
 
     public static func unregisterFont(font: PAGFont): Unit {
-        unregisterFont(font.ptr)
-    }
-
-    private static func unregisterFont(ptr: Int64): Unit {
         unsafe {
-            cj_PAGFont_unregisterFont(ptr)
+            let ff = LibC.mallocCString(font.fontFamily)
+            let fs = LibC.mallocCString(font.fontStyle)
+            cj_PAGFont_unregisterFont(ff, fs)
+            LibC.free(ff)
+            LibC.free(fs)
         }
     }
 
@@ -190,7 +181,7 @@ public class PAGFont {
         }
     }
 
-    static func getFontFamily(ptr: Int64): String {
+    protected static func getFontFamily(ptr: Int64): String {
         unsafe {
             let res: CJBytesArray = cj_PAGFont_getFontFamily(ptr)
             let str = BytesArrayToString(res)
@@ -199,7 +190,7 @@ public class PAGFont {
         }
     }
 
-    static func getFontStyle(ptr: Int64): String {
+    protected static func getFontStyle(ptr: Int64): String {
         unsafe {
             let res: CJBytesArray = cj_PAGFont_getFontStyle(ptr)
             let str = BytesArrayToString(res)

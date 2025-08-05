@@ -84,8 +84,7 @@ void cj_PAGSolidLayer_setSolidColor(const int64_t ptr, const int64_t solidColor)
 long long cj_PAGTextLayer_make(const int64_t duration, char *text, float fontSize, char *fontFamily, char *fontStyle);
 long long cj_PAGTextLayer_fillColor(const int64_t ptr);
 void cj_PAGTextLayer_setFillColor(const int64_t ptr, const int64_t color);
-long long cj_PAGTextLayer_font(const int64_t ptr);
-void cj_PAGTextLayer_setFont(const int64_t ptr, const int64_t fontptr);
+void cj_PAGTextLayer_setFont(const int64_t ptr, char *fontFamily, char *fontStyle);
 double cj_PAGTextLayer_fontSize(const int64_t ptr);
 void cj_PAGTextLayer_setFontSize(const int64_t ptr, double fontSize);
 long long cj_PAGTextLayer_strokeColor(const int64_t ptr);
@@ -94,5 +93,7 @@ CJBytesArray cj_PAGTextLayer_text(const int64_t ptr);
 void cj_PAGTextLayer_setText(const int64_t ptr, char *t);
 void cj_PAGTextLayer_reset(const int64_t ptr);
 void cj_PAGTextLayer_release(const int64_t ptr);
+CJBytesArray cj_PAGFont_getFontFamily(const int64_t ptr);
+CJBytesArray cj_PAGFont_getFontStyle(const int64_t ptr);
 }
 #endif // LIBPAG_CJ_CJ_PAG_LAYER_HANDLE_H
