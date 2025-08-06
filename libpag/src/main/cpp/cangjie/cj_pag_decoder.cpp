@@ -26,8 +26,7 @@ long long cj_PAGDecoder_makeFrom(const int64_t ptr, float maxFrameRate, float sc
                      "[cj_PAGDecoder_makeFrom]-PAGDecoder::MakeFrom() Failed to create a PAGDecoder!");
         return 0;
     }
-    CJPAGDecoder cjPAGDecoder = CJPAGDecoder(decoder);
-    CJPAGDecoder *ptrCJPAGDecoder = &cjPAGDecoder;
+    CJPAGDecoder *ptrCJPAGDecoder = new CJPAGDecoder(decoder);
     return (int64_t)ptrCJPAGDecoder;
 }
 
@@ -79,7 +78,7 @@ float cj_PAGDecoder_frameRate(const int64_t ptr)
     return frameRate;
 }
 
-bool cj_PAGDecoder_checkFrameChanged(const int64_t ptr, const int32_t index)
+bool cj_PAGDecoder_checkFrameChanged(const int64_t ptr, int64_t index)
 {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGDecoder_checkFrameChanged", "Pointer is null");
@@ -91,19 +90,43 @@ bool cj_PAGDecoder_checkFrameChanged(const int64_t ptr, const int32_t index)
     return flag;
 }
 
-bool cj_PAGDecoder_readFrame(const int64_t ptr, const int32_t index, uint8_t *bytes, const int64_t rowBytes,
-                             const uint8_t colorType, const uint8_t alphaType)
+CJPixelMap cj_PAGDecoder_readFrame(const int64_t ptr, int64_t index)
 {
     if (ptr == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGDecoder_readFrame", "Pointer is null");
-        return false;
+        return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGDecoder *instance = reinterpret_cast<CJPAGDecoder *>(ptrInt);
-    pag::ColorType ct = pag::getColorType(colorType);
-    pag::AlphaType at = pag::getAlphaType(alphaType);
-    bool flag = instance->get()->readFrame(index, bytes, rowBytes, ct, at);
-    return flag;
+    if (!instance || !instance->get()) {
+        return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
+    }
+    auto decoder = instance->get();
+    tgfx::ImageInfo imageInfo = tgfx::ImageInfo::Make(decoder->width(), decoder->height(), tgfx::ColorType::BGRA_8888,
+                                                      tgfx::AlphaType::Premultiplied);
+    auto pixels = ByteData::Make(imageInfo.byteSize());
+    if (pixels == nullptr) {
+        return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
+    }
+    if (!decoder->readFrame(index, pixels->data(), imageInfo.rowBytes(), ColorType::BGRA_8888,
+                            AlphaType::Premultiplied)) {
+        return CJPixelMap{0, nullptr, 0, false, 0, 0, 0};
+    }
+    int32_t width = imageInfo.width();
+    int32_t height = imageInfo.height();
+    uint8_t pixelFormat = 3; // PIXEL_FORMAT_BGRA_8888;
+    uint8_t alphaType = 2;   // OHOS_PIXEL_MAP_ALPHA_TYPE_PREMUL;
+    bool editable = true;
+
+    uint8_t *bytes = pixels->data();
+    // Return the byte size of the pixel.
+    int size = pixels->length();
+
+    uint8_t *buf = new uint8_t[size];
+    for (int i = 0; i < size; i++) {
+        buf[i] = bytes[i];
+    }
+    return CJPixelMap{size, buf, alphaType, editable, pixelFormat, height, width};
 }
 
 void cj_PAGDecoder_nativeRelease(const int64_t ptr)
@@ -116,6 +139,7 @@ void cj_PAGDecoder_nativeRelease(const int64_t ptr)
     CJPAGDecoder *instance = reinterpret_cast<CJPAGDecoder *>(ptrInt);
     if (instance != nullptr) {
         instance->clear();
+        delete instance;
     }
 }
 

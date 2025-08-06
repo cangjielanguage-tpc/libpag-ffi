@@ -70,23 +70,10 @@ foreign {
 }
 
 public open class PAGLayer {
-
-    /*
-     * Layer is always one of the following types.
-     */
-    public static let LayerTypeUnknown: Int8 = 0
-    public static let LayerTypeNull: Int8 = 1
-    public static let LayerTypeSolid: Int8 = 2
-    public static let LayerTypeText: Int8 = 3
-    public static let LayerTypeShape: Int8 = 4
-    public static let LayerTypeImage: Int8 = 5
-    public static let LayerTypePreCompose: Int8 = 6
-    public static let LayerTypeCamera: Int8 = 7
-
     // Binding with C code, the object pointer returned by C code.
-    let ptr: Int64
+    protected var ptr: Int64
 
-    var isRelease: Bool = false
+    protected var isRelease: Bool = false
 
     init(ptr: Int64) {
         this.ptr = ptr
@@ -98,18 +85,18 @@ public open class PAGLayer {
         }
     }
 
-    public func getptr(): Int64 {
+    protected func getptr(): Int64 {
         return this.ptr
     }
 
-    public static func makeEmptyPAGLayer(): PAGLayer {
+    protected static func makeEmptyPAGLayer(): PAGLayer {
         return PAGLayer(0)
     }
 
     /**
      *  Load the PAG file from byte data, and return null if the byte is empty or not a valid PAG file.
      */
-    public static func makePAGLayer(bytes: Array<UInt8>, length: Int64, filePath!: String = "", password!: String = ""): Option<PAGLayer> {
+    protected static func makePAGLayer(bytes: Array<UInt8>, length: Int64, filePath!: String = "", password!: String = ""): Option<PAGLayer> {
         unsafe {
             let handle = acquireArrayRawData(bytes)
             let fp = LibC.mallocCString(filePath)
@@ -128,7 +115,7 @@ public open class PAGLayer {
     /**
      *  Load the PAG file from the path, and return null if the file does not exist or the data is not a PAG file.
      */
-    public static func makePAGLayer(filePath: String, password!: String = ""): Option<PAGLayer> {
+    protected static func makePAGLayer(filePath: String, password!: String = ""): Option<PAGLayer> {
         unsafe {
             let fp = LibC.mallocCString(filePath)
             let pw = LibC.mallocCString(password)
@@ -145,11 +132,13 @@ public open class PAGLayer {
     /**
      * Return the type of layer.
      */
-    public func layerType(): Int8 {
+    public func layerType(): PAGLayerType {
         unsafe {
-            return cj_PAGLayer_layerType(ptr)
+            let value = cj_PAGLayer_layerType(ptr)
+            return PAGLayerType.int8ToType(value)
         }
     }
+
     protected static func getLayerType(nativeLayer: Int64): Int8 {
         unsafe {
             return cj_PAGLayer_layerType(nativeLayer)

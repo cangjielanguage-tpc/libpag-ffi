@@ -54,7 +54,7 @@ public open class PAGComposition <: PAGLayer {
         super(nativeLayer)
     }
 
-    public func getNativeComposition(): Int64 {
+    protected func getNativeComposition(): Int64 {
         return this.ptr
     }
 

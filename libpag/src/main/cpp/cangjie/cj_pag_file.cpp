@@ -335,7 +335,7 @@ void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerNa
 }
 
 CJInt64Array cj_PAGFile_getLayersByEditableIndex(const int64_t ptrPAGFile, const int32_t index,
-                                                 const int32_t layerType)
+                                                 const int8_t layerType)
 {
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getLayersByEditableIndex", "ptrPAGFile is null");
@@ -372,7 +372,7 @@ CJInt64Array cj_PAGFile_getLayersByEditableIndex(const int64_t ptrPAGFile, const
     return CJInt64Array{static_cast<int64_t>(size), arr};
 }
 
-CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int32_t layerType)
+CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int8_t layerType)
 {
     if (ptrPAGFile == 0) {
         OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_getEditableIndices", "ptrPAGFile is null");

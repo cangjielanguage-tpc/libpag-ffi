@@ -33,9 +33,9 @@ foreign {
 
     func cj_PAGFile_replaceImageByName(ptrPAGFile: Int64, layerName: CString, ptrPAGImage: Int64): Unit
 
-    func cj_PAGFile_getLayersByEditableIndex(ptrPAGFile: Int64, index: Int32, layerType: Int32): CJInt64Array
+    func cj_PAGFile_getLayersByEditableIndex(ptrPAGFile: Int64, index: Int32, layerType: Int8): CJInt64Array
 
-    func cj_PAGFile_getEditableIndices(ptrPAGFile: Int64, layerType: Int32): CJInt64Array
+    func cj_PAGFile_getEditableIndices(ptrPAGFile: Int64, layerType: Int8): CJInt64Array
 
     func cj_PAGFile_timeStretchMode(ptr: Int64): Int32
 
@@ -445,9 +445,9 @@ public class PAGFile <: PAGComposition {
     /*
      * Return an array of layers by specified editable index and layer type.
      */
-    public func getLayersByEditableIndex(index: Int32, layerType: Int32): Array<PAGLayer> {
+    public func getLayersByEditableIndex(index: Int32, layerType: PAGLayerType): Array<PAGLayer> {
         unsafe {
-            let res: CJInt64Array = cj_PAGFile_getLayersByEditableIndex(ptrPAGFile, index, layerType);
+            let res: CJInt64Array = cj_PAGFile_getLayersByEditableIndex(ptrPAGFile, index, PAGLayerType.typeToInt8(layerType))
             let size: Int64 = res.size
             let buf: CPointer<Int64> = res.buf
             let bytes: Array<Int64> = Array<Int64>(size, repeat: 0)
@@ -466,9 +466,9 @@ public class PAGFile <: PAGComposition {
      * If the editableIndex of a PAGLayer is not present in the returned indices, the PAGLayer should
      * not be treated as editable.
      */
-    public func getEditableIndices(layerType: Int32): Array<Int64> {
+    public func getEditableIndices(layerType: PAGLayerType): Array<Int64> {
         unsafe {
-            let res: CJInt64Array = cj_PAGFile_getEditableIndices(ptrPAGFile, layerType);
+            let res: CJInt64Array = cj_PAGFile_getEditableIndices(ptrPAGFile, PAGLayerType.typeToInt8(layerType));
             let size: Int64 = res.size
             let buf: CPointer<Int64> = res.buf
             let bytes: Array<Int64> = Array<Int64>(size, repeat: 0)
@@ -539,6 +539,7 @@ public class PAGFile <: PAGComposition {
         unsafe {
             cj_PAGFile_release(ptrPAGFile)
             ptrPAGFile = 0
+            ptr = 0
             isRelease = true
             return
         }

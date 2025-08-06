@@ -42,7 +42,7 @@ public class PAGSurface {
     /**
      * The width of surface in pixels.
      */
-    public func getCID(): Int64 {
+    protected func getCID(): Int64 {
         unsafe {
             return ptrCJPAGSurface
         }
@@ -155,6 +155,7 @@ public class PAGSurface {
     public func release(): Unit {
         unsafe {
             cj_PAGSurface_release(ptrCJPAGSurface)
+            ptrCJPAGSurface = 0
         }
     }
 }

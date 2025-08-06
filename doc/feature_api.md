@@ -891,7 +891,7 @@ public class PAGDecoder {
     public static func make(pagComposition: PAGComposition, maxFrameRate: Float32, scale: Float32): Option<PAGDecoder>
 
 	/*
-     * 如果给定索引处的帧自上次 copyFrameTo()、readFrameToo() 或 frameAtIndex() 调用以来发生了变化，则返回 true。
+     * 如果给定索引处的帧自上次调用以来发生了变化，则返回 true。
      * 如果帧没有改变，呼叫者应该跳过相应的呼叫。
      * 
      * @param index - 给定索引
@@ -899,18 +899,6 @@ public class PAGDecoder {
      * @return Bool - 发生了变化，返回 true，否则返回 false。
      */
     public func checkFrameChanged(index: Int32): Bool
-
-	/*
-     * 将给定索引处的图像帧像素复制到指定的位图。
-     * 如果失败，则返回 false。
-     * 请注意，调用者必须确保位图的配置在每次复制调用中保持不变。否则，它可能会返回 false。
-     * 
-     * @param pixelMap - 图像像素类
-     * @param index - 给定索引
-     *
-     * @return Bool - 复制像素成功，返回 true，否则返回 false。
-     */
-    public func copyFrameTo(pixelMap: PixelMap, index: Int32): Bool
 
 	/*
      * 获取解码图像帧的帧率。
@@ -936,19 +924,13 @@ public class PAGDecoder {
     public func numFrames(): Int64
 
 	/*
-     * 将给定索引处的图像帧像素读取到指定的硬件缓冲区中。
-     * 如果失败，则返回 false。将图像帧读入硬件缓冲区通常比读入内存具有更好的性能。
+     * 将给定索引处的图像帧像素读取到指定的PixelMap中。如果失败，则返回 None。
      * 
      * @param index - 给定索引
-     * @param pixels - 像素数组
-     * @param rowBytes - 图像像素的总字节数
-     * @param colorType - 像素格式，默认值为 PixelMapFormat.RGBA_8888。
-     * @param alphaType - 透明度，默认值为 AlphaType.PREMUL。
      *
-     * @return Bool - 复制像素成功，返回 true，否则返回 false。
+     * @return Option<PixelMap> - 捕获的位图，或 None
      */
-    public func readFrame(index: Int32, pixels: Array<UInt8>, rowBytes: Int64,
-        colorType!: PixelMapFormat = PixelMapFormat.RGBA_8888, alphaType!: AlphaType = AlphaType.PREMUL): Bool
+    public func readFrame(index: Int64): Option<PixelMap>
 
 	/*
      * 立即释放 PAGDecoder 实例使用的资源。
@@ -2337,5 +2319,56 @@ public class Rect: ToString {
      * @return 类型为 String，表示矩形的字符串描述。
      */
     public func toString(): String
+}
+```
+
+##### 3.25 PAGLayerType
+
+```cangjie
+public enum PAGLayerType <: Equatable<PAGLayerType> {
+    /**
+     * 未知图层类型
+     */
+    | Unknown
+
+    /**
+     * 空图层
+     */
+    | Null
+
+    /**
+     * 实心图层
+     */
+    | Solid
+
+    /**
+     * 文本图层
+     */
+    | Text
+
+    /**
+     * 形状图层
+     */
+    | Shape
+
+    /**
+     * 图像图层
+     */
+    | Image
+
+    /**
+     * 预合成图层
+     */
+    | PreCompose
+
+    /**
+     * 比较两个 `PAGLayerType` 是否相等。
+     */
+    public operator func ==(that: PAGLayerType): Bool
+
+    /**
+     * 比较两个 `PAGLayerType` 是否不相等。
+     */
+    public operator func !=(that: PAGLayerType): Bool
 }
 ```

@@ -57,4 +57,16 @@ public enum PAGScaleMode <: Equatable<PAGScaleMode> {
     public operator func !=(that: PAGScaleMode): Bool {
         return !(this == that)
     }
+
+    public func toString(): String {
+        var str: String = ''
+        match (this) {
+            case PAGScaleMode.None => str = "None"
+            case PAGScaleMode.Stretch => str = "Stretch"
+            case PAGScaleMode.LetterBox => str = "LetterBox"
+            case PAGScaleMode.Zoom => str = "Zoom"
+            case _ => str = "None"
+        }
+        return str
+    }
 }
