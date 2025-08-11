@@ -107,6 +107,9 @@ CJBytesArray cj_PAGLayer_layerName(const int64_t ptr)
     }
     intptr_t ptrInt = static_cast<intptr_t>(ptr);
     CJPAGLayerHandle *instance = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
+    if (!instance || !instance->get()) {
+        return {0, nullptr};
+    }
     std::string layerName = instance->get()->layerName();
     CJBytesArray result = stringToCJBytesArray(layerName);
     return result;

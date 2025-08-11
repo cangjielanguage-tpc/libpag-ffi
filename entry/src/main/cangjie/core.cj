@@ -431,7 +431,7 @@ class Core {
                                 var array: Array<PAGLayer> = this.controller.getLayersUnderPoint(300.0, 300.0)
                                 var msg = '返回位于指定点下方的图层数组长度:${array.size}\n'
                                 for (i in 0..array.size) {
-                                    msg += '${i} layerType:${array[i].layerType()} layerName:${array[i].layerName()}'
+                                    msg += '${i} layerType:${array[i].layerType().toString()} layerName:${array[i].layerName()}'
                                 }
                                 msg += '部分layerName显示空是正常的，底层接口获取到的就是空值'
                                 showToast(msg)
@@ -594,9 +594,7 @@ class Core {
                                 if (file.isNone()) {
                                     showToast("pag文件不存在")
                                 } else {
-                                    // 3表示Text类型
-                                    let layerType: Int32 = 3
-                                    var array: Array<Int64> = file.getOrThrow().getEditableIndices(layerType)
+                                    var array: Array<Int64> = file.getOrThrow().getEditableIndices(PAGLayerType.Text)
                                     showToast("该动画中Text类型可编辑图层的索引为${array.toString()}")
                                 }
                             }

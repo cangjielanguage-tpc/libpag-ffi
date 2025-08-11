@@ -20,10 +20,9 @@ foreign {
 
     func cj_PAGDecoder_frameRate(ptr: Int64): Float32
 
-    func cj_PAGDecoder_checkFrameChanged(ptr: Int64, index: Int32): Bool
+    func cj_PAGDecoder_checkFrameChanged(ptr: Int64, index: Int64): Bool
 
-    func cj_PAGDecoder_readFrame(ptr: Int64, index: Int32, pixels: CPointer<UInt8>, rowBytes: Int64, colorType: UInt8,
-        alphaType: UInt8): Bool
+    func cj_PAGDecoder_readFrame(ptr: Int64, index: Int64): CJPixelMap
 
     func cj_PAGDecoder_nativeRelease(ptr: Int64): Unit
 
@@ -127,23 +126,39 @@ public class PAGDecoder {
      * readFrameTo(), or frameAtIndex() call. The caller should skip the corresponding call
      * if the frame has not changed.
      */
-    public func checkFrameChanged(index: Int32): Bool {
+    public func checkFrameChanged(index: Int64): Bool {
         unsafe {
             let flag: Bool = cj_PAGDecoder_checkFrameChanged(nativeContext, index)
             return flag
         }
     }
 
-    public func readFrame(index: Int32, pixels: Array<UInt8>, rowBytes: Int64,
-        colorType!: PixelMapFormat = PixelMapFormat.RGBA_8888, alphaType!: AlphaType = AlphaType.PREMUL): Bool {
+    public func readFrame(index: Int64): Option<PixelMap> {
         unsafe {
-            let handle = acquireArrayRawData(pixels)
-            let colorType: UInt8 = getPAGColorTypeFromPixelMapFormat(colorType)
-            let alphaType: UInt8 = getPAGAlphaTypeFromAlphaType(alphaType)
-            let flag: Bool = cj_PAGDecoder_readFrame(nativeContext, index, handle.pointer, rowBytes, colorType,
-                alphaType)
-            releaseArrayRawData(handle)
-            return flag
+            let res: CJPixelMap = cj_PAGDecoder_readFrame(nativeContext, index)
+            let size: Int64 = res.size
+            let buf: CPointer<UInt8> = res.buf
+            if (size <= 0 || buf.isNull()) {
+                return None
+            }
+            var alphaType: AlphaType = getAlphaType(res.alphaType)
+            var editable: Bool = res.editable
+            var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
+            var height: Int32 = res.height
+            var width: Int32 = res.width
+            let bytes: Array<Byte> = Array<Byte>(size, repeat: 0)
+            for (i in 0..size) {
+                bytes[i] = buf.read(i)
+            }
+            free_CPointer_UInt8(buf)
+            let opts: InitializationOptions = InitializationOptions(
+                alphaType: alphaType,
+                editable: editable,
+                pixelFormat: pixelFormat,
+                size: Size(height: height, width: width)
+            )
+            let pixelMap: PixelMap = createPixelMap(bytes, opts)
+            return pixelMap
         }
     }
 
@@ -153,6 +168,7 @@ public class PAGDecoder {
      */
     public func release(): Unit {
         nativeRelease()
+        nativeContext = 0
     }
 
     protected func finalize(): Unit {

@@ -401,6 +401,7 @@ public class PAGPlayer {
     public func release(): Unit {
         unsafe {
             cj_PAGPlayer_release(ptrCJPAGPlayer)
+            ptrCJPAGPlayer = 0
         }
     }
 }

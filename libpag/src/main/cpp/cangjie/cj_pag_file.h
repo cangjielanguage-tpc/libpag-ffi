@@ -47,7 +47,7 @@ PAGTextData cj_PAGFile_getTextData(const int64_t ptr, int32_t index);
 void cj_PAGFile_replaceText(const int64_t ptr, int32_t index, PAGTextData data);
 void cj_PAGFile_replaceImage(const int64_t ptrPAGFile, int32_t index, const int64_t ptrPAGImage);
 void cj_PAGFile_replaceImageByName(const int64_t ptrPAGFile, const char *layerName, const int64_t ptrPAGImage);
-CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int32_t layerType);
+CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int8_t layerType);
 int32_t cj_PAGFile_timeStretchMode(const int64_t ptrPAGFile);
 void cj_PAGFile_setTimeStretchMode(const int64_t ptrPAGFile, int32_t mode);
 void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration);
