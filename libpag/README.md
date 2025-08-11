@@ -50,25 +50,48 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 
 #### 依赖的三方库编译指导
 
-1. 安装[node.js](https://nodejs.org/zh-cn)最新版本
-
-2. 从[libpag](https://github.com/Tencent/libpag)通过git clone git@github.com:Tencent/libpag.git拉取最新三方库源码（需在github上自行添加SSH keys）
-
-3. git checkout -b 本地分支名 origin/release/4.4 切换到[release/4.4](https://github.com/Tencent/libpag/tree/release/4.4)分支
-
-4. 打开Git Bash在仓库根目录下执行 npm install -g depsync
-
-5. 首次检出的仓库需要在项目根目录同步第三方依赖仓库执行 depsync 。
-
-6. depsync完成后，打开libpag\ohos\libpag\build-profile.json5，在"externalNativeOptions"中添加"abiFilters": ["arm64-v8a","x86_64"]
-
-7. 用DevEco Studio打开前面拉取的源码中的ohos项目工程。打开libpag\CMakeLists.txt和libpag\third_party\tgfx\CMakeLists.txt 分别注释掉里面的set(CMAKE_CXX_VISIBILITY_PRESET hidden)（这样做可以避免因为符号被隐藏，导致外部模块无法正确链接或调用库中的函数或类）
-
-8. 在DevEco Studio中点击选中libpag\ohos\libpag目录，在顶部菜单栏选择 Build - Make Module 'libpag'，构建libpag模块
-
-9. 构建完成后，在libpag\ohos\libpag\build\default\outputs\default下找到libpag.har，将后缀.har改成.zip，解压，然后将package\libs下的两个目录arm64-v8a和x86_64拷贝到本项目仓库libpag-cj\libpag\libs下
-
-10. 使用 DevEco Studio 构建工程项目, 生成 hap 包即可
+1. 安装最新版本[node.js](https://nodejs.org/zh-cn)
+2. 从[libpag](https://github.com/Tencent/libpag)拉取最新三方库源码（需在github上自行添加SSH keys）。当前目录会生成一个libpag文件夹
+   ```shell
+   git clone git@github.com:Tencent/libpag.git
+   ```
+3. 切换到[release/4.4](https://github.com/Tencent/libpag/tree/release/4.4)分支
+   ```shell
+   git checkout -b 本地分支名 origin/release/4.4 
+   ```
+4. 打开Git Bash在仓库根目录下执行
+   ```shell
+   npm install -g depsync
+   ```
+5. 首次检出的仓库需要在项目根目录同步第三方依赖仓库执行depsync。
+   ```shell
+   depsync
+   ```
+6. 步骤1-5完成后，打开libpag\CMakeLists.txt和libpag\third_party\tgfx\CMakeLists.txt 分别注释掉里面的set(CMAKE_CXX_VISIBILITY_PRESET hidden)（这样做可以避免因为符号被隐藏，导致外部模块无法正确链接或调用库中的函数或类）
+7. 使用DevEco Studio新建一个[Cangjie] Empty Ability工程MyApplication。将步骤2中的libpag文件夹拷贝到当前工程根目录下
+8. 打开MyApplication\entry\build-profile.json5,在cangjieOptions里新增配置：
+   ```shell
+   "abiFilters": ["x86_64", "arm64-v8a"]
+   ```
+9. 选中MyApplication，右键New-Module，新建一个Native C++模块，模块名默认为application。打开MyApplication\application\build-profile.json5将
+   ```shell
+    "externalNativeOptions": {
+      "path": "./src/main/cpp/CMakeLists.txt",
+      "arguments": "",
+      "cppFlags": "",
+    }
+   ```
+   改为
+   ```shell
+    "externalNativeOptions": {
+      "path": "../libpag/CMakeLists.txt",
+      "arguments": "--log-level=verbose -DOHOS_STL=c++_shared -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS='-s' -DCMAKE_CXX_FLAGS='-s'",
+      "cppFlags": "-fstack-protector-strong",
+      "abiFilters": ["arm64-v8a", "x86_64"]
+    }
+   ```
+10. 在DevEco Studio中点击选中application目录，在顶部菜单栏选择 Build - Make Module 'application'，构建模块
+11. 构建完成后，将生成的MyApplication\application\build\default\intermediates\libs\default中arm64-v8a\libpag.so和x86_64\libpag.so拷贝到本项目仓库libpag-cj\libpag\libs下
 
 #### 使用说明
 
