@@ -51,7 +51,6 @@ CJInt64Array cj_PAGFile_getEditableIndices(const int64_t ptrPAGFile, const int8_
 int32_t cj_PAGFile_timeStretchMode(const int64_t ptrPAGFile);
 void cj_PAGFile_setTimeStretchMode(const int64_t ptrPAGFile, int32_t mode);
 void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration);
-int64_t cj_PAGFile_duration(const int64_t ptrPAGFile);
 int64_t cj_PAGFile_copyOriginal(const int64_t ptrPAGFile);
 }
 } // namespace pag

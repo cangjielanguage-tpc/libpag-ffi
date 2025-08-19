@@ -78,17 +78,6 @@ public class PAGDiskCache {
         }
     }
 
-    protected static func writeFile(key: String, bytes: Array<Byte>): Bool {
-        unsafe {
-            let str = LibC.mallocCString(key)
-            let handle = acquireArrayRawData(bytes)
-            let flag: Bool = cj_PAGDiskCache_writeFile(str, handle.pointer, bytes.size)
-            LibC.free(str)
-            releaseArrayRawData(handle)
-            return flag
-        }
-    }
-
     protected static func SetCacheDir(path: String): Unit {
         unsafe {
             let p = LibC.mallocCString(path)

@@ -25,8 +25,6 @@ foreign {
     func cj_PAGDecoder_readFrame(ptr: Int64, index: Int64): CJPixelMap
 
     func cj_PAGDecoder_nativeRelease(ptr: Int64): Unit
-
-    func cj_PAGDecoder_nativeFinalize(ptr: Int64): Unit
 }
 
 /**
@@ -171,19 +169,9 @@ public class PAGDecoder {
         nativeContext = 0
     }
 
-    protected func finalize(): Unit {
-        nativeFinalize()
-    }
-
     private func nativeRelease(): Unit {
         unsafe {
             cj_PAGDecoder_nativeRelease(nativeContext)
-        }
-    }
-
-    private func nativeFinalize(): Unit {
-        unsafe {
-            cj_PAGDecoder_nativeFinalize(nativeContext)
         }
     }
 }

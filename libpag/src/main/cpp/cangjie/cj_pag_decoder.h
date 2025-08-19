@@ -37,7 +37,6 @@ long long cj_PAGDecoder_numFrames(const int64_t ptr);
 float cj_PAGDecoder_frameRate(const int64_t ptr);
 bool cj_PAGDecoder_checkFrameChanged(const int64_t ptr, int64_t index);
 void cj_PAGDecoder_nativeRelease(const int64_t ptr);
-void cj_PAGDecoder_nativeFinalize(const int64_t ptr);
 CJPixelMap cj_PAGDecoder_readFrame(const int64_t ptr, int64_t index);
 }
 

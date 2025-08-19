@@ -247,18 +247,6 @@ public class PAGImageViewController <: XComponentController {
     }
 
     /**
-     * Sets a new PAGComposition and the maxFrameRate limit to the PAGImageView. Note: If the
-     * composition is already added to another PAGImageView, it will be removed from the previous
-     * PAGImageView.
-     */
-    private func setComposition(composition: Int64, maxFrameRate!: Float64 = 30.0): Unit {
-        this.filePath = ""
-        unsafe {
-            cj_PAGImageViewController_setComposition(cjImageView, composition, maxFrameRate, false)
-        }
-    }
-
-    /**
      * The path string of a pag file set by setPath().
      */
     public func getPath(): String {
@@ -373,22 +361,6 @@ public class PAGImageViewController <: XComponentController {
         }
     }
 
-    private func matrixToMatrix4(): Matrix4 {
-        unsafe {
-            let res: CJFloat32Array = cj_PAGImageViewController_matrix(cjImageView)
-            let size: Int64 = res.size
-            let buf: CPointer<Float32> = res.buf
-            let bytes: Array<Float32> = Array<Float32>(size, repeat: 0.0)
-            for (i in 0..size) {
-                bytes[i] = (buf + i).read()
-            }
-            free_CPointer_Float32(buf)
-
-            //如果 bytes 返回的结果是 长度为9的0.0的数组，则有可能传入的参数 bytes(VArray<Float32, $9>) 无效。需要换成 CPointer<UInt8>。
-            return PAGUtils.ToTsMatrix(bytes)
-        }
-    }
-
     /**
      * Returns a copy of the current matrix.
      */
@@ -401,19 +373,6 @@ public class PAGImageViewController <: XComponentController {
                 data[i] = values[i]
             }
             return data
-        }
-    }
-
-    /**
-     * Sets the transformation which will be applied to the composition. The scaleMode property
-     * will be set to PAGScaleMode::None when this method is called.
-     */
-    private func setMatrixFormMatrix4(matrix: Matrix4): Unit {
-        unsafe {
-            let buf: Array<Float32> = PAGUtils.ToNativeMatrix(matrix)
-            let handle = acquireArrayRawData(buf)
-            cj_PAGImageViewController_setMatrix(cjImageView, handle.pointer)
-            releaseArrayRawData(handle)
         }
     }
 
@@ -594,18 +553,6 @@ public class PAGImageViewController <: XComponentController {
     public func removeListener(listener: PAGImageViewListener): Unit {
         synchronized(mt) {
             listeners.removeValue(listener)
-        }
-    }
-
-    /**
-     * Renders the current image frame immediately. Note that all the changes previously made to the
-     * PAGImageView will only take effect after this method is called. If the play() method is
-     * already called, there is no need to call it manually since it will be automatically called
-     * every frame. Returns true if the content has changed.
-     */
-    private func flush(): Bool {
-        unsafe {
-            return cj_PAGImageViewController_flush(cjImageView)
         }
     }
 
