@@ -25,10 +25,6 @@ protected class PAGUtils {
         )
     }
 
-    protected static func ToNativeRect(rect: Rect): Array<Float32> {
-        return [rect.left, rect.top, rect.right, rect.bottom]
-    }
-
     protected static func WarpJPAGLayer(nativeLayer: Int64): PAGLayer {
         if (PAGLayer.isPAGFileOfPAGLayer(nativeLayer)) {
             return PAGFile(nativeLayer)
@@ -55,10 +51,6 @@ protected class PAGUtils {
             result[i] = PAGUtils.WarpJPAGLayer(nativeLayers[i])
         }
         return result
-    }
-
-    protected static func ToJPAGFont(font: PAGFont): Int64 {
-        return font.ptr
     }
 
     protected static func ToPAGFont(font: Int64): PAGFont {

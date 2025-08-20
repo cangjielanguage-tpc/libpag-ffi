@@ -431,10 +431,6 @@ public open class PAGLayer {
         }
     }
 
-    protected func finalize(): Unit {
-        nativeRelease()
-    }
-
     private func nativeEquals(other: PAGLayer): Bool {
         unsafe {
             return cj_PAGLayer_nativeEquals(ptr, other.getptr())
@@ -446,10 +442,6 @@ public open class PAGLayer {
             return true
         }
         return nativeEquals(obj)
-    }
-
-    protected func hashCode(): Int64 {
-        return 31 * 17 + (ptr ^ (ptr >> 32))
     }
 
     public func isNullptr(): Bool {

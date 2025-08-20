@@ -459,26 +459,6 @@ void cj_PAGFile_setDuration(const int64_t ptrPAGFile, int64_t duration)
     pagFile->setDuration(duration);
 }
 
-int64_t cj_PAGFile_duration(const int64_t ptrPAGFile)
-{
-    if (ptrPAGFile == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_duration", "ptrPAGFile is null");
-        return -1;
-    }
-    intptr_t ptrInt = static_cast<intptr_t>(ptrPAGFile);
-    CJPAGLayerHandle *layer = reinterpret_cast<CJPAGLayerHandle *>(ptrInt);
-    if (!layer || !layer->get()) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_duration", "layer or layer->get() is null");
-        return -1;
-    }
-    std::shared_ptr<PAGFile> pagFile = std::static_pointer_cast<PAGFile>(layer->get());
-    if (!pagFile) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGFile_duration", "pagFile is null");
-        return -1;
-    }
-    return pagFile->duration();
-}
-
 int64_t cj_PAGFile_copyOriginal(const int64_t ptrPAGFile)
 {
     if (ptrPAGFile == 0) {

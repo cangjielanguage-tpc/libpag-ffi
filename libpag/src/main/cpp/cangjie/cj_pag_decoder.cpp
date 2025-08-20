@@ -142,18 +142,5 @@ void cj_PAGDecoder_nativeRelease(const int64_t ptr)
         delete instance;
     }
 }
-
-void cj_PAGDecoder_nativeFinalize(const int64_t ptr)
-{
-    if (ptr == 0) {
-        OH_LOG_Print(LOG_APP, LOG_ERROR, LOG_DOMAIN, "cj_PAGDecoder_nativeFinalize", "Pointer is null");
-        return;
-    }
-    intptr_t ptrInt = static_cast<intptr_t>(ptr);
-    CJPAGDecoder *instance = reinterpret_cast<CJPAGDecoder *>(ptrInt);
-    if (instance != nullptr) {
-        delete instance;
-    }
-}
 }
 } // namespace pag

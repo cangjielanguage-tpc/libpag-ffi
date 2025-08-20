@@ -163,16 +163,6 @@ struct PAGColorType {
     static let RGBA_1010102: UInt8 = 7
 }
 
-func getPAGAlphaTypeFromAlphaType(alphaType: AlphaType): UInt8 {
-    match (alphaType) {
-        case UNKNOWN => PAGAlphaType.Unknown // 0
-        case OPAQUE => PAGAlphaType.Opaque // 1
-        case PREMUL => PAGAlphaType.Premultiplied // 2
-        case UNPREMUL => PAGAlphaType.Unpremultiplied // 3
-        case _ => PAGAlphaType.Unknown
-    }
-}
-
 func getAlphaType(alphaType: UInt8): AlphaType {
     match (alphaType) {
         case 0 => AlphaType.UNKNOWN // PAGAlphaType.Unknown 0
@@ -180,18 +170,6 @@ func getAlphaType(alphaType: UInt8): AlphaType {
         case 2 => AlphaType.PREMUL // PAGAlphaType.Premultiplied 2
         case 3 => AlphaType.UNPREMUL // PAGAlphaType.Unpremultiplied 3
         case _ => AlphaType.UNKNOWN
-    }
-}
-
-func getPAGColorTypeFromPixelMapFormat(colorType: PixelMapFormat): UInt8 {
-    match (colorType) {
-        case UNKNOWN => PAGColorType.Unknown //0
-        case ALPHA_8 => PAGColorType.ALPHA_8 //1
-        case RGBA_8888 => PAGColorType.RGBA_8888 //2
-        case BGRA_8888 => PAGColorType.BGRA_8888 //3
-        case RGB_565 => PAGColorType.RGB_565 //4
-        case RGBA_F16 => PAGColorType.RGBA_F16 //6
-        case _ => PAGColorType.Unknown //0
     }
 }
 

@@ -2253,11 +2253,6 @@ public class Matrix4 {
     public var props: Array<Float32> = Array<Float32>(16, repeat: 0.0)
 
     /**
-     * 默认构造函数，初始化为单位矩阵
-     */
-    public init()
-
-    /**
      * 使用指定矩阵数据构造 Matrix4 对象
      *
      * @param props - 包含16个 Float32 元素的数组，按列主序排列

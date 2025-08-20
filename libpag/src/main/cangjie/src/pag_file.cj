@@ -43,8 +43,6 @@ foreign {
 
     func cj_PAGFile_setDuration(ptr: Int64, duration: Int64): Unit
 
-    func cj_PAGFile_duration(ptr: Int64): Int64
-
     func cj_PAGFile_copyOriginal(ptr: Int64): Int64
 
     func cj_PAGFile_release(ptrCJPAGImage: Int64): Unit
@@ -185,9 +183,6 @@ public class PAGFile <: PAGComposition {
         unsafe {
             PAGFont.initFontFallback()
             PAGDiskCache.SetCacheDir(cacheDir)
-            if (filePath == '') {
-                callback(Option<PAGFile>.None)
-            }
             if (PAGFile.IsNetWorkPath(filePath)) {
                 let cacheData: Array<UInt8> = PAGDiskCache.readFile(filePath)
                 if (cacheData.size > 0) {
@@ -523,15 +518,6 @@ public class PAGFile <: PAGComposition {
                 return Option<PAGFile>.None
             }
             return PAGFile(instanceId)
-        }
-    }
-
-    /**
-     * The duration of the layer in microseconds, indicates the length of the visible range.
-     */
-    public func duration(duration: Int64): Int64 {
-        unsafe {
-            return cj_PAGFile_duration(ptrPAGFile)
         }
     }
 
