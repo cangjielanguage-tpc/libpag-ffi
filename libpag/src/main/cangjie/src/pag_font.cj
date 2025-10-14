@@ -6,7 +6,8 @@ package libpag4cj
 
 internal import ohos.resource_manager.*
 internal import ohos.ability.*
-import ohos.font.*
+import kit.UIKit.*
+import std.unicode.UnicodeStringExtension
 
 @FastNative
 foreign {
@@ -45,14 +46,28 @@ public class PAGFont {
         if (hasInit) {
             return
         }
-        let fontList: Array<String> = Font.getSystemFontList()
+        let fontConfig = Font.getUIFontConfig()
         var paths: ArrayList<String> = ArrayList<String>()
-        for (i in 0..fontList.size) {
-            let info = Font.getFontByName(fontList[i])
-            paths.add(info.getOrThrow().path)
+        var emojiPaths: ArrayList<String> = ArrayList<String>()
+        for (element in fontConfig.fallbackGroups) {
+            for (fallback in element.fallback) {
+                var fontInfo = Font.getFontByName(fallback.family)
+                if (fontInfo.isNone()) {
+                    fontInfo = Font.getFontByName(fallback.family + " Regular")
+                }
+                if (let Some(info) <- fontInfo) {
+                    let idxOpt = info.fullName.toLower().indexOf("emoji")
+                    if (idxOpt.isSome() && idxOpt.getOrThrow() > 0) {
+                        emojiPaths.add(info.path)
+                    } else {
+                        paths.add(info.path)
+                    }
+                }
+            }
         }
+        paths.add(all: emojiPaths)
         if (paths.size > 0) {
-            var ttcIndices: Array<Int32> = [0]
+            var ttcIndices: Array<Int32> = Array<Int32>(paths.size, repeat: 0)
             let fontPathList: Array<String> = paths.toArray()
             setFallbackFontPaths(fontPathList, ttcIndices)
             hasInit = true
