@@ -10,7 +10,7 @@
       ]
     },
     "cangjieOptions": {
-      "path": "./src/main/cangjie/cjpm.toml",
+      "path": "./cjpm.toml",
       "abiFilters": [
         "arm64-v8a", "x86_64"
       ]

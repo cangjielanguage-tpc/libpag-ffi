@@ -187,7 +187,7 @@ public class PAGViewController <: XComponentController {
     public func scaleMode(): PAGScaleMode
 
 	/*
-     * 指定如何缩放页面内容以适应曲面大小的规则。矩阵调用此方法时会发生变化。
+     * 设置缩放模式
 	 * 
 	 * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
@@ -478,7 +478,7 @@ public class PAGImageViewController <: XComponentController {
      * 
      * @param renderScale - 要设置的缩放比例
      */
-    public func setRenderScale(renderScale: Float64): Unit
+    public func setRenderScale(renderScale: Float32): Unit
     
     /*
 	 * 获取 cacheAllFramesInMemory 属性的值。
@@ -591,6 +591,20 @@ public class PAGImageViewController <: XComponentController {
 	 *
      */
     public func update(): Unit
+
+    /*
+     * 立即渲染当前图像帧并将所有已修改的属性应用到渲染表面。
+     * 
+     * 该方法会强制 PAGImageView 立刻刷新显示内容。此前对图层、
+     * 图像或其他属性的更改只有在调用本方法后才会生效。
+     * 
+     * 若当前已处于播放状态（通过 play() 启动），无需手动调用，
+     * 因为 flush() 会在每一帧渲染时自动执行。
+     * 
+     * @return Bool - 若渲染内容自上次刷新后发生变化，则返回 true；
+     *                若内容无变化，则返回 false。
+     */
+    public func flush(): Bool
 }
 ```
 
@@ -1262,7 +1276,7 @@ public class PAGImage {
     public func scaleMode(): PAGScaleMode
 
     /*
-     * 指定如何缩放图像内容以适应原始图像大小的规则。
+     * 设置缩放模式
      * 
      * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）
      */
@@ -1736,7 +1750,7 @@ public class PAGPlayer {
     public func scaleMode(): PAGScaleMode
 
 	/*
-     * 该设置指定了如何将 PAG 内容缩放以适应目标表面（surface）大小的规则。
+     * 设置缩放模式
 	 * 当调用此方法时，相关的变换矩阵（matrix）会随之更新。
 	 * 
 	 * @param mode - 缩放模式。PAGScaleMode.None（内容不缩放）、PAGScaleMode.Stretch（内容拉伸以适应区域）、PAGScaleMode.LetterBox（按原始比例缩放，默认模式）、PAGScaleMode.Zoom（按原始比例缩放并裁剪超出的部分）

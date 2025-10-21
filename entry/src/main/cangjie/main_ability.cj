@@ -8,10 +8,11 @@ internal import ohos.base.AppLog
 internal import ohos.ability.AbilityStage
 internal import ohos.ability.LaunchReason
 import ohos.ability.*
+import ohos.window.WindowStage
 
 var globalAbilityContext: Option<AbilityContext> = Option<AbilityContext>.None
 
-class MainAbility <: Ability {
+class MainAbility <: UIAbility {
     public init() {
         super()
         registerSelf()

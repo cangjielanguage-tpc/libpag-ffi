@@ -1,3 +1,5 @@
+    libpag is licensed under the Apache License Version 2.0 except for the third-party components listed below.
+    --------------------------------------------------------------------
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -199,3 +201,60 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+
+    Open Source Software Licensed under the BSD 2-Clause License and the GNU General Public License, version 2:
+	--------------------------------------------------------------------
+    1. lz4
+    Copyright (C) Yann Collet 2011-2020
+    All rights reserved.
+    
+    
+    Terms of the BSD 2-Clause License:
+    --------------------------------------------------------------------
+    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+    
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    
+    
+    This repository uses 2 different licenses :
+    - all files in the `lib` directory use a BSD 2-Clause license
+    - all other files use a GPLv2 license, unless explicitly stated otherwise
+    
+    Relevant license is reminded at the top of each source file,
+    and with presence of COPYING or LICENSE file in associated directories.
+    
+    This model is selected to emphasize that
+    files in the `lib` directory are designed to be included into 3rd party applications,
+    while all other files, in `programs`, `tests` or `examples`,
+    are intended to be used "as is", as part of their intended scenarios,
+    with no intention to support 3rd party integration use cases.
+
+
+
+	Open Source Software Licensed under the BSD 3-Clause License and Other Licenses of the Third-Party Components therein:
+	--------------------------------------------------------------------
+    1. tgfx
+    Copyright (C) 2023 Tencent.  All rights reserved.
+    
+    
+    Terms of the BSD 3-Clause:
+    --------------------------------------------------------------------
+    Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+    
+    1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    
+    2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    
+    3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    
+    For the license of other third party components, please refer to the following URL:
+    https://github.com/Tencent/tgfx/blob/main/LICENSE.txt
+

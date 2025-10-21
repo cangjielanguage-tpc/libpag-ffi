@@ -1,6 +1,6 @@
 [
     {
-        "Name": "libpag-cj",
+        "Name": "libpag",
         "License": "Apache License Version 2.0",
         "License File": " LICENSE ",
         "Version Number": "v4.4.31",

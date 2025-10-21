@@ -298,7 +298,7 @@ public class PAGViewController <: XComponentController {
      * Sets a new PAGComposition for PAGView to render as content. Note that if the composition is
      * already added to another PAGView, it will be removed from the previous PAGView.
      */
-    public func setComposition(composition: Option<PAGComposition>) {
+    public func setComposition(composition: Option<PAGComposition>): Unit {
         this.filePath = ''
         if (this.composition.isNone() && composition.isNone()) {
             return
@@ -317,6 +317,7 @@ public class PAGViewController <: XComponentController {
                 }
                 this.composition = None
             }
+            return
         }
     }
 
@@ -729,29 +730,7 @@ public class PAGViewController <: XComponentController {
     public func makeSnapshot(): Option<PixelMap> {
         unsafe {
             let res: CJPixelMap = cj_PAGViewController_makeSnapshot(jView)
-            let size: Int64 = res.size
-            let buf: CPointer<UInt8> = res.buf
-            if (size <= 0 || buf.isNull()) {
-                return None
-            }
-            var alphaType: AlphaType = getAlphaType(res.alphaType)
-            var editable: Bool = res.editable
-            var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
-            var height: Int32 = res.height
-            var width: Int32 = res.width
-            let bytes: Array<Byte> = Array<Byte>(size, repeat: 0)
-            for (i in 0..size) {
-                bytes[i] = buf.read(i)
-            }
-            free_CPointer_UInt8(buf)
-            let opts: InitializationOptions = InitializationOptions(
-                alphaType: alphaType,
-                editable: editable,
-                pixelFormat: pixelFormat,
-                size: Size(height: height, width: width)
-            )
-            let pixelMap: PixelMap = createPixelMap(bytes, opts)
-            return pixelMap
+            return ConvertToPixelMap(res)
         }
     }
 
@@ -775,18 +754,20 @@ public class PAGViewController <: XComponentController {
      * Adds a listener to the set of listeners that are sent events through the life of an
      * animation, such as start, repeat, and end.
      */
-    public func addListener(listener: PAGViewListener) {
+    public func addListener(listener: PAGViewListener): Unit {
         synchronized(mt) {
             listeners.add(listener)
+            return
         }
     }
 
     /**
      * Removes a listener from the set listening to this animation.
      */
-    public func removeListener(listener: PAGViewListener) {
+    public func removeListener(listener: PAGViewListener): Unit {
         synchronized(mt) {
             listeners.removeValue(listener)
+            return
         }
     }
 

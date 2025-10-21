@@ -9,10 +9,10 @@ namespace pag {
 CJPAGLayerHandle::~CJPAGLayerHandle() { reset(); }
 
 extern "C" {
-long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, char *password)
+long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, char *credentialKey)
 {
     std::string fp = filePath;
-    std::vector<char> pwdSecret(password, password + strlen(password));
+    std::vector<char> pwdSecret(credentialKey, credentialKey + strlen(credentialKey));
     static std::shared_ptr<File> file = File::Load(bytes, length, fp, std::string(pwdSecret.data()));
     std::fill(pwdSecret.begin(), pwdSecret.end(), 0);
     PAGLayer *pagLayer = new PAGLayer(file, nullptr);
@@ -24,10 +24,10 @@ long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, cha
     return (int64_t)cjlayer;
 }
 
-long long cj_PAGLayer_makeByURL(char *filePath, char *password)
+long long cj_PAGLayer_makeByURL(char *filePath, char *credentialKey)
 {
     std::string fp = filePath;
-    std::vector<char> pwdSecret(password, password + strlen(password));
+    std::vector<char> pwdSecret(credentialKey, credentialKey + strlen(credentialKey));
     static std::shared_ptr<File> file = File::Load(fp, std::string(pwdSecret.data()));
     std::fill(pwdSecret.begin(), pwdSecret.end(), 0);
     PAGLayer *pagLayer = new PAGLayer(file, nullptr);
