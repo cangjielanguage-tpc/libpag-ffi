@@ -85,7 +85,7 @@ public class PAGPlayer {
      * Note: If the composition is already added to another PAGPlayer, it will be removed from the
      * previous PAGPlayer.
      */
-    public func setComposition(composition: Option<PAGComposition>) {
+    public func setComposition(composition: Option<PAGComposition>): Unit {
         unsafe {
             if (let Some(v) <- this.composition) {
                 v.nativeRelease()
@@ -100,6 +100,7 @@ public class PAGPlayer {
                 }
             }
         }
+        return
     }
 
     /*

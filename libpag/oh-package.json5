@@ -1,9 +1,10 @@
 {
   "name": "@cangjie-tpc/libpag",
   "version": "1.0.0",
-  "description": "libpag-cj是一款在仓颉环境下适配的动态图形渲染库.",
-  "main": "index.ets",
+  "description": "libpag-ffi是一款在仓颉环境下适配的动态图形渲染库.",
+  "main": "",
   "author": "cangjie-tpc",
+  "types": "./Index.d.ets",
   "license": "Apache-2.0",
   "dependencies": {
   }

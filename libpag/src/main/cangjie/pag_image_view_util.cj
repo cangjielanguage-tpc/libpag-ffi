@@ -5,7 +5,7 @@
 package libpag4cj
 
 @C
-struct CJPixelMap {
+protected struct CJPixelMap {
     var size: Int64
     var buf: CPointer<UInt8>
     var alphaType: UInt8

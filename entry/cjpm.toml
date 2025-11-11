@@ -13,10 +13,6 @@
       path-option = [ "${X86_64_LIBS}", "${X86_64_MACRO_LIBS}" ]
       [target.x86_64-unknown-windows-gnu.bin-dependencies.package-option]
 
-[dependencies]
-  [dependencies.libpag4cj]
-    path = "${libpag}"
-
 [package]
   cjc-version = "0.48.2"
   compile-option = "--dy-std"
@@ -35,6 +31,10 @@
     incremental = true
     lto = ""
   [profile.customized-option]
-    debug = "-g -Woff all"
-    release = "--fast-math -O2 -s -Woff all"
+    debug = "-g -Woff all -Won apilevel-check"
+    release = "--fast-math -O2 -s -Woff all -Won apilevel-check"
   [profile.test]
+
+[dependencies]
+  [dependencies.libpag4cj]
+    path = "${cangjie_tpc_libpag}"

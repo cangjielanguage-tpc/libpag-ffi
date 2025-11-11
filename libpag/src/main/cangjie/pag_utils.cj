@@ -73,6 +73,34 @@ public func ToColor(value: Int64): Color {
     return Color(UInt8(red), UInt8(green), UInt8(blue))
 }
 
+protected func ConvertToPixelMap(res: CJPixelMap): Option<PixelMap> {
+    unsafe {
+        let size: Int64 = res.size
+        let buf: CPointer<UInt8> = res.buf
+        if (size <= 0 || buf.isNull()) {
+            return None
+        }
+        var alphaType: AlphaType = getAlphaType(res.alphaType)
+        var editable: Bool = res.editable
+        var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
+        var height: Int32 = res.height
+        var width: Int32 = res.width
+        let bytes: Array<Byte> = Array<Byte>(size, repeat: 0)
+        for (i in 0..size) {
+            bytes[i] = buf.read(i)
+        }
+        free_CPointer_UInt8(buf)
+        let opts: InitializationOptions = InitializationOptions(
+            alphaType: alphaType,
+            editable: editable,
+            pixelFormat: pixelFormat,
+            size: Size(height: height, width: width)
+        )
+        let pixelMap: PixelMap = createPixelMap(bytes, opts)
+        return pixelMap
+    }
+}
+
 @FastNative
 foreign func free_CJBytesArray(ptr: CJBytesArray): Unit
 

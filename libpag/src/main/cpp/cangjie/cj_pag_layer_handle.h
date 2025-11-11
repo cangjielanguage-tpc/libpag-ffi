@@ -35,8 +35,8 @@ private:
 } // namespace pag
 
 extern "C" { // cangjie [PAGLayer] ffi
-long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, char *password);
-long long cj_PAGLayer_makeByURL(char *filePath, char *password);
+long long cj_PAGLayer_make(int *bytes, const int64_t length, char *filePath, char *credentialKey);
+long long cj_PAGLayer_makeByURL(char *filePath, char *credentialKey);
 int8_t cj_PAGLayer_layerType(const int64_t ptr);
 CJBytesArray cj_PAGLayer_layerName(const int64_t ptr);
 void cj_PAGLayer_matrix(const int64_t ptr, float buf[]);
@@ -67,8 +67,8 @@ bool cj_PAGLayer_nativeEquals(const int64_t ptr, const int64_t otherptr);
 void cj_PAGLayer_nativeRelease(const int64_t ptr);
 bool cj_PAGLayer_isNullptr(const int64_t ptr);
 // cangjie [PAGShapeLayer] ffi
-long long cj_PAGShapeLayer_make(int *bytes, const int64_t length, char *filePath, char *password);
-long long cj_PAGShapeLayer_makeByURL(char *filePath, char *password);
+long long cj_PAGShapeLayer_make(int *bytes, const int64_t length, char *filePath, char *credentialKey);
+long long cj_PAGShapeLayer_makeByURL(char *filePath, char *credentialKey);
 // cangjie [PAGImageLayer] ffi
 long long cj_PAGImageLayer_nativeMake(const int64_t width, const int64_t height, const int64_t duration);
 long long cj_PAGImageLayer_contentDuration(const int64_t ptr);

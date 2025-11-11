@@ -1,10 +1,10 @@
 <div align="center">
-<h1>libpag-cj</h1>
+<h1>libpag-ffi</h1>
 </div>
 <p align="center">
-<img alt="" src="https://img.shields.io/badge/release-v.1.0.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/release-v1.0.0-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/build-pass-brightgreen" style="display: inline-block;" />
-<img alt="" src="https://img.shields.io/badge/cjc-v1.0.0-brightgreen" style="display: inline-block;" />
+<img alt="" src="https://img.shields.io/badge/cjc-v1.0.3-brightgreen" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/cjcov-NA-red" style="display: inline-block;" />
 <img alt="" src="https://img.shields.io/badge/project-open-brightgreen" style="display: inline-block;" />
 </p>
@@ -12,25 +12,24 @@
 
 
 
-## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-cj/blobs/15213299d979e856624253d41858a9369a44ad5c/readme-icon-introduction.png" style="display: inline-block;" width=3%/>介绍
+## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-ffi/blobs/15213299d979e856624253d41858a9369a44ad5c/readme-icon-introduction.png" style="display: inline-block;" width=3%/>介绍
 
-libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于腾讯的 libpag 开发，并对 libpag 进行了封装。libpag 旨在为仓颉开发者提供高效的矢量动画与序列帧渲染支持。
+libpag-ffi是一款在仓颉环境下适配的动态图形渲染库，它基于腾讯的 libpag 开发，并对 libpag 进行了封装。libpag 旨在为仓颉开发者提供高效的矢量动画与序列帧渲染支持。
 
 ### 特性
 
 - 🚀 支持加载本地文件方式加载pag动画
-- 🚀 支持加载网络URI路径方式加载pag动画
+- 🚀 支持加载网络URL路径方式加载pag动画
 - 🚀 支持动画播放、暂停、销毁等功能
 
-##    <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-cj/blobs/cde6bdb14ced62261c2f5cb6bd976b9a9aa10fa9/readme-icon-framework.png" style="display: inline-block;" width=3%/> 架构
+##    <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-ffi/blobs/cde6bdb14ced62261c2f5cb6bd976b9a9aa10fa9/readme-icon-framework.png" style="display: inline-block;" width=3%/> 架构
 
 ### 源码目录
 
 ```shell
 ├── LICENSE  
 ├── doc                      # 文档目录
-│   ├── assets               # 文档资源目录
-│   └── feature_api.md       # API接口文档
+│    └── feature_api.md      # API接口文档
 ├── entry                    # 示例代码文件夹
 ├── libpag                   # libpag库文件夹
 │    ├─ libs                 # 依赖三方库so目录
@@ -42,9 +41,9 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
 
 ### 接口说明：
 
-主要类和函数接口说明详见 [API](https://gitcode.com/Cangjie-TPC/libpag-cj/blob/develop/doc/feature_api.md)
+主要类和函数接口说明详见 [API](https://gitcode.com/Cangjie-TPC/libpag-ffi/blob/libpag_cangjie_plugin-5.1.1.840/doc/feature_api.md)
 
-## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-cj/blobs/da64231ac2d2bf0a586c6a35353585af005e2faf/readme-icon-compile.png" style="display: inline-block;" width=3%/> 使用说明
+## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-ffi/blobs/da64231ac2d2bf0a586c6a35353585af005e2faf/readme-icon-compile.png" style="display: inline-block;" width=3%/> 使用说明
 
 ### 编译构建
 
@@ -91,7 +90,7 @@ libpag-cj是一款在仓颉环境下适配的动态图形渲染库，它基于�
     }
    ```
 10. 在DevEco Studio中点击选中application目录，在顶部菜单栏选择 Build - Make Module 'application'，构建模块
-11. 构建完成后，将生成的MyApplication\application\build\default\intermediates\libs\default中arm64-v8a\libpag.so和x86_64\libpag.so拷贝到本项目仓库libpag-cj\libpag\libs下
+11. 构建完成后，将生成的MyApplication\application\build\default\intermediates\libs\default中arm64-v8a\libpag.so和x86_64\libpag.so拷贝到本项目仓库libpag-ffi\libpag\libs下
 
 #### 使用说明
 
@@ -232,15 +231,14 @@ class EntryView {
 ## 约束和限制
 在下述版本验证通过：
 
-    DevEco Studio 5.1.0 Release(5.1.0.828SP1) 
-    Cangjie Support Plugin 5.1.0.828
-    Cangjie Compiler: 1.0.0(cjnative)
+    DevEco Studio 5.1.1 Release(5.1.1.840) 
+
     SdkVersion需使用支持19及以上版本
 
 ## 开源协议
 
-本项目基于 [Apache License Version 2.0](https://gitcode.com/Cangjie-TPC/libpag-cj/blob/develop/libpag/LICENSE) ，请自由的享受和参与开源。
+本项目基于 [Apache License Version 2.0](./LICENSE) ，请自由的享受和参与开源。
 
-## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-cj/blobs/db89f3665c31896952fbb4c657fd09d30adf952b/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 参与贡献
+## <img alt="" src="https://raw.gitcode.com/Cangjie-TPC/libpag-ffi/blobs/db89f3665c31896952fbb4c657fd09d30adf952b/readme-icon-contribute.png" style="display: inline-block;" width=3%/> 参与贡献
 
 欢迎给我们提交 PR，欢迎给我们提交 issue，欢迎参与任何形式的贡献。

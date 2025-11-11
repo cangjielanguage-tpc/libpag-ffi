@@ -6,9 +6,9 @@ package libpag4cj
 
 @FastNative
 foreign {
-    func cj_PAGLayer_make(bytes: CPointer<UInt8>, length: Int64, filePath: CString, password: CString): Int64
+    func cj_PAGLayer_make(bytes: CPointer<UInt8>, length: Int64, filePath: CString, credentialKey: CString): Int64
 
-    func cj_PAGLayer_makeByURL(filePath: CString, password: CString): Int64
+    func cj_PAGLayer_makeByURL(filePath: CString, credentialKey: CString): Int64
 
     func cj_PAGLayer_layerType(ptr: Int64): Int8
 
@@ -96,11 +96,11 @@ public open class PAGLayer {
     /**
      *  Load the PAG file from byte data, and return null if the byte is empty or not a valid PAG file.
      */
-    protected static func makePAGLayer(bytes: Array<UInt8>, length: Int64, filePath!: String = "", password!: String = ""): Option<PAGLayer> {
+    protected static func makePAGLayer(bytes: Array<UInt8>, length: Int64, filePath!: String = "", credentialKey!: String = ""): Option<PAGLayer> {
         unsafe {
             let handle = acquireArrayRawData(bytes)
             let fp = LibC.mallocCString(filePath)
-            let pw = LibC.mallocCString(password)
+            let pw = LibC.mallocCString(credentialKey)
             let native: Int64 = cj_PAGLayer_make(handle.pointer, length, fp, pw)
             LibC.free(fp)
             LibC.free(pw)
@@ -115,10 +115,10 @@ public open class PAGLayer {
     /**
      *  Load the PAG file from the path, and return null if the file does not exist or the data is not a PAG file.
      */
-    protected static func makePAGLayer(filePath: String, password!: String = ""): Option<PAGLayer> {
+    protected static func makePAGLayer(filePath: String, credentialKey!: String = ""): Option<PAGLayer> {
         unsafe {
             let fp = LibC.mallocCString(filePath)
-            let pw = LibC.mallocCString(password)
+            let pw = LibC.mallocCString(credentialKey)
             let native: Int64 = cj_PAGLayer_makeByURL(fp, pw)
             LibC.free(fp)
             LibC.free(pw)

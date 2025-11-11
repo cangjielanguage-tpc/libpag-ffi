@@ -458,31 +458,7 @@ public class PAGImageViewController <: XComponentController {
     public func currentImage(): Option<PixelMap> {
         unsafe {
             let res: CJPixelMap = cj_PAGImageViewController_currentImage(cjImageView)
-            let size: Int64 = res.size
-            let buf: CPointer<UInt8> = res.buf
-            if (size <= 0 || buf.isNull()) {
-                return None
-            }
-
-            //InitializationOptions
-            var alphaType: AlphaType = getAlphaType(res.alphaType)
-            var editable: Bool = res.editable
-            var pixelFormat: PixelMapFormat = getPixelMapFormat(res.pixelFormat)
-            var height: Int32 = res.height
-            var width: Int32 = res.width
-            let bytes: Array<Byte> = Array<Byte>(size, repeat: 0)
-            for (i in 0..size) {
-                bytes[i] = buf.read(i)
-            }
-            free_CPointer_UInt8(buf)
-            let opts: InitializationOptions = InitializationOptions(
-                alphaType: alphaType,
-                editable: editable,
-                pixelFormat: pixelFormat,
-                size: Size(height: height, width: width)
-            )
-            let pixelMap: PixelMap = createPixelMap(bytes, opts)
-            return pixelMap
+            return ConvertToPixelMap(res)
         }
     }
 
@@ -571,6 +547,18 @@ public class PAGImageViewController <: XComponentController {
     public func update(): Unit {
         unsafe {
             return cj_PAGImageViewController_update(cjImageView)
+        }
+    }
+
+    /**
+     * Renders the current image frame immediately. Note that all the changes previously made to the
+     * PAGImageView will only take effect after this method is called. If the play() method is
+     * already called, there is no need to call it manually since it will be automatically called
+     * every frame. Returns true if the content has changed.
+     */
+    public func flush(): Bool {
+        unsafe {
+            return cj_PAGImageViewController_flush(cjImageView)
         }
     }
 
