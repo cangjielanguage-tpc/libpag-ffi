@@ -13,13 +13,13 @@ public:
     explicit CJPAGDecoder(std::shared_ptr<pag::PAGDecoder> pagDecoder) : pagDecoder(pagDecoder) {}
 
     std::shared_ptr<pag::PAGDecoder> get()
-    { 
+    {
         std::lock_guard<std::mutex> autoLock(locker);
-        return pagDecoder; 
+        return pagDecoder;
     }
 
     void clear()
-    { 
+    {
         std::lock_guard<std::mutex> autoLock(locker);
         pagDecoder = nullptr;
     }
