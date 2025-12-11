@@ -241,7 +241,9 @@ func onStateChange(state: UInt8, jView: Int64): Unit {
 @C
 func onProgressUpdate(jView: Int64): Unit {
     if (controllerMap.contains(jView)) {
-        controllerMap[jView].getOrThrow().onAnimatorProgressUpdate()
+        if (let Some(v) <- controllerMap[jView]) {
+            v.onAnimatorProgressUpdate()
+        }
     }
 }
 

@@ -172,7 +172,9 @@ func onImageViewStateChange(state: UInt8, imageView: Int64): Unit {
 @C
 func onImageViewProgressUpdate(imageView: Int64): Unit {
     if (imageViewControllerMap.contains(imageView)) {
-        imageViewControllerMap[imageView].getOrThrow().onAnimatorProgressUpdate()
+        if (let Some(v) <- imageViewControllerMap[imageView]) {
+            v.onAnimatorProgressUpdate()
+        }
     }
 }
 
