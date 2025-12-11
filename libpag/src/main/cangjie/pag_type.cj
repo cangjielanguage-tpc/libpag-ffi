@@ -74,7 +74,6 @@ struct CJFloat32Array {
     }
 }
 
-// in the range [0 - 255]
 @C
 public struct Color {
     var red: UInt8
