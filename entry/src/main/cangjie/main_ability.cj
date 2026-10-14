@@ -1,10 +1,6 @@
-/*
- * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
- */
-
 package ohos_app_cangjie_entry
 
-internal import ohos.base.AppLog
+import kit.PerformanceAnalysisKit.Hilog
 internal import ohos.ability.AbilityStage
 internal import ohos.ability.LaunchReason
 import ohos.ability.*
@@ -20,15 +16,15 @@ class MainAbility <: UIAbility {
 
     public override func onCreate(want: Want, launchParam: LaunchParam): Unit {
         globalAbilityContext = Option<AbilityContext>.Some(this.context)
-        AppLog.info("MainAbility OnCreated.${want.abilityName}")
+        Hilog.info(1, "Cangjie", "MainAbility OnCreated.${want.abilityName}")
         match (launchParam.launchReason) {
-            case LaunchReason.START_ABILITY => AppLog.info("START_ABILITY")
+            case LaunchReason.START_ABILITY => Hilog.info(1, "Cangjie", "START_ABILITY")
             case _ => ()
         }
     }
 
     public override func onWindowStageCreate(windowStage: WindowStage): Unit {
-        AppLog.info("MainAbility onWindowStageCreate.")
+        Hilog.info(1, "Cangjie", "MainAbility onWindowStageCreate.")
         windowStage.loadContent("EntryView")
     }
 }
